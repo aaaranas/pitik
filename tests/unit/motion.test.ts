@@ -11,6 +11,7 @@ import {
   motionExtension,
   pickMotionMimeType,
 } from "@/lib/camera/motion";
+import { CLIP_SPEED, speedUpTimeoutMs } from "@/lib/camera/motion-speed";
 
 /**
  * Container choice and the size cap.
@@ -183,5 +184,40 @@ describe("motionBitrateFor", () => {
 
   it("respects a caller-supplied budget", () => {
     expect(motionBitrateFor(30_000, 1024 * 1024)).toBeLessThan(motionBitrateFor(30_000));
+  });
+});
+
+/**
+ * Re-encoding budget.
+ *
+ * Speeding a clip up is real-time work — it plays the recording through — so
+ * the allowance has to scale with the clip rather than being a flat number, or
+ * a long booth would be cut off mid-encode and silently fall back.
+ */
+describe("speedUpTimeoutMs", () => {
+  it("scales with the sped-up playback length", () => {
+    expect(speedUpTimeoutMs(30_000)).toBeGreaterThan(speedUpTimeoutMs(10_000));
+  });
+
+  it("always allows at least the time playback will take", () => {
+    for (const duration of [5_000, 20_000, 60_000, 90_000]) {
+      expect(speedUpTimeoutMs(duration)).toBeGreaterThan(duration / CLIP_SPEED);
+    }
+  });
+
+  it("leaves headroom beyond playback for decode and encode", () => {
+    // A clip that takes exactly its playback duration would time out on any
+    // device slower than real time, which is most phones.
+    expect(speedUpTimeoutMs(15_000) - 15_000 / CLIP_SPEED).toBeGreaterThanOrEqual(5_000);
+  });
+
+  it("honours a caller-supplied rate", () => {
+    expect(speedUpTimeoutMs(30_000, 3)).toBeLessThan(speedUpTimeoutMs(30_000, 1.5));
+  });
+});
+
+describe("CLIP_SPEED", () => {
+  it("is faster than real time, or the re-encode is pointless", () => {
+    expect(CLIP_SPEED).toBeGreaterThan(1);
   });
 });

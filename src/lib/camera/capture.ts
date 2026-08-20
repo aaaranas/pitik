@@ -24,6 +24,13 @@ export interface CaptureRequest {
   aspect: AspectId;
   mirrored: boolean;
   captureSource?: CaptureSource;
+  /**
+   * Burn the date into the corner.
+   *
+   * Passed explicitly rather than read from the profile: Camera Mode no longer
+   * has a profile dial, so the stamp is the user's own switch.
+   */
+  timestamp?: boolean;
   /** JPEG quality. Lowered only by the booth, which composites afterwards. */
   quality?: number;
 }
@@ -42,7 +49,8 @@ export async function captureFrame(request: CaptureRequest): Promise<Capture> {
     // Seeded per-shot so two photos taken seconds apart don't share a grain
     // pattern, which would read as a static overlay rather than film.
     seed: Date.now() & 0xffff,
-    timestamp: profile.timestamp ? formatCameraTimestamp(new Date()) : null,
+    timestamp:
+      (request.timestamp ?? profile.timestamp) ? formatCameraTimestamp(new Date()) : null,
   });
 
   const blob = await canvasToBlob(canvas, "image/jpeg", request.quality ?? 0.92);

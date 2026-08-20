@@ -47,7 +47,7 @@ test("shoots several frames in a row without blocking", async ({ page }) => {
   await expect(shutter).toBeVisible();
 });
 
-test("opens a roll and shows its frames on the contact sheet", async ({ page }) => {
+test("files camera photos in the camera library, not an invented roll", async ({ page }) => {
   await open(page, "/camera");
   await page.getByRole("button", { name: "Turn on the camera" }).click();
   const shutter = page.getByRole("button", { name: "Take a photo" });
@@ -55,8 +55,19 @@ test("opens a roll and shows its frames on the contact sheet", async ({ page }) 
   await shutter.click();
   await expect.poll(() => countStore(page, "captures"), { timeout: 15_000 }).toBe(1);
 
-  await page.getByRole("link", { name: "Open this roll" }).click();
-  await expect(page).toHaveURL(/\/rolls\//);
+  // Shooting without starting a roll must not create one: a photograph is not
+  // a decision to begin a named session.
+  await expect
+    .poll(() => countStore(page, "rolls"), { timeout: 10_000 })
+    .toBeLessThanOrEqual(1);
+  await expect(page.getByRole("heading", { name: "Rolls" })).toHaveCount(0);
+
+  await page.getByRole("link", { name: "Open your camera photos" }).click();
+  await expect(page).toHaveURL(/\/rolls\?tab=camera/);
+  await expect(page.getByRole("tab", { name: "Camera" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
 
   const frame = page.getByRole("button", { name: /^Frame 1/ });
   await expect(frame).toBeVisible();

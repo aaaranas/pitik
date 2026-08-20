@@ -18,6 +18,7 @@ import {
   type StripStyle,
 } from "@/lib/booth/types";
 import type { MotionClip } from "@/lib/camera/motion";
+import { CLIP_SPEED, speedUpClip } from "@/lib/camera/motion-speed";
 import { addStrip } from "@/lib/db/repo";
 import { extensionFor, downloadBlob, shareFile } from "@/lib/share";
 import { cn, slugify } from "@/lib/utils";
@@ -44,7 +45,7 @@ export function StripEditor({
 }) {
   const router = useRouter();
   const { toast } = useToast();
-  const { ensureRoll } = useSession();
+  const { destinationFor } = useSession();
 
   const [style, setStyle] = useState<StripStyle>({
     ...DEFAULT_STRIP_STYLE,
@@ -55,10 +56,49 @@ export function StripEditor({
   const [saved, setSaved] = useState(false);
   const [clipOpen, setClipOpen] = useState(false);
 
+  /**
+   * The clip as it will actually be stored and shared.
+   *
+   * Starts as the raw recording and is replaced by the sped-up re-encode when
+   * that finishes. Held in a ref alongside state so `save` can read the newest
+   * value without being re-created, and so the re-encode can be awaited if the
+   * user taps Keep it before it lands.
+   */
+  const [exportClip, setExportClip] = useState<MotionClip | null>(motion ?? null);
+  const speedUpRef = useRef<Promise<MotionClip | null> | null>(null);
+
   const filename = useMemo(
     () => `pitik-${slugify(style.caption || template.name)}-strip.png`,
     [style.caption, template.name],
   );
+
+  /**
+   * Re-encodes the clip at speed, in the background.
+   *
+   * Started on mount rather than at save time because this is inherently
+   * real-time work — it plays the clip through — and the seconds it takes are
+   * seconds the user is already spending on paper and captions. By the time
+   * they tap Keep it, it is almost always done.
+   */
+  useEffect(() => {
+    if (!motion) return;
+    let cancelled = false;
+
+    const task = speedUpClip(motion, CLIP_SPEED)
+      .then((faster) => {
+        // A failed re-encode keeps the original: the player compensates with
+        // playback rate, so the shoot is never lost over a speed change.
+        const result = faster ?? motion;
+        if (!cancelled) setExportClip(result);
+        return result;
+      })
+      .catch(() => motion);
+
+    speedUpRef.current = task;
+    return () => {
+      cancelled = true;
+    };
+  }, [motion]);
 
   // ------------------------------------------------------------- preview
 
@@ -108,10 +148,10 @@ export function StripEditor({
   const save = useCallback(async () => {
     setSaving(true);
     try {
-      const roll = await ensureRoll();
+      const rollId = await destinationFor("booth");
       const composed = await buildFullSize();
       await addStrip({
-        rollId: roll.id,
+        rollId,
         templateId: template.id,
         blob: composed.blob,
         thumb: composed.thumb,
@@ -119,11 +159,13 @@ export function StripEditor({
         height: composed.height,
         captureIds: [],
         caption: style.caption || null,
-        motion: motion ?? undefined,
+        // Wait for the re-encode if it is still running, so the stored clip is
+        // the sped-up one rather than whichever happened to be ready.
+        motion: (await speedUpRef.current) ?? exportClip ?? motion ?? undefined,
       });
       setSaved(true);
       toast("Strip saved to your roll.", { tone: "success" });
-      router.push(`/rolls/${roll.id}`);
+      router.push("/rolls?tab=booth");
     } catch (error) {
       toast("Couldn't save that strip.", {
         detail: error instanceof Error ? error.message : undefined,
@@ -132,7 +174,7 @@ export function StripEditor({
     } finally {
       setSaving(false);
     }
-  }, [buildFullSize, ensureRoll, motion, router, style.caption, template.id, toast]);
+  }, [buildFullSize, destinationFor, exportClip, motion, router, style.caption, template.id, toast]);
 
   const share = useCallback(async () => {
     try {
@@ -160,7 +202,7 @@ export function StripEditor({
   return (
     <div className="flex h-full flex-col bg-ink-950">
       <ClipDialog
-        clip={motion ?? null}
+        clip={exportClip ?? motion ?? null}
         title={style.caption || template.name}
         open={clipOpen}
         onOpenChange={setClipOpen}

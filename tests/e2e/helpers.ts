@@ -43,6 +43,10 @@ export interface StoredStripMotion {
   hasMotion: boolean;
   size: number;
   mimeType: string | null;
+  /** Speed baked into the stored file. */
+  speed: number;
+  /** Duration the browser reports after decoding the stored bytes. */
+  playableSeconds: number;
 }
 
 /**
@@ -59,20 +63,47 @@ export async function readStripMotion(page: Page): Promise<StoredStripMotion> {
       request.onerror = () => reject(request.error);
     });
     if (!db.objectStoreNames.contains("strips")) {
-      return { strips: 0, hasMotion: false, size: 0, mimeType: null };
+      return {
+        strips: 0,
+        hasMotion: false,
+        size: 0,
+        mimeType: null,
+        speed: 1,
+        playableSeconds: 0,
+      };
     }
     const all = await new Promise<Record<string, unknown>[]>((resolve) => {
       const read = db.transaction("strips").objectStore("strips").getAll();
       read.onsuccess = () => resolve(read.result);
       read.onerror = () => resolve([]);
     });
-    const latest = all[all.length - 1] as { motion?: { blob: Blob; mimeType: string } } | undefined;
+    const latest = all[all.length - 1] as
+      | { motion?: { blob: Blob; mimeType: string; speed?: number } }
+      | undefined;
     const motion = latest?.motion;
+
+    // Decode the stored file and read its real duration, so the assertion is
+    // about the bytes rather than about a number we wrote next to them.
+    let playableSeconds = 0;
+    if (motion?.blob) {
+      const url = URL.createObjectURL(motion.blob);
+      const probe = document.createElement("video");
+      probe.src = url;
+      playableSeconds = await new Promise<number>((resolve) => {
+        probe.onloadedmetadata = () => resolve(probe.duration);
+        probe.onerror = () => resolve(0);
+        setTimeout(() => resolve(0), 5000);
+      });
+      URL.revokeObjectURL(url);
+    }
+
     return {
       strips: all.length,
       hasMotion: Boolean(motion),
       size: motion?.blob?.size ?? 0,
       mimeType: motion?.mimeType ?? null,
+      speed: motion?.speed ?? 1,
+      playableSeconds,
     };
   });
 }

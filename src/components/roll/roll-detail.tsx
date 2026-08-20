@@ -1,32 +1,20 @@
 "use client";
 
-import {
-  Camera,
-  ChevronLeft,
-  Download,
-  LayoutGrid,
-  Lock,
-  Film,
-  Share2,
-  Trash2,
-} from "lucide-react";
+import { Camera, ChevronLeft, LayoutGrid, Lock, Share2, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ClipDialog } from "@/components/booth/clip-dialog";
 import { CaptureViewer } from "./capture-viewer";
 import { ContactSheet } from "./contact-sheet";
+import { StripGrid } from "./strip-grid";
 import { ShareSheet } from "./share-sheet";
 import { Button } from "@/components/ui/button";
 import { Modal, SheetRoot } from "@/components/ui/sheet";
 import { useToast } from "@/components/providers/toast-provider";
 import { useMinute } from "@/hooks/use-now";
-import { useObjectUrl } from "@/hooks/use-object-url";
 import { useCaptures, useRoll, useStrips } from "@/hooks/use-store";
 import { deleteRoll, updateRoll } from "@/lib/db/repo";
-import type { Strip } from "@/lib/db/types";
-import { downloadBlob, extensionFor, shareFile } from "@/lib/share";
-import { cn, formatCount, formatTimeUntil, relativeDay, slugify } from "@/lib/utils";
+import { cn, formatCount, formatTimeUntil, relativeDay } from "@/lib/utils";
 
 /**
  * One roll, in full.
@@ -221,11 +209,7 @@ export function RollDetail({ rollId }: { rollId: string }) {
               <EmptyRoll rollId={roll.id} />
             )
           ) : (
-            <div className="mt-5 grid grid-cols-2 gap-4 px-4 sm:grid-cols-3">
-              {strips.map((strip) => (
-                <StripTile key={strip.id} strip={strip} rollTitle={roll.title} />
-              ))}
-            </div>
+            <StripGrid strips={strips} title={roll.title} className="mt-5 px-4" />
           )}
         </>
       )}
@@ -297,69 +281,6 @@ function DevelopingState({
         <p className="mt-1 text-xs text-ink-600">Waiting is better, but it&rsquo;s your roll.</p>
       </div>
     </section>
-  );
-}
-
-function StripTile({ strip, rollTitle }: { strip: Strip; rollTitle: string }) {
-  const url = useObjectUrl(strip.thumb);
-  const [clipOpen, setClipOpen] = useState(false);
-  const filename = `pitik-${slugify(rollTitle)}-strip.${extensionFor(strip.blob)}`;
-
-  return (
-    <figure className="group relative">
-      <ClipDialog
-        clip={strip.motion ?? null}
-        title={strip.caption || rollTitle}
-        open={clipOpen}
-        onOpenChange={setClipOpen}
-      />
-      {url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={url}
-          alt={strip.caption ?? "Photo strip"}
-          loading="lazy"
-          className="w-full rounded-sm shadow-lg shadow-black/40"
-        />
-      ) : (
-        <div className="aspect-[1/3] w-full animate-pulse rounded-sm bg-ink-900" />
-      )}
-      <figcaption className="mt-2 flex items-center justify-between gap-2">
-        <span className="truncate text-xs text-ink-400">
-          {strip.caption || relativeDay(strip.createdAt)}
-        </span>
-        <span className="flex gap-1">
-          <button
-            type="button"
-            onClick={() => downloadBlob(strip.blob, filename)}
-            aria-label="Save this strip"
-            className="grid size-7 place-items-center rounded-full text-ink-400 transition hover:bg-ink-800 hover:text-ink-100"
-          >
-            <Download className="size-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => void shareFile({ blob: strip.blob, filename, title: rollTitle })}
-            aria-label="Share this strip"
-            className="grid size-7 place-items-center rounded-full text-ink-400 transition hover:bg-ink-800 hover:text-ink-100"
-          >
-            <Share2 className="size-3.5" />
-          </button>
-          {/* A clip saved with the strip has to stay reachable, or it is data
-              the user can never get back out. */}
-          {strip.motion ? (
-            <button
-              type="button"
-              onClick={() => setClipOpen(true)}
-              aria-label="Watch the clip of this shoot"
-              className="grid size-7 place-items-center rounded-full text-ink-400 transition hover:bg-ink-800 hover:text-ink-100"
-            >
-              <Film className="size-3.5" />
-            </button>
-          ) : null}
-        </span>
-      </figcaption>
-    </figure>
   );
 }
 

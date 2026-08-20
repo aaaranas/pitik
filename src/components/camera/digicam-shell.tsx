@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { fitBox, useElementSize } from "@/hooks/use-element-size";
+import { getCameraBody } from "@/lib/camera/bodies";
 import type { AspectId } from "@/lib/db/types";
 import { cn } from "@/lib/utils";
 
@@ -64,6 +65,8 @@ export interface DigicamShellProps {
   aspect: AspectId;
   /** Name of the selected model, printed on the body like a real one. */
   model?: string;
+  /** Filter id of the model, which decides what the body is made of. */
+  modelId?: string;
   /** Numeric framing the camera will actually capture. `null` means fill. */
   aspectRatio: number | null;
   /** Frames taken on this roll, shown on the counter like an exposure count. */
@@ -78,6 +81,7 @@ export interface DigicamShellProps {
 export function DigicamShell({
   aspect,
   model,
+  modelId,
   aspectRatio,
   shotCount,
   shotsLeft,
@@ -86,6 +90,8 @@ export function DigicamShell({
 }: DigicamShellProps) {
   const clock = useClock();
   const [containerRef, containerSize] = useElementSize<HTMLDivElement>();
+  // Each model is a different piece of plastic, not a relabelled one.
+  const shell = useMemo(() => getCameraBody(modelId ?? ""), [modelId]);
 
   // The LCD is sized to the framing the shutter will actually take, so what is
   // behind the bezel is the photograph — not a crop of it with black bars.
@@ -93,7 +99,7 @@ export function DigicamShell({
     () =>
       fitBox(
         {
-          width: Math.max(0, Math.min(containerSize.width, 448) - CHROME_WIDTH),
+          width: Math.max(0, containerSize.width - CHROME_WIDTH),
           height: Math.max(0, containerSize.height - CHROME_HEIGHT),
         },
         aspectRatio ?? 3 / 4,
@@ -105,17 +111,13 @@ export function DigicamShell({
     <div ref={containerRef} className="grid size-full place-items-center">
       <div
         className={cn(
-          "relative flex w-full max-w-md flex-col overflow-hidden rounded-[1.75rem] transition-opacity",
+          "relative flex size-full flex-col items-center justify-center overflow-hidden transition-opacity",
           busy && "opacity-95",
         )}
         style={{
-          // Width follows the screen plus the body's side moulding, so the
-          // shell hugs a 16:9 LCD as happily as a square one.
-          width: screen.width ? screen.width + CHROME_WIDTH : undefined,
-          // Warm silver-graphite rather than cold grey, so the body sits in the
-          // same palette as the rest of the app instead of looking pasted on.
-          background:
-            "linear-gradient(160deg, #6f6660 0%, #574f4a 26%, #3d3733 55%, #4a433e 78%, #2e2926 100%)",
+          // Full bleed: the body *is* the screen, edge to edge, rather than a
+          // card floating on a dark page.
+          background: `linear-gradient(160deg, ${shell.body[0]} 0%, ${shell.body[1]} 48%, ${shell.body[2]} 100%)`,
           boxShadow:
             "inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -2px 6px rgba(0,0,0,0.55), 0 18px 40px rgba(0,0,0,0.5)",
         }}
@@ -131,17 +133,24 @@ export function DigicamShell({
         />
 
         {/* ------------------------------------------------------ top plate */}
-        <div className="relative z-[2] flex shrink-0 items-center justify-between px-4 pt-3">
-          <span className="font-display text-sm leading-none tracking-wide text-white/70 drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]">
+        <div className="relative z-[2] flex w-full shrink-0 items-center justify-between px-5 pt-3">
+          <span
+            className="font-display text-sm leading-none tracking-wide"
+            style={{ color: shell.ink, opacity: 0.75 }}
+          >
             Pitik
           </span>
 
           <span className="flex items-center gap-1.5">
             <span
               aria-hidden
-              className="size-1.5 rounded-full bg-safelight-500 shadow-[0_0_6px_rgba(234,79,52,0.9)]"
+              className="size-1.5 rounded-full"
+              style={{ background: shell.accent, boxShadow: `0 0 6px ${shell.accent}` }}
             />
-            <span className="max-w-[9rem] truncate font-mono text-[0.5rem] uppercase tracking-[0.2em] text-white/45">
+            <span
+              className="max-w-[9rem] truncate font-mono text-[0.5rem] uppercase tracking-[0.2em]"
+              style={{ color: shell.ink, opacity: 0.6 }}
+            >
               {model ?? "Digicam"}
             </span>
           </span>
@@ -154,8 +163,7 @@ export function DigicamShell({
             style={{
               width: screen.width || "100%",
               height: screen.height || "auto",
-              boxShadow:
-                "inset 0 0 0 2px rgba(0,0,0,0.85), inset 0 2px 10px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.12)",
+              boxShadow: `inset 0 0 0 2px rgba(0,0,0,0.85), inset 0 2px 10px rgba(0,0,0,0.9), 0 0 0 2px ${shell.lens}66`,
             }}
           >
             {children}
@@ -163,7 +171,7 @@ export function DigicamShell({
         </div>
 
         {/* ------------------------------------------------------- readout */}
-        <div className="relative z-[2] shrink-0 px-4">
+        <div className="relative z-[2] w-full shrink-0 px-5">
           <div className="flex items-center justify-between rounded-sm bg-black/45 px-2.5 py-1 font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[#9fe6b8]">
             <span>{ASPECT_LABEL[aspect]}</span>
             <span aria-hidden>
@@ -176,7 +184,7 @@ export function DigicamShell({
         </div>
 
         {/* --------------------------------------------------- moulded deck */}
-        <div aria-hidden className="relative z-[2] flex shrink-0 items-center justify-between px-5 py-3">
+        <div aria-hidden className="relative z-[2] flex w-full shrink-0 items-center justify-between px-6 py-3">
           {/* Speaker grille */}
           <span className="flex gap-[3px]">
             {[0, 1, 2, 3, 4].map((line) => (

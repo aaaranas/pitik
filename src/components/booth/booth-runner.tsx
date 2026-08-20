@@ -45,7 +45,7 @@ interface BoothFrame {
 const INTERVAL_OPTIONS = [3, 5, 8] as const;
 
 /** Comfortably above the largest slot any shipped template asks for. */
-const BOOTH_FRAME_MAX_EDGE = 1600;
+const BOOTH_FRAME_MAX_EDGE = 1280;
 
 export function BoothRunner({ template }: { template: BoothTemplate }) {
   const camera = useCamera({ initialFacing: "user" });

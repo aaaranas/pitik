@@ -44,7 +44,19 @@ export function FilteredPreview({
 }: FilteredPreviewProps) {
   // Recomputed only when the grade changes — never on a render caused by, say,
   // the shutter animation.
-  const preview = useMemo(() => toCssPreview(adjustments), [adjustments]);
+  const preview = useMemo(() => {
+    const computed = toCssPreview(adjustments);
+    return {
+      ...computed,
+      // Grain is dropped from the live preview. It is a tiled noise bitmap
+      // composited with `overlay` across the whole frame every time the video
+      // paints — by far the most expensive layer here, and the one CSS
+      // approximates worst. The exported photograph still gets real grain, so
+      // this keeps the rule that the preview understates rather than
+      // overpromises.
+      layers: computed.layers.filter((layer) => layer.kind !== "grain"),
+    };
+  }, [adjustments]);
   const [containerRef, containerSize] = useElementSize<HTMLDivElement>();
   const frame = useMemo(
     () => fitBox(containerSize, aspectRatio),

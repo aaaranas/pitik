@@ -81,6 +81,7 @@ export async function createRoll(input: CreateRollInput): Promise<Roll> {
   const mode = input.mode ?? "standard";
   const roll: Roll = {
     id: newId(),
+    kind: "roll",
     title: input.title.trim() || "Untitled roll",
     emoji: input.emoji ?? null,
     coverStyle: input.coverStyle ?? "envelope",
@@ -116,10 +117,62 @@ export async function getRollByShareCode(code: string): Promise<Roll | undefined
   return roll && !roll.deletedAt ? roll : undefined;
 }
 
+/**
+ * Named rolls only.
+ *
+ * The two libraries are deliberately excluded: they are containers, not
+ * moments, and listing them among the evenings somebody named would bury the
+ * thing this screen is for.
+ */
 export async function listRolls(): Promise<Roll[]> {
   const db = await getDB();
   const all = await db.getAllFromIndex("rolls", "by_updated");
-  return all.filter((roll) => !roll.deletedAt).reverse();
+  return all.filter((roll) => !roll.deletedAt && roll.kind !== "library").reverse();
+}
+
+export type LibraryKind = "camera" | "booth";
+
+/**
+ * Finds — or mints — the standing collection for a kind of shooting.
+ *
+ * Camera Mode and the photobooth each write here unless the user has
+ * explicitly started a roll. That is the whole point: taking a photograph
+ * should not silently create a "Thursday night" session nobody asked for.
+ */
+export async function ensureLibrary(kind: LibraryKind): Promise<Roll> {
+  const settings = await getSettings();
+  const key = kind === "camera" ? "cameraLibraryId" : "boothLibraryId";
+  const existingId = settings[key];
+
+  if (existingId) {
+    const existing = await getRoll(existingId);
+    if (existing) return existing;
+  }
+
+  const db = await getDB();
+  const now = Date.now();
+  const roll: Roll = {
+    id: newId(),
+    kind: "library",
+    title: kind === "camera" ? "Camera" : "Photobooth",
+    emoji: null,
+    coverStyle: "contact",
+    mode: "standard",
+    shotLimit: null,
+    revealAt: null,
+    developedAt: null,
+    createdAt: now,
+    updatedAt: now,
+    ownerId: null,
+    remoteId: null,
+    shareCode: null,
+    syncState: "local",
+    deletedAt: null,
+  };
+  await db.put("rolls", roll);
+  await updateSettings({ [key]: roll.id });
+  emit("rolls");
+  return roll;
 }
 
 export async function updateRoll(id: string, patch: Partial<Roll>): Promise<Roll | undefined> {
