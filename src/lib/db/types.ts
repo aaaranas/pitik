@@ -187,6 +187,14 @@ export interface Settings {
   boothLibraryId?: string;
   /** Burn a vintage date into the corner of each photograph. */
   dateStamp: boolean;
+  /**
+   * Light the subject with the screen when shooting on the front camera.
+   *
+   * Front cameras have no lamp, so the display becomes one: it goes white
+   * for a moment before the shutter fires. Off by default, because it is
+   * startling in a dark room if you did not ask for it.
+   */
+  screenFlash: boolean;
   /** Off by default — sync is opt-in, not a dark pattern. */
   syncEnabled: boolean;
   onboarded: boolean;
@@ -206,6 +214,7 @@ export const DEFAULT_SETTINGS: Omit<Settings, "deviceId"> = {
   defaultFilterId: "2003",
   defaultProfileId: "everyday",
   dateStamp: false,
+  screenFlash: false,
   syncEnabled: false,
   onboarded: false,
   livePreview: true,

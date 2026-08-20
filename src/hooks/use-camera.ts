@@ -8,8 +8,10 @@ import {
   type CameraCapabilities,
   closeCamera,
   type Facing,
+  findUltraWide,
   focusAt as focusTrackAt,
   isCameraSupported,
+  listCameras,
   openCamera,
   permissionState,
   setExposure as setTrackExposure,
@@ -67,7 +69,21 @@ export interface CameraController {
   setExposure: (value: number) => Promise<void>;
   /** `x`/`y` normalised 0..1 in displayed-frame space. */
   focusAt: (x: number, y: number) => Promise<boolean>;
+
+  /**
+   * Whether this device has an ultra-wide lens on the current side.
+   *
+   * False on most phones and on every laptop, which is precisely when the 0.5x
+   * control must not be rendered.
+   */
+  hasUltraWide: boolean;
+  /** Which lens is live. */
+  lens: Lens;
+  setLens: (lens: Lens) => Promise<void>;
 }
+
+/** 1x main camera, or the 0.5x ultra-wide module beside it. */
+export type Lens = "wide" | "ultra";
 
 const EMPTY_CAPABILITIES: CameraCapabilities = {
   torch: false,
@@ -86,13 +102,23 @@ const EMPTY_CAPABILITIES: CameraCapabilities = {
  *    preview on Android.
  *  - The stream is released when the page is hidden. iOS will otherwise keep
  *    the privacy indicator lit and may drop the track without telling us.
- *  - Nothing is ever started without an explicit call, so the permission prompt
- *    always follows a deliberate user action.
+ *  - Opening is explicit. With `autoStart` the screen asks for it on mount, so
+ *    the camera is live the moment you arrive rather than behind a tap; without
+ *    it nothing opens until `start()` is called.
  */
 export function useCamera(options: {
   initialFacing?: Facing;
   /** Reopen automatically when the tab becomes visible again. */
   resumeOnVisible?: boolean;
+  /**
+   * Open the camera as soon as the screen mounts.
+   *
+   * A camera app should be ready when you arrive; making people tap a button
+   * first is a step between them and the moment they opened the app to catch.
+   * The browser still shows its own permission prompt the first time, and a
+   * refusal still surfaces as an error the user can act on.
+   */
+  autoStart?: boolean;
 } = {}): CameraController {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   /**
@@ -120,6 +146,9 @@ export function useCamera(options: {
   const [zoom, setZoomState] = useState(1);
   const [exposure, setExposureState] = useState(0);
   const [frameAspect, setFrameAspect] = useState<number | null>(null);
+  const [lens, setLensState] = useState<Lens>("wide");
+  /** Device id of the ultra-wide on this side, once labels are readable. */
+  const [ultraWideId, setUltraWideId] = useState<string | null>(null);
   const [permission, setPermission] = useState<PermissionState | "unknown">("unknown");
   // A browser capability, not app state: read through an external store so the
   // server render stays optimistic and hydration doesn't flicker the gate.
@@ -168,7 +197,7 @@ export function useCamera(options: {
     };
   }, [stream, videoGeneration]);
 
-  const openInternal = useCallback(async (nextFacing: Facing) => {
+  const openInternal = useCallback(async (nextFacing: Facing, deviceId?: string) => {
     setStatus("starting");
     setError(null);
     setStream(null);
@@ -176,7 +205,7 @@ export function useCamera(options: {
       closeCamera(cameraRef.current);
       cameraRef.current = null;
 
-      const camera = await openCamera({ facing: nextFacing });
+      const camera = await openCamera({ facing: nextFacing, deviceId });
       cameraRef.current = camera;
       setFacing(camera.facing);
       setCapabilities(camera.capabilities);
@@ -193,9 +222,10 @@ export function useCamera(options: {
       // effect runs immediately after, with the ref already populated.
       setStream(camera.stream);
       setStatus("ready");
-      // Labels — and therefore an accurate camera count — only become
-      // readable once permission has been granted.
+      // Labels — and therefore both the camera count and any ultra-wide — only
+      // become readable once permission has been granted.
       setPermission(await permissionState());
+      setUltraWideId(findUltraWide(await listCameras(), camera.facing)?.deviceId ?? null);
     } catch (cause) {
       cameraRef.current = null;
       setStream(null);
@@ -223,9 +253,31 @@ export function useCamera(options: {
     setStatus("idle");
   }, []);
 
+  const setLens = useCallback(
+    async (next: Lens) => {
+      if (next === lens) return;
+      // The ultra-wide is a separate camera, so switching lens means reopening
+      // the stream rather than applying a zoom constraint.
+      if (next === "ultra" && !ultraWideId) return;
+      setLensState(next);
+      if (startingRef.current) await startingRef.current;
+      const pending = openInternal(
+        facing,
+        next === "ultra" ? (ultraWideId ?? undefined) : undefined,
+      ).finally(() => {
+        startingRef.current = null;
+      });
+      startingRef.current = pending;
+      return pending;
+    },
+    [facing, lens, openInternal, ultraWideId],
+  );
+
   const flip = useCallback(async () => {
     const next: Facing = facing === "user" ? "environment" : "user";
     setFacing(next);
+    // Lenses do not carry across sides: the other camera may not have one.
+    setLensState("wide");
     if (startingRef.current) await startingRef.current;
     const pending = openInternal(next).finally(() => {
       startingRef.current = null;
@@ -259,6 +311,34 @@ export function useCamera(options: {
     if (!track) return false;
     return focusTrackAt(track, x, y);
   }, []);
+
+  const autoStart = options.autoStart ?? false;
+  useEffect(() => {
+    if (!autoStart) return;
+    // Deferred by a tick so opening does not set state synchronously inside the
+    // effect that scheduled it.
+    const handle = window.setTimeout(() => {
+      if (!supported) {
+        // Otherwise a browser that cannot open a camera would sit on the
+        // "opening…" spinner forever, which reads as a hang rather than as the
+        // dead end it is.
+        setError(
+          new CameraError(
+            "unsupported",
+            "This browser can't open a camera.",
+            "Try Safari on iOS, or Chrome on Android and desktop.",
+          ),
+        );
+        setStatus("error");
+        return;
+      }
+      void start();
+    }, 0);
+    return () => window.clearTimeout(handle);
+    // `start` is deliberately excluded: it changes identity when `facing` does,
+    // and re-running this on a camera flip would reopen the stream twice.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart, supported]);
 
   // Release on unmount. Without this, navigating away from /camera leaves the
   // recording indicator on and the sensor powered.
@@ -309,5 +389,8 @@ export function useCamera(options: {
     setZoom,
     setExposure,
     focusAt,
+    hasUltraWide: ultraWideId !== null,
+    lens,
+    setLens,
   };
 }

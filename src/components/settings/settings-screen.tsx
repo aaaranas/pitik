@@ -80,6 +80,13 @@ export function SettingsScreen() {
         />
         <Toggle
           settings={settings}
+          field="screenFlash"
+          label="Screen flash"
+          hint="Front cameras have no lamp, so the screen lights you instead just before the shutter."
+          onChange={update}
+        />
+        <Toggle
+          settings={settings}
           field="gridOverlay"
           label="Composition grid"
           hint="Thirds guides over the viewfinder."

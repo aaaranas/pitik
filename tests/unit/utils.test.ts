@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { cn, formatBytes, formatCount, formatTimeUntil, relativeDay, slugify } from "@/lib/utils";
 import { extensionFor } from "@/lib/share";
-import { isFrameReady } from "@/lib/camera/service";
+import { findUltraWide, isFrameReady } from "@/lib/camera/service";
 
 /**
  * These strings are the app's voice. "Tonight" instead of a date is a product
@@ -152,5 +152,59 @@ describe("isFrameReady", () => {
 
   it("rejects a decoded video that has no dimensions", () => {
     expect(isFrameReady(video(4, 0, 0))).toBe(false);
+  });
+});
+
+/**
+ * Ultra-wide detection.
+ *
+ * 0.5x is a separate camera module rather than a zoom level, and the only
+ * cross-platform way to find it is the device label. Getting this wrong either
+ * hides a lens the phone has or offers one it does not.
+ */
+describe("findUltraWide", () => {
+  const device = (label: string, kind = "videoinput"): MediaDeviceInfo =>
+    ({ deviceId: label, groupId: "g", kind, label, toJSON: () => ({}) }) as MediaDeviceInfo;
+
+  it("finds the iOS Safari ultra-wide by its label", () => {
+    const devices = [
+      device("Front Camera"),
+      device("Back Camera"),
+      device("Back Ultra Wide Camera"),
+    ];
+    expect(findUltraWide(devices, "environment")?.label).toBe("Back Ultra Wide Camera");
+  });
+
+  it("matches a hyphenated or unspaced label too", () => {
+    expect(findUltraWide([device("back ultra-wide")], "environment")).not.toBeNull();
+    expect(findUltraWide([device("BackUltraWideCamera")], "environment")).not.toBeNull();
+  });
+
+  it("prefers the lens facing the way we are shooting", () => {
+    const devices = [
+      device("Front Ultra Wide Camera"),
+      device("Back Ultra Wide Camera"),
+    ];
+    expect(findUltraWide(devices, "user")?.label).toBe("Front Ultra Wide Camera");
+    expect(findUltraWide(devices, "environment")?.label).toBe("Back Ultra Wide Camera");
+  });
+
+  it("falls back to the only ultra-wide when the label says nothing about side", () => {
+    expect(findUltraWide([device("Ultra Wide")], "user")?.label).toBe("Ultra Wide");
+  });
+
+  it("returns null when the phone has no ultra-wide", () => {
+    // The common case, and the reason the control is hidden rather than shown
+    // disabled: a 0.5x button that cannot work is worse than none.
+    expect(findUltraWide([device("Front Camera"), device("Back Camera")], "environment")).toBeNull();
+  });
+
+  it("ignores microphones that happen to be labelled wide", () => {
+    expect(findUltraWide([device("Ultra Wide Mic", "audioinput")], "user")).toBeNull();
+  });
+
+  it("returns null before labels are readable", () => {
+    // Labels are empty until camera permission has been granted.
+    expect(findUltraWide([device(""), device("")], "user")).toBeNull();
   });
 });
