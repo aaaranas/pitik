@@ -46,7 +46,7 @@ const INTERVAL_OPTIONS = [3, 5, 8] as const;
 
 
 export function BoothRunner({ template }: { template: BoothTemplate }) {
-  const camera = useCamera({ initialFacing: "user" });
+  const camera = useCamera({ initialFacing: "user", autoStart: true });
   const { settings } = useSettings();
   const { toast } = useToast();
 
@@ -358,7 +358,7 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
           </FilteredPreview>
         ) : (
           <PermissionGate
-            status={camera.status === "ready" ? "idle" : camera.status}
+            status={camera.status === "error" ? "error" : "starting"}
             error={camera.error}
             onStart={() => void camera.start()}
           />

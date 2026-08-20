@@ -111,6 +111,33 @@ function readCapabilities(
 }
 
 /**
+ * Finds the ultra-wide lens, if this device has one.
+ *
+ * 0.5x is a *different camera*, not a zoom level — on nearly every phone the
+ * main camera's zoom range bottoms out at 1x, and the wider view comes from a
+ * separate module. The only cross-platform signal is the device label: iOS
+ * Safari reports "Back Ultra Wide Camera", and Android Chrome usually says
+ * something similar once permission has been granted.
+ *
+ * Returns null when there is no such lens, which is how the control stays
+ * hidden on devices that cannot honour it.
+ */
+export function findUltraWide(
+  devices: MediaDeviceInfo[],
+  facing: Facing,
+): MediaDeviceInfo | null {
+  const candidates = devices.filter(
+    (device) => device.kind === "videoinput" && /ultra[\s-]?wide/i.test(device.label),
+  );
+  if (candidates.length === 0) return null;
+
+  // Labels are unreliable about which way a lens points, so prefer one that
+  // names the side we want and fall back to the only ultra-wide there is.
+  const side = facing === "user" ? /front/i : /back|rear/i;
+  return candidates.find((device) => side.test(device.label)) ?? candidates[0];
+}
+
+/**
  * Longest edge requested from the sensor.
  *
  * Deliberately not 4K. A 3840x2160 track is 8.3 megapixels arriving sixty times

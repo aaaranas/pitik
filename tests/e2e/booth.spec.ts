@@ -9,7 +9,6 @@ test("runs a booth sequence and composes a strip", async ({ page }) => {
   await page.getByRole("link", { name: /Instant Pair/ }).click();
   await expect(page).toHaveURL(/\/booth\/run/);
 
-  await page.getByRole("button", { name: "Turn on the camera" }).click();
   const start = page.getByRole("button", { name: "Start the booth" });
   await expect(start).toBeVisible({ timeout: 15_000 });
 
@@ -39,7 +38,6 @@ test("offers every booth layout with an honest shot count", async ({ page }) => 
 test("records the whole shoot and saves the clip with the strip", async ({ page }) => {
   await open(page, "/booth");
   await page.getByRole("link", { name: /Instant Pair/ }).click();
-  await page.getByRole("button", { name: "Turn on the camera" }).click();
 
   const start = page.getByRole("button", { name: "Start the booth" });
   await expect(start).toBeVisible({ timeout: 15_000 });

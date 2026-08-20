@@ -76,16 +76,26 @@ Three decisions shape it:
   another filter, so there is no separate tray to disagree with it.
 - **No aspect ratios.** The camera shoots the sensor's own framing and the
   viewfinder is shaped to match, so what is on screen is the photograph.
-- **No confirmation screen.** The shutter fires, the frame is snapshotted
-  immediately, and grading plus encoding happen off the critical path.
+- **No confirmation screen, and no button to press first.** The camera opens on
+  arrival; the shutter fires, the frame is snapshotted immediately, and grading
+  plus encoding happen off the critical path.
 
 **Polaroid is a print, not a grade.** Selecting it mounts the photograph in a
-white instant frame with a deep chin, cropped square — the border is what that
-camera actually produces.
+white instant frame with a deep chin. The frame keeps the sensor's own framing
+rather than cropping square, so it is the only thing that changes.
+
+**Flash means whatever the camera can actually do.** One control: the rear lamp
+where the hardware exposes one, and on the front camera a screen flash — the
+display goes warm white for a moment before the shutter so the sensor has time
+to meter for it. Off by default.
+
+**0.5x appears only on phones that have an ultra-wide.** It is a separate camera
+module rather than a zoom level, so the control reopens the stream on that lens
+and is hidden entirely where none exists.
 
 Also here: rear/front switching, a self-timer, a composition grid, a horizon
-level, tap-to-focus, torch and zoom where the hardware exposes them, gallery
-import, and an optional vintage date stamp.
+level, tap-to-focus, zoom where the hardware exposes it, gallery import, and an
+optional vintage date stamp.
 
 ### Resolution, deliberately
 
@@ -409,7 +419,7 @@ and pulling a shared roll brings the strip without the motion behind it.
 ## Testing
 
 ```bash
-pnpm test        # 205 unit tests
+pnpm test        # 207 unit tests
 pnpm test:e2e    # 24 end-to-end tests, mobile and desktop
 ```
 

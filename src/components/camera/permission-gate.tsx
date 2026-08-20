@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 /**
  * What stands in for the viewfinder before the camera is live.
  *
- * The permission prompt is never triggered on mount. It fires from the button
- * below, so the browser's dialog always arrives immediately after a deliberate
- * tap — which is both the honest thing to do and, in practice, the difference
- * between people granting access and permanently blocking the site.
+ * The camera opens on arrival, so in the ordinary case this is a spinner that
+ * lasts a moment. Its real job is the failure case: a refusal, a camera already
+ * in use, or a browser that cannot open one at all — each stated plainly with
+ * the one thing the user can try.
  */
 export function PermissionGate({
   status,

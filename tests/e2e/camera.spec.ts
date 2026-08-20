@@ -16,9 +16,7 @@ test("takes a photo and files it under a named roll", async ({ page }) => {
   await expect(page).toHaveURL(/\/camera/);
   await expect(page.getByText("Playwright night")).toBeVisible();
 
-  // The permission prompt is pre-granted, but the camera still only starts on a
-  // deliberate tap — that is the product behaviour being asserted here.
-  await page.getByRole("button", { name: "Turn on the camera" }).click();
+  // The camera opens on arrival — there is no button to press.
 
   const shutter = page.getByRole("button", { name: "Take a photo" });
   await expect(shutter).toBeVisible({ timeout: 15_000 });
@@ -32,7 +30,6 @@ test("takes a photo and files it under a named roll", async ({ page }) => {
 
 test("shoots several frames in a row without blocking", async ({ page }) => {
   await open(page, "/camera");
-  await page.getByRole("button", { name: "Turn on the camera" }).click();
 
   const shutter = page.getByRole("button", { name: "Take a photo" });
   await expect(shutter).toBeVisible({ timeout: 15_000 });
@@ -49,7 +46,6 @@ test("shoots several frames in a row without blocking", async ({ page }) => {
 
 test("files camera photos in the camera library, not an invented roll", async ({ page }) => {
   await open(page, "/camera");
-  await page.getByRole("button", { name: "Turn on the camera" }).click();
   const shutter = page.getByRole("button", { name: "Take a photo" });
   await expect(shutter).toBeVisible({ timeout: 15_000 });
   await shutter.click();
@@ -81,7 +77,6 @@ test("files camera photos in the camera library, not an invented roll", async ({
 
 test("keeps photos on the device when there is no network", async ({ page, context }) => {
   await open(page, "/camera");
-  await page.getByRole("button", { name: "Turn on the camera" }).click();
   await expect(page.getByRole("button", { name: "Take a photo" })).toBeVisible({
     timeout: 15_000,
   });

@@ -58,6 +58,15 @@ const TIMER_OPTIONS = [0, 3, 10] as const;
 const DEFAULT_MODEL_ID = "2003";
 const NEUTRAL_PROFILE_ID = "everyday";
 
+/**
+ * How long the screen stays white before the shutter fires.
+ *
+ * The sensor needs a moment to meter for the new light. Firing immediately
+ * gives you the dark exposure with a white flash that arrived too late to
+ * help.
+ */
+const SCREEN_FLASH_SETTLE_MS = 260;
+
 export function CameraScreen({
   roll,
   captureCount,
@@ -67,7 +76,7 @@ export function CameraScreen({
   captureCount: number;
   lastCapture: Capture | null;
 }) {
-  const camera = useCamera({ initialFacing: "user" });
+  const camera = useCamera({ initialFacing: "user", autoStart: true });
   // Destructured so the memoised callbacks below depend on stable identities
   // rather than on the controller object, which changes every render.
   const { videoRef, attachVideo, focusAt: focusCameraAt, frameAspect } = camera;
@@ -83,6 +92,8 @@ export function CameraScreen({
   const [focusPoint, setFocusPoint] = useState<FocusPoint | null>(null);
   const [busy, setBusy] = useState(false);
   const [levelOn, setLevelOn] = useState(false);
+  /** True while the screen is lighting the subject, just before a capture. */
+  const [flashing, setFlashing] = useState(false);
 
   /** The bodies on the dial: one entry per camera model. */
   const models = useMemo(() => listFiltersForProfile("digicam"), []);
@@ -117,8 +128,20 @@ export function CameraScreen({
   const gridOn = settings?.gridOverlay ?? false;
   const livePreview = settings?.livePreview !== false;
   const dateStamp = settings?.dateStamp ?? false;
+  const screenFlash = settings?.screenFlash ?? false;
 
   const mirrored = camera.facing === "user" && (settings?.mirrorSelfie ?? true);
+
+  /**
+   * Which kind of flash this camera can actually give you.
+   *
+   * The rear camera has a real lamp where the hardware exposes one; the front
+   * camera only has the display. One control, doing whichever of the two is
+   * genuinely possible.
+   */
+  const hasTorch = camera.capabilities?.torch ?? false;
+  const usingScreenFlash = !hasTorch && camera.facing === "user" && screenFlash;
+  const flashOn = hasTorch ? camera.torch : screenFlash;
   const lastThumbUrl = useObjectUrl(lastCapture?.thumb ?? null);
 
   /** True only when the user deliberately started a named roll. */
@@ -142,6 +165,14 @@ export function CameraScreen({
     let bitmap: ImageBitmap | null = null;
     try {
       setBusy(true);
+
+      // Front cameras have no lamp. Blanking the screen white lights the
+      // subject, but only if the sensor is given time to meter for it.
+      if (usingScreenFlash) {
+        setFlashing(true);
+        await new Promise((resolve) => setTimeout(resolve, SCREEN_FLASH_SETTLE_MS));
+      }
+
       // A press in the moment before the first frame decodes must still produce
       // a photo, so wait for one rather than quietly doing nothing.
       if (!(await waitForFrame(video))) {
@@ -171,6 +202,7 @@ export function CameraScreen({
       if (hapticsOn) vibrate("error");
     } finally {
       bitmap?.close();
+      setFlashing(false);
       setBusy(false);
     }
   }, [
@@ -181,6 +213,7 @@ export function CameraScreen({
     mirrored,
     soundOn,
     toast,
+    usingScreenFlash,
     videoRef,
   ]);
 
@@ -302,16 +335,29 @@ export function CameraScreen({
 
       <button
         type="button"
-        onClick={() => camera.toggleTorch()}
-        disabled={!camera.capabilities?.torch}
-        aria-pressed={camera.torch}
-        aria-label={camera.torch ? "Turn off the light" : "Turn on the light"}
+        onClick={() => {
+          if (hasTorch) void camera.toggleTorch();
+          else void update({ screenFlash: !screenFlash });
+        }}
+        // Only truly unavailable on a rear camera with no lamp: the front one
+        // can always light you with the screen.
+        disabled={!hasTorch && camera.facing !== "user"}
+        aria-pressed={flashOn}
+        aria-label={
+          hasTorch
+            ? flashOn
+              ? "Turn off the light"
+              : "Turn on the light"
+            : flashOn
+              ? "Turn off the screen flash"
+              : "Turn on the screen flash"
+        }
         className={cn(
           "grid size-10 place-items-center rounded-full transition disabled:opacity-25",
-          camera.torch ? "text-amber-warm" : "hover:bg-black/10",
+          flashOn ? "text-amber-warm" : "hover:bg-black/10",
         )}
       >
-        {camera.torch ? <Zap className="size-5" /> : <ZapOff className="size-5" />}
+        {flashOn ? <Zap className="size-5" /> : <ZapOff className="size-5" />}
       </button>
     </>
   );
@@ -374,12 +420,37 @@ export function CameraScreen({
         </button>
       )}
 
-      <ShutterButton
-        onCapture={onShutter}
-        countdown={countdown}
-        busy={busy}
-        disabled={rollFull}
-      />
+      <div className="flex flex-col items-center gap-2">
+        {/* Rendered only where an ultra-wide module actually exists — most
+            phones and every laptop have none. */}
+        {camera.hasUltraWide ? (
+          <button
+            type="button"
+            onClick={() => void camera.setLens(camera.lens === "ultra" ? "wide" : "ultra")}
+            aria-pressed={camera.lens === "ultra"}
+            aria-label={
+              camera.lens === "ultra"
+                ? "Switch to the main lens"
+                : "Switch to the ultra-wide lens"
+            }
+            className={cn(
+              "h-7 rounded-full px-3 font-mono text-[0.6875rem] tabular-nums transition",
+              camera.lens === "ultra"
+                ? "bg-amber-warm text-ink-950"
+                : "bg-black/30 text-white/80 hover:bg-black/40",
+            )}
+          >
+            {camera.lens === "ultra" ? "0.5x" : "1x"}
+          </button>
+        ) : null}
+
+        <ShutterButton
+          onCapture={onShutter}
+          countdown={countdown}
+          busy={busy}
+          disabled={rollFull}
+        />
+      </div>
 
       <button
         type="button"
@@ -406,7 +477,9 @@ export function CameraScreen({
         </div>
         <div className="grid min-h-0 flex-1 place-items-center">
           <PermissionGate
-            status={camera.status === "ready" ? "idle" : camera.status}
+            // Never the primer: the camera opens by itself, so the only states
+            // worth showing are "opening" and a genuine failure.
+            status={camera.status === "error" ? "error" : "starting"}
             error={camera.error}
             onStart={() => void camera.start()}
             onImport={() => fileInputRef.current?.click()}
@@ -418,7 +491,18 @@ export function CameraScreen({
   }
 
   return (
-    <DigicamShell
+    <>
+      {/* Warm white rather than pure white: it flatters skin, where a flat
+          #ffffff makes everyone look like a photocopy. */}
+      {flashing ? (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-[100]"
+          style={{ background: "#fff6ea" }}
+        />
+      ) : null}
+
+      <DigicamShell
       model={getFilter(activeModelId).name}
       modelId={activeModelId}
       aspectRatio={frameAspect}
@@ -456,7 +540,8 @@ export function CameraScreen({
         </FilteredPreview>
         <FileInput inputRef={fileInputRef} onPick={onPickFiles} />
       </div>
-    </DigicamShell>
+      </DigicamShell>
+    </>
   );
 }
 

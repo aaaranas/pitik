@@ -75,7 +75,18 @@ a dependency that phones home, that test will fail and it is right.
   viewfinder is shaped from `frameAspect`, so preview and photograph match. A
   preview cropped differently from the capture is a lie.
 - A model may produce a *print* rather than a bare frame (`CameraBody.print`).
-  Polaroid is a white border with a chin; a grade alone does not make one.
+  Polaroid is a white border with a chin; a grade alone does not make one. The
+  print keeps the sensor framing — cropping it would make one camera quietly
+  throw pixels away and break the preview/capture match.
+- The camera opens on arrival (`autoStart`). A browser that cannot open one must
+  land on the error state, never on a spinner that never resolves.
+- Flash is one control that does whichever flash exists: the torch where the
+  track reports one, the screen otherwise. Never render both.
+- A screen flash must give the sensor time to meter (`SCREEN_FLASH_SETTLE_MS`).
+  Firing immediately yields the dark exposure with the light arriving too late.
+- 0.5x is a separate camera module, not `zoom: 0.5`. Detect it by device label
+  (`findUltraWide`) and hide the control when there is none — most phones and
+  every laptop.
 - Body furniture is scenery: `aria-hidden`, no button semantics. Anything on the
   readout must be a real value.
 - Zero-padded camera-back numerals read as gibberish to a screen reader. State
