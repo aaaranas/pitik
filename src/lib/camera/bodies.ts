@@ -22,6 +22,13 @@ export interface CameraBody {
    * cream, and white-on-cream makes the wordmark and the model name vanish.
    */
   ink: string;
+  /**
+   * Print format this camera produces.
+   *
+   * `instant` mounts the photograph in a white frame with a deep chin, because
+   * that border is what a Polaroid *is* — a grade alone does not make one.
+   */
+  print?: "instant";
 }
 
 /** Printed ink for a dark body, and for a light one. */
@@ -64,7 +71,13 @@ const BODIES: Record<string, CameraBody> = {
   // Candy-shell compact.
   "pocket-cam": { body: ["#c9a2a6", "#8b5f66", "#402a2f"], accent: "#ff7a9c", lens: "#e6c4c8", ink: DARK_INK },
   // Instant film: the white body everyone pictures.
-  polaroid: { body: ["#efe9df", "#b9b1a3", "#5d574d"], accent: "#f2a03d", lens: "#ffffff", ink: DARK_INK },
+  polaroid: {
+    body: ["#efe9df", "#b9b1a3", "#5d574d"],
+    accent: "#f2a03d",
+    lens: "#ffffff",
+    ink: DARK_INK,
+    print: "instant",
+  },
 };
 
 export function getCameraBody(filterId: string): CameraBody {

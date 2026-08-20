@@ -6,9 +6,7 @@ import {
   Grid3x3,
   ImageDown,
   RefreshCcw,
-  Ratio,
   SlidersHorizontal,
-  Sparkles,
   Timer,
   X,
   Zap,
@@ -16,16 +14,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { DigicamShell } from "./digicam-shell";
 import { FilteredPreview } from "./filtered-preview";
-import { FilterTray, useReferenceFrame } from "./filter-tray";
 import { FocusReticle, type FocusPoint } from "./focus-reticle";
 import { GridOverlay, LevelIndicator } from "./grid-overlay";
-import { DigicamShell } from "./digicam-shell";
 import { PermissionGate } from "./permission-gate";
 import { ProfileDial } from "./profile-dial";
 import { ShutterButton, ShutterFlash } from "./shutter-button";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { useSession } from "@/components/providers/session-provider";
 import { useToast } from "@/components/providers/toast-provider";
 import { useCamera } from "@/hooks/use-camera";
@@ -34,38 +29,32 @@ import { useSettings } from "@/hooks/use-store";
 import { useDeviceRoll } from "@/hooks/use-tilt";
 import { captureFrame, importFiles } from "@/lib/camera/capture";
 import { waitForFrame } from "@/lib/camera/service";
-import { ASPECT_IDS, ASPECT_RATIOS, type AspectId, type Capture, type Roll } from "@/lib/db/types";
+import type { Capture, Roll } from "@/lib/db/types";
 import { playShutter, primeAudio, vibrate } from "@/lib/feedback";
-import {
-  composeAdjustments,
-  getFilter,
-  listFilters,
-  listFiltersForProfile,
-} from "@/lib/filters/registry";
+import { composeAdjustments, getFilter, listFiltersForProfile } from "@/lib/filters/registry";
 import { cn } from "@/lib/utils";
 
 /**
  * Camera Mode.
  *
- * The design brief for this screen: it should be possible to open the app and
- * take a photo without reading anything. Everything except the shutter, the
- * flip, and the roll you're shooting into is one layer down.
+ * The whole screen is one instrument: a compact camera body, edge to edge, with
+ * the shutter moulded into it rather than sitting underneath as a web button.
  *
- * Rapid shooting is the constraint that shapes the code. Tapping the shutter
- * snapshots the frame to an ImageBitmap immediately and hands the grading and
- * encoding off asynchronously, so the next tap is never waiting on the last
- * photo's JPEG. There is deliberately no confirmation step after a capture.
+ * Three decisions shape this screen:
+ *
+ *  - **The dial is the only look control.** Each entry is a different camera,
+ *    and a camera is not a filter you layer on top of another one — so there is
+ *    no separate filter tray to disagree with it.
+ *  - **No aspect ratios.** The camera shoots the sensor's own framing, and the
+ *    viewfinder is shaped to match, so what is on screen is the photograph.
+ *  - **Rapid shooting.** Tapping the shutter snapshots the frame to an
+ *    ImageBitmap immediately and hands grading and encoding off asynchronously,
+ *    so the next tap never waits on the last photo's JPEG.
  */
 
 const TIMER_OPTIONS = [0, 3, 10] as const;
 
-/**
- * Camera Mode is the digicam.
- *
- * The dial selects which body you are shooting with, so there is no separate
- * "profile" to choose and the profile layer is pinned neutral — the model
- * filter carries the entire look.
- */
+/** The model the camera opens on, and the neutral body underneath it. */
 const DEFAULT_MODEL_ID = "2003";
 const NEUTRAL_PROFILE_ID = "everyday";
 
@@ -81,50 +70,44 @@ export function CameraScreen({
   const camera = useCamera({ initialFacing: "user" });
   // Destructured so the memoised callbacks below depend on stable identities
   // rather than on the controller object, which changes every render.
-  const { videoRef, attachVideo, focusAt: focusCameraAt } = camera;
+  const { videoRef, attachVideo, focusAt: focusCameraAt, frameAspect } = camera;
   const { settings, update } = useSettings();
   const { destinationFor, setActiveRoll } = useSession();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [filterId, setFilterId] = useState(DEFAULT_MODEL_ID);
-  const [aspect, setAspect] = useState<AspectId>("4:3");
+  const [modelId, setModelId] = useState(DEFAULT_MODEL_ID);
   const [timer, setTimer] = useState<number>(0);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [flashKey, setFlashKey] = useState(0);
-  const [trayOpen, setTrayOpen] = useState(false);
   const [focusPoint, setFocusPoint] = useState<FocusPoint | null>(null);
   const [busy, setBusy] = useState(false);
   const [levelOn, setLevelOn] = useState(false);
 
   /** The bodies on the dial: one entry per camera model. */
   const models = useMemo(() => listFiltersForProfile("digicam"), []);
-  /** The full shelf, for anyone who wants a look that isn't a camera. */
-  const filters = useMemo(() => listFilters(), []);
-
-  /** Falls back to a real model if a stored id no longer exists. */
-  const activeFilterId = filters.some((filter) => filter.id === filterId)
-    ? filterId
+  /** Falls back to a real model if a stored id no longer names one. */
+  const activeModelId = models.some((model) => model.id === modelId)
+    ? modelId
     : DEFAULT_MODEL_ID;
+
   const deviceRoll = useDeviceRoll(levelOn);
   const rollId = roll?.id ?? null;
 
-  // Hydrate the controls from saved preferences exactly once — after that the
-  // screen owns its own state so changing a setting mid-shoot isn't clobbered.
+  // Hydrate from saved preferences exactly once — after that the screen owns
+  // its own state so changing a setting mid-shoot isn't clobbered.
   const hydratedRef = useRef(false);
   useEffect(() => {
     if (!settings || hydratedRef.current) return;
     hydratedRef.current = true;
-    setFilterId(settings.defaultFilterId);
-    setAspect(settings.defaultAspect);
+    setModelId(settings.defaultFilterId);
   }, [settings]);
 
   const adjustments = useMemo(
     // No profile layer: the model *is* the look, and stacking a body grade on
-    // top of it would double the sharpening and contrast the models already
-    // carry.
-    () => composeAdjustments({ profileId: NEUTRAL_PROFILE_ID, filterId: activeFilterId }),
-    [activeFilterId],
+    // top would double the sharpening and contrast the models already carry.
+    () => composeAdjustments({ profileId: NEUTRAL_PROFILE_ID, filterId: activeModelId }),
+    [activeModelId],
   );
 
   // Read out of the settings record once. Optional chaining inside a callback's
@@ -136,12 +119,10 @@ export function CameraScreen({
   const dateStamp = settings?.dateStamp ?? false;
 
   const mirrored = camera.facing === "user" && (settings?.mirrorSelfie ?? true);
-  const referenceFrame = useReferenceFrame(videoRef, trayOpen && camera.status === "ready");
   const lastThumbUrl = useObjectUrl(lastCapture?.thumb ?? null);
 
   /** True only when the user deliberately started a named roll. */
   const shootingIntoRoll = Boolean(roll && roll.kind !== "library");
-
   const shotsLeft =
     roll?.mode === "disposable" && roll.shotLimit ? roll.shotLimit - captureCount : null;
   const rollFull = shotsLeft !== null && shotsLeft <= 0;
@@ -169,15 +150,16 @@ export function CameraScreen({
       // Snapshot now, grade later — this is what unblocks rapid shooting.
       bitmap = await createImageBitmap(video);
       // Only *then* resolve where it goes: the named roll if one is active,
-      // otherwise the camera library. Resolved after the snapshot so a tap that
-      // lands before the roll record has loaded still keeps its frame.
+      // otherwise the camera library.
       const targetRollId = await destinationFor("camera");
       await captureFrame({
         source: bitmap,
         rollId: targetRollId,
-        filterId: activeFilterId,
+        filterId: activeModelId,
         profileId: NEUTRAL_PROFILE_ID,
-        aspect,
+        // The sensor's own framing. No crop, because there is no ratio to
+        // choose — the camera shoots what it sees.
+        aspect: "original",
         mirrored,
         timestamp: dateStamp,
       });
@@ -191,7 +173,16 @@ export function CameraScreen({
       bitmap?.close();
       setBusy(false);
     }
-  }, [activeFilterId, aspect, dateStamp, destinationFor, videoRef, hapticsOn, mirrored, soundOn, toast]);
+  }, [
+    activeModelId,
+    dateStamp,
+    destinationFor,
+    hapticsOn,
+    mirrored,
+    soundOn,
+    toast,
+    videoRef,
+  ]);
 
   const onShutter = useCallback(() => {
     primeAudio();
@@ -206,9 +197,8 @@ export function CameraScreen({
     setCountdown(timer);
   }, [doCapture, rollFull, timer, toast]);
 
-  // Self-timer. Each tick schedules the next one and fires the shutter on the
-  // last, so the state transitions all happen in the timer callback rather than
-  // synchronously in the effect body.
+  // Self-timer. Each tick schedules the next and fires the shutter on the last,
+  // so state transitions happen in the timer callback rather than the effect.
   useEffect(() => {
     if (countdown === null) return;
     if (hapticsOn) vibrate("tick");
@@ -247,9 +237,9 @@ export function CameraScreen({
         const { captures, failures } = await importFiles({
           files,
           rollId: await destinationFor("camera"),
-          filterId: activeFilterId,
+          filterId: activeModelId,
           profileId: NEUTRAL_PROFILE_ID,
-          aspect,
+          aspect: "original",
         });
         if (captures.length) {
           toast(`Added ${captures.length} photo${captures.length === 1 ? "" : "s"}.`, {
@@ -266,14 +256,8 @@ export function CameraScreen({
         setBusy(false);
       }
     },
-    [activeFilterId, aspect, destinationFor, toast],
+    [activeModelId, destinationFor, toast],
   );
-
-  const cycleAspect = () => {
-    const next = ASPECT_IDS[(ASPECT_IDS.indexOf(aspect) + 1) % ASPECT_IDS.length];
-    setAspect(next);
-    void update({ defaultAspect: next });
-  };
 
   const cycleTimer = () => {
     setTimer(TIMER_OPTIONS[(TIMER_OPTIONS.indexOf(timer as 0) + 1) % TIMER_OPTIONS.length]);
@@ -281,258 +265,221 @@ export function CameraScreen({
 
   const live = camera.status === "ready";
 
-  return (
-    <div className="flex h-full flex-col bg-ink-950">
-      {/* ------------------------------------------------------ top bar */}
-      <header
-        className="flex shrink-0 items-center gap-1 px-2 pb-2"
-        style={{ paddingTop: "calc(var(--safe-top) + 0.5rem)" }}
+  const header = (
+    <>
+      <Link
+        href={shootingIntoRoll && rollId ? `/rolls/${rollId}` : "/rolls?tab=camera"}
+        className="grid size-10 place-items-center rounded-full transition hover:bg-black/10"
+        aria-label="Leave the camera"
       >
+        <ChevronLeft className="size-5" />
+      </Link>
+
+      <div className="min-w-0 flex-1 text-center">
+        <p className="flex items-center justify-center gap-1.5 truncate text-sm font-medium">
+          {shootingIntoRoll ? (
+            <>
+              <span className="truncate">
+                {roll?.emoji ? `${roll.emoji} ` : ""}
+                {roll?.title}
+              </span>
+              {/* A roll you started should be one you can step out of, or every
+                  later photo silently joins a session that ended. */}
+              <button
+                type="button"
+                onClick={() => setActiveRoll(null)}
+                aria-label="Stop shooting into this roll"
+                className="grid size-5 shrink-0 place-items-center rounded-full opacity-60 transition hover:bg-black/10 hover:opacity-100"
+              >
+                <X className="size-3" />
+              </button>
+            </>
+          ) : (
+            <span className="truncate">Camera</span>
+          )}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => camera.toggleTorch()}
+        disabled={!camera.capabilities?.torch}
+        aria-pressed={camera.torch}
+        aria-label={camera.torch ? "Turn off the light" : "Turn on the light"}
+        className={cn(
+          "grid size-10 place-items-center rounded-full transition disabled:opacity-25",
+          camera.torch ? "text-amber-warm" : "hover:bg-black/10",
+        )}
+      >
+        {camera.torch ? <Zap className="size-5" /> : <ZapOff className="size-5" />}
+      </button>
+    </>
+  );
+
+  const tools = (
+    <>
+      {/* Labelled, not just a glyph: "does this add the date?" is not a question
+          an icon on its own can answer. */}
+      <ToolButton
+        label={dateStamp ? "Date stamp on" : "Date stamp off"}
+        onClick={() => void update({ dateStamp: !dateStamp })}
+        active={dateStamp}
+      >
+        <CalendarClock className="size-4" aria-hidden />
+        <span className="text-[0.625rem] uppercase tracking-[0.12em]">Date</span>
+      </ToolButton>
+
+      <ToolButton
+        label={timer === 0 ? "Self-timer off" : `Self-timer: ${timer} seconds`}
+        onClick={cycleTimer}
+        active={timer > 0}
+      >
+        <Timer className="size-4" aria-hidden />
+        {timer > 0 ? <span className="text-[0.625rem] tabular-nums">{timer}s</span> : null}
+      </ToolButton>
+
+      <ToolButton
+        label="Composition grid"
+        onClick={() => void update({ gridOverlay: !gridOn })}
+        active={gridOn}
+      >
+        <Grid3x3 className="size-4" aria-hidden />
+      </ToolButton>
+
+      <ToolButton label="Level" onClick={() => setLevelOn((on) => !on)} active={levelOn}>
+        <SlidersHorizontal className="size-4" aria-hidden />
+      </ToolButton>
+    </>
+  );
+
+  const deck = (
+    <>
+      {lastCapture && lastThumbUrl ? (
         <Link
           href={shootingIntoRoll && rollId ? `/rolls/${rollId}` : "/rolls?tab=camera"}
-          className="grid size-10 place-items-center rounded-full text-ink-200 transition hover:bg-ink-800"
-          aria-label="Leave the camera"
+          className="size-12 shrink-0 overflow-hidden rounded-lg ring-1 ring-black/25 transition hover:ring-black/50"
+          aria-label={shootingIntoRoll ? "Open this roll" : "Open your camera photos"}
         >
-          <ChevronLeft className="size-5" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={lastThumbUrl} alt="" className="size-full object-cover" />
         </Link>
-
-        <div className="min-w-0 flex-1 text-center">
-          <p className="flex items-center justify-center gap-1.5 truncate text-sm font-medium text-ink-100">
-            {shootingIntoRoll ? (
-              <>
-                <span className="truncate">
-                  {roll?.emoji ? `${roll.emoji} ` : ""}
-                  {roll?.title}
-                </span>
-                {/* A roll you started should be one you can step out of, or
-                    every later photo silently joins a session that ended. */}
-                <button
-                  type="button"
-                  onClick={() => setActiveRoll(null)}
-                  aria-label="Stop shooting into this roll"
-                  className="grid size-5 shrink-0 place-items-center rounded-full text-ink-400 transition hover:bg-ink-800 hover:text-ink-100"
-                >
-                  <X className="size-3" />
-                </button>
-              </>
-            ) : (
-              <span className="truncate">Camera</span>
-            )}
-          </p>
-          <p className="text-[0.6875rem] uppercase tracking-[0.16em] text-ink-400">
-            {shotsLeft !== null
-              ? `${Math.max(0, shotsLeft)} left`
-              : `${captureCount} shot${captureCount === 1 ? "" : "s"}`}
-          </p>
-        </div>
-
+      ) : (
         <button
           type="button"
-          onClick={() => camera.toggleTorch()}
-          disabled={!camera.capabilities?.torch}
-          aria-pressed={camera.torch}
-          aria-label={camera.torch ? "Turn off the light" : "Turn on the light"}
-          className={cn(
-            "grid size-10 place-items-center rounded-full transition disabled:opacity-25",
-            camera.torch ? "text-amber-warm" : "text-ink-200 hover:bg-ink-800",
-          )}
+          onClick={() => fileInputRef.current?.click()}
+          className="grid size-12 shrink-0 place-items-center rounded-lg border border-dashed border-black/30 opacity-70 transition hover:opacity-100"
+          aria-label="Import photos from your gallery"
         >
-          {camera.torch ? <Zap className="size-5" /> : <ZapOff className="size-5" />}
+          <ImageDown className="size-5" />
         </button>
-      </header>
+      )}
 
-      {/* --------------------------------------------------- viewfinder */}
-      <div className="relative min-h-0 flex-1 overflow-hidden">
-        {live ? (
-          <div
-            className="size-full"
-            onPointerDown={onViewfinderTap}
-            role="presentation"
-          >
-            {/* The viewfinder is always the back of a compact camera — that is
-                what Camera Mode is. */}
-            <DigicamShell
-              aspect={aspect}
-              model={getFilter(activeFilterId).name}
-              modelId={activeFilterId}
-              aspectRatio={ASPECT_RATIOS[aspect]}
-              shotCount={captureCount}
-              shotsLeft={shotsLeft}
-              busy={busy}
-            >
-              <FilteredPreview
-                videoRef={attachVideo}
-                adjustments={adjustments}
-                mirrored={mirrored}
-                aspectRatio={ASPECT_RATIOS[aspect]}
-                livePreview={livePreview}
-              >
-                <GridOverlay visible={gridOn} />
-                <LevelIndicator roll={deviceRoll} />
-                <FocusReticle point={focusPoint} />
-                <ShutterFlash flashKey={flashKey} />
-              </FilteredPreview>
-            </DigicamShell>
-          </div>
-        ) : (
+      <ShutterButton
+        onCapture={onShutter}
+        countdown={countdown}
+        busy={busy}
+        disabled={rollFull}
+      />
+
+      <button
+        type="button"
+        onClick={() => void camera.flip()}
+        disabled={!camera.capabilities?.multipleCameras}
+        className="grid size-12 shrink-0 place-items-center rounded-full transition hover:bg-black/10 disabled:opacity-25"
+        aria-label="Switch camera"
+      >
+        <RefreshCcw className="size-5" />
+      </button>
+    </>
+  );
+
+  if (!live) {
+    return (
+      <div className="flex h-full flex-col bg-ink-950 text-ink-100">
+        {/* The header stays before the camera starts: which roll you are about
+            to shoot into is exactly the thing you want to check first. */}
+        <div
+          className="flex shrink-0 items-center gap-1 px-3"
+          style={{ paddingTop: "calc(var(--safe-top) + 0.5rem)" }}
+        >
+          {header}
+        </div>
+        <div className="grid min-h-0 flex-1 place-items-center">
           <PermissionGate
             status={camera.status === "ready" ? "idle" : camera.status}
             error={camera.error}
             onStart={() => void camera.start()}
             onImport={() => fileInputRef.current?.click()}
           />
-        )}
-      </div>
-
-      {/* ------------------------------------------------------ controls */}
-      {live ? (
-        <div className="shrink-0">
-          {camera.capabilities?.zoom ? (
-            <div className="mx-auto mb-1 flex max-w-xs items-center gap-3 px-6">
-              <span className="text-[0.625rem] uppercase tracking-widest text-ink-400">
-                Zoom
-              </span>
-              <Slider
-                aria-label="Zoom"
-                min={camera.capabilities.zoom.min}
-                max={camera.capabilities.zoom.max}
-                step={camera.capabilities.zoom.step}
-                value={[camera.zoom]}
-                onValueChange={([value]) => void camera.setZoom(value)}
-              />
-            </div>
-          ) : null}
-
-          <ProfileDial
-            items={models}
-            selectedId={activeFilterId}
-            label="Camera model"
-            onSelect={(id) => {
-              setFilterId(id);
-              void update({ defaultFilterId: id });
-            }}
-            className="mb-2"
-          />
-
-          {trayOpen ? (
-            <FilterTray
-              filters={filters}
-              selectedId={activeFilterId}
-              referenceFrame={referenceFrame}
-              onSelect={(id) => {
-                setFilterId(id);
-                void update({ defaultFilterId: id });
-              }}
-            />
-          ) : null}
-
-          {/* Secondary row: things you set once and forget. */}
-          <div className="flex items-center justify-center gap-1 px-4 py-1.5">
-            <ToolButton
-              label={`Aspect ratio: ${aspect}`}
-              onClick={cycleAspect}
-              active={aspect !== "original"}
-            >
-              <Ratio className="size-4" aria-hidden />
-              <span className="text-[0.6875rem] tabular-nums">
-                {aspect === "original" ? "FULL" : aspect}
-              </span>
-            </ToolButton>
-
-            <ToolButton
-              label={timer === 0 ? "Self-timer off" : `Self-timer: ${timer} seconds`}
-              onClick={cycleTimer}
-              active={timer > 0}
-            >
-              <Timer className="size-4" aria-hidden />
-              {timer > 0 ? <span className="text-[0.6875rem] tabular-nums">{timer}s</span> : null}
-            </ToolButton>
-
-            <ToolButton
-              label="Composition grid"
-              onClick={() => void update({ gridOverlay: !gridOn })}
-              active={gridOn}
-            >
-              <Grid3x3 className="size-4" aria-hidden />
-            </ToolButton>
-
-            <ToolButton
-              label={dateStamp ? "Date stamp on" : "Date stamp off"}
-              onClick={() => void update({ dateStamp: !dateStamp })}
-              active={dateStamp}
-            >
-              <CalendarClock className="size-4" aria-hidden />
-            </ToolButton>
-
-            <ToolButton label="Level" onClick={() => setLevelOn((on) => !on)} active={levelOn}>
-              <SlidersHorizontal className="size-4" aria-hidden />
-            </ToolButton>
-
-            <ToolButton label="Filters" onClick={() => setTrayOpen((open) => !open)} active={trayOpen}>
-              <Sparkles className="size-4" aria-hidden />
-            </ToolButton>
-          </div>
-
-          {/* Primary row. */}
-          <div
-            className="flex items-center justify-between px-8 pt-1"
-            style={{ paddingBottom: "calc(var(--safe-bottom) + 1.25rem)" }}
-          >
-            {lastCapture && lastThumbUrl ? (
-              <Link
-                href={shootingIntoRoll && rollId ? `/rolls/${rollId}` : "/rolls?tab=camera"}
-                className="size-12 shrink-0 overflow-hidden rounded-lg ring-1 ring-white/20 transition hover:ring-white/50"
-                aria-label={shootingIntoRoll ? "Open this roll" : "Open your camera photos"}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={lastThumbUrl} alt="" className="size-full object-cover" />
-              </Link>
-            ) : (
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="grid size-12 shrink-0 place-items-center rounded-lg border border-dashed border-ink-600 text-ink-400 transition hover:border-ink-500 hover:text-ink-200"
-                aria-label="Import photos from your gallery"
-              >
-                <ImageDown className="size-5" />
-              </button>
-            )}
-
-            <ShutterButton
-              onCapture={onShutter}
-              countdown={countdown}
-              busy={busy}
-              disabled={rollFull}
-            />
-
-            <button
-              type="button"
-              onClick={() => void camera.flip()}
-              disabled={!camera.capabilities?.multipleCameras}
-              className="grid size-12 shrink-0 place-items-center rounded-full text-ink-200 transition hover:bg-ink-800 disabled:opacity-25"
-              aria-label="Switch camera"
-            >
-              <RefreshCcw className="size-5" />
-            </button>
-          </div>
         </div>
-      ) : (
-        <div style={{ height: "calc(var(--safe-bottom) + 1rem)" }} />
-      )}
+        <FileInput inputRef={fileInputRef} onPick={onPickFiles} />
+      </div>
+    );
+  }
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        className="sr-only"
-        onChange={(event) => {
-          void onPickFiles(event.target.files);
-          // Reset so picking the same file twice still fires a change event.
-          event.target.value = "";
-        }}
-      />
-    </div>
+  return (
+    <DigicamShell
+      model={getFilter(activeModelId).name}
+      modelId={activeModelId}
+      aspectRatio={frameAspect}
+      shotCount={captureCount}
+      shotsLeft={shotsLeft}
+      dateStamp={dateStamp}
+      busy={busy}
+      header={header}
+      dial={
+        <ProfileDial
+          items={models}
+          selectedId={activeModelId}
+          label="Camera model"
+          onSelect={(id) => {
+            setModelId(id);
+            void update({ defaultFilterId: id });
+          }}
+        />
+      }
+      tools={tools}
+      deck={deck}
+    >
+      <div className="size-full" onPointerDown={onViewfinderTap} role="presentation">
+        <FilteredPreview
+          videoRef={attachVideo}
+          adjustments={adjustments}
+          mirrored={mirrored}
+          aspectRatio={frameAspect}
+          livePreview={livePreview}
+        >
+          <GridOverlay visible={gridOn} />
+          <LevelIndicator roll={deviceRoll} />
+          <FocusReticle point={focusPoint} />
+          <ShutterFlash flashKey={flashKey} />
+        </FilteredPreview>
+        <FileInput inputRef={fileInputRef} onPick={onPickFiles} />
+      </div>
+    </DigicamShell>
+  );
+}
+
+function FileInput({
+  inputRef,
+  onPick,
+}: {
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  onPick: (files: FileList | null) => void;
+}) {
+  return (
+    <input
+      ref={inputRef}
+      type="file"
+      accept="image/*"
+      multiple
+      className="sr-only"
+      onChange={(event) => {
+        onPick(event.target.files);
+        // Reset so picking the same file twice still fires a change event.
+        event.target.value = "";
+      }}
+    />
   );
 }
 
@@ -548,15 +495,19 @@ function ToolButton({
   children: React.ReactNode;
 }) {
   return (
-    <Button
-      variant="ghost"
-      size="sm"
+    <button
+      type="button"
       onClick={onClick}
       aria-label={label}
       aria-pressed={active}
-      className={cn("gap-1.5 px-2.5", active && "text-safelight-400")}
+      className={cn(
+        "flex h-9 items-center gap-1.5 rounded-full px-3 text-xs transition",
+        active
+          ? "bg-black/35 text-white"
+          : "bg-black/15 text-white/70 hover:bg-black/25 hover:text-white",
+      )}
     >
       {children}
-    </Button>
+    </button>
   );
 }

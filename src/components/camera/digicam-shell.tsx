@@ -3,34 +3,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { fitBox, useElementSize } from "@/hooks/use-element-size";
 import { getCameraBody } from "@/lib/camera/bodies";
-import type { AspectId } from "@/lib/db/types";
 import { cn } from "@/lib/utils";
 
 /**
- * A compact-camera body wrapped around the viewfinder.
+ * The camera body — the whole screen.
  *
- * Selecting the Digicam profile stops being a filter choice and becomes a
- * change of instrument: you are holding a 2000s point-and-shoot, looking at its
- * screen. That is most of why the look is fun, and a rectangle of graded video
- * doesn't deliver it on its own.
+ * Camera Mode is not a viewfinder with controls beneath it; it is a compact
+ * camera you are holding, edge to edge, and the shutter is part of the body
+ * rather than a web button sitting under it. Everything the user touches lives
+ * inside this moulding, passed in as slots.
  *
  * Two rules keep this from violating "no fake features":
  *
- *  - The moulded dial, pads and grille are **scenery**, not controls. They are
- *    `aria-hidden` divs with no button semantics and no hover or press states,
- *    so they read as the plastic of a camera body rather than as UI that has
- *    stopped working. Every real control stays below, where it already was.
- *  - The status readout shows **real values** — the actual aspect ratio, the
- *    actual frame count, a live clock. Nothing on this screen is invented.
+ *  - The grille is **scenery**: aria-hidden, no button semantics, no press
+ *    states. It reads as plastic rather than as UI that has stopped working.
+ *  - The readout shows **real values** — the frame count, the live clock, and
+ *    whether the date stamp is actually armed. Nothing here is invented.
  */
-
-const ASPECT_LABEL: Record<AspectId, string> = {
-  original: "FULL",
-  "1:1": "1:1",
-  "4:3": "4:3",
-  "3:2": "3:2",
-  "16:9": "16:9",
-};
 
 /** `HH:MM`, ticking once a minute like a camera back. */
 function useClock(): string {
@@ -52,185 +41,151 @@ function useClock(): string {
   return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 }
 
-/**
- * Vertical space the body's own furniture occupies: top plate, the padding
- * around the screen, the status readout, and the moulded deck. Subtracted
- * before fitting the screen so the body shrink-wraps its LCD instead of
- * stretching it into a letterbox.
- */
-const CHROME_HEIGHT = 178;
-const CHROME_WIDTH = 24;
-
 export interface DigicamShellProps {
-  aspect: AspectId;
   /** Name of the selected model, printed on the body like a real one. */
-  model?: string;
+  model: string;
   /** Filter id of the model, which decides what the body is made of. */
-  modelId?: string;
-  /** Numeric framing the camera will actually capture. `null` means fill. */
+  modelId: string;
+  /** Sensor framing, so the screen is shaped like the photograph. */
   aspectRatio: number | null;
-  /** Frames taken on this roll, shown on the counter like an exposure count. */
+  /** Frames taken so far, shown as an exposure count. */
   shotCount: number;
   /** Remaining exposures on a disposable roll, if there is a limit. */
   shotsLeft?: number | null;
-  /** Dims the body while the sequence is between shots. */
+  /** Whether the date stamp is armed, shown on the readout. */
+  dateStamp?: boolean;
   busy?: boolean;
+
+  /** Back control, title and torch. */
+  header: React.ReactNode;
+  /** The live viewfinder. */
   children: React.ReactNode;
+  /** Model dial. */
+  dial: React.ReactNode;
+  /** Small toggles above the deck. */
+  tools: React.ReactNode;
+  /** Gallery, shutter and flip. */
+  deck: React.ReactNode;
 }
 
 export function DigicamShell({
-  aspect,
   model,
   modelId,
   aspectRatio,
   shotCount,
   shotsLeft,
+  dateStamp,
   busy,
+  header,
   children,
+  dial,
+  tools,
+  deck,
 }: DigicamShellProps) {
   const clock = useClock();
-  const [containerRef, containerSize] = useElementSize<HTMLDivElement>();
+  const [screenRef, screenSpace] = useElementSize<HTMLDivElement>();
   // Each model is a different piece of plastic, not a relabelled one.
-  const shell = useMemo(() => getCameraBody(modelId ?? ""), [modelId]);
+  const shell = useMemo(() => getCameraBody(modelId), [modelId]);
 
-  // The LCD is sized to the framing the shutter will actually take, so what is
-  // behind the bezel is the photograph — not a crop of it with black bars.
-  const screen = useMemo(
-    () =>
-      fitBox(
-        {
-          width: Math.max(0, containerSize.width - CHROME_WIDTH),
-          height: Math.max(0, containerSize.height - CHROME_HEIGHT),
-        },
-        aspectRatio ?? 3 / 4,
-      ),
-    [containerSize, aspectRatio],
-  );
+  // The screen is shaped to the sensor, so what is behind the bezel is the
+  // photograph rather than a differently-cropped preview of it.
+  const screen = useMemo(() => fitBox(screenSpace, aspectRatio), [screenSpace, aspectRatio]);
 
   return (
-    <div ref={containerRef} className="grid size-full place-items-center">
-      <div
-        className={cn(
-          "relative flex size-full flex-col items-center justify-center overflow-hidden transition-opacity",
-          busy && "opacity-95",
-        )}
+    <div
+      className={cn("relative flex h-full flex-col transition-opacity", busy && "opacity-95")}
+      style={{
+        background: `linear-gradient(160deg, ${shell.body[0]} 0%, ${shell.body[1]} 48%, ${shell.body[2]} 100%)`,
+      }}
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-28 opacity-30"
         style={{
-          // Full bleed: the body *is* the screen, edge to edge, rather than a
-          // card floating on a dark page.
-          background: `linear-gradient(160deg, ${shell.body[0]} 0%, ${shell.body[1]} 48%, ${shell.body[2]} 100%)`,
-          boxShadow:
-            "inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -2px 6px rgba(0,0,0,0.55), 0 18px 40px rgba(0,0,0,0.5)",
+          background: "linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0))",
         }}
+      />
+
+      <div
+        className="relative z-[2] flex shrink-0 items-center gap-1 px-3"
+        style={{ paddingTop: "calc(var(--safe-top) + 0.5rem)", color: shell.ink }}
       >
-        {/* Specular sheen across the top of the moulding. */}
+        {header}
+      </div>
+
+      <div className="relative z-[2] flex shrink-0 items-center justify-between px-5 pb-1 pt-1">
         <span
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-24 opacity-40"
+          className="font-display text-sm leading-none tracking-wide"
+          style={{ color: shell.ink, opacity: 0.75 }}
+        >
+          Pitik
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span
+            aria-hidden
+            className="size-1.5 rounded-full"
+            style={{ background: shell.accent, boxShadow: `0 0 6px ${shell.accent}` }}
+          />
+          <span
+            className="max-w-[10rem] truncate font-mono text-[0.5rem] uppercase tracking-[0.2em]"
+            style={{ color: shell.ink, opacity: 0.6 }}
+          >
+            {model}
+          </span>
+        </span>
+      </div>
+
+      <div ref={screenRef} className="relative z-[2] grid min-h-0 flex-1 place-items-center px-3">
+        <div
+          className="relative overflow-hidden rounded-lg bg-black"
           style={{
-            background:
-              "linear-gradient(to bottom, rgba(255,255,255,0.35), rgba(255,255,255,0))",
+            width: screen.width || "100%",
+            height: screen.height || "100%",
+            boxShadow: `inset 0 0 0 2px rgba(0,0,0,0.85), 0 0 0 2px ${shell.lens}66`,
           }}
-        />
-
-        {/* ------------------------------------------------------ top plate */}
-        <div className="relative z-[2] flex w-full shrink-0 items-center justify-between px-5 pt-3">
-          <span
-            className="font-display text-sm leading-none tracking-wide"
-            style={{ color: shell.ink, opacity: 0.75 }}
-          >
-            Pitik
-          </span>
-
-          <span className="flex items-center gap-1.5">
-            <span
-              aria-hidden
-              className="size-1.5 rounded-full"
-              style={{ background: shell.accent, boxShadow: `0 0 6px ${shell.accent}` }}
-            />
-            <span
-              className="max-w-[9rem] truncate font-mono text-[0.5rem] uppercase tracking-[0.2em]"
-              style={{ color: shell.ink, opacity: 0.6 }}
-            >
-              {model ?? "Digicam"}
-            </span>
-          </span>
+        >
+          {children}
         </div>
+      </div>
 
-        {/* -------------------------------------------------- screen bezel */}
-        <div className="relative z-[2] shrink-0 px-3 py-2.5">
-          <div
-            className="relative overflow-hidden rounded-lg bg-black"
-            style={{
-              width: screen.width || "100%",
-              height: screen.height || "auto",
-              boxShadow: `inset 0 0 0 2px rgba(0,0,0,0.85), inset 0 2px 10px rgba(0,0,0,0.9), 0 0 0 2px ${shell.lens}66`,
-            }}
-          >
-            {children}
-          </div>
-        </div>
-
-        {/* ------------------------------------------------------- readout */}
-        <div className="relative z-[2] w-full shrink-0 px-5">
-          <div className="flex items-center justify-between rounded-sm bg-black/45 px-2.5 py-1 font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[#9fe6b8]">
-            <span>{ASPECT_LABEL[aspect]}</span>
-            <span aria-hidden>
-              {typeof shotsLeft === "number"
-                ? `${String(Math.max(0, shotsLeft)).padStart(3, "0")} LEFT`
-                : `${String(shotCount).padStart(3, "0")}`}
-            </span>
-            <span>{clock}</span>
-          </div>
-        </div>
-
-        {/* --------------------------------------------------- moulded deck */}
-        <div aria-hidden className="relative z-[2] flex w-full shrink-0 items-center justify-between px-6 py-3">
-          {/* Speaker grille */}
-          <span className="flex gap-[3px]">
-            {[0, 1, 2, 3, 4].map((line) => (
-              <span
-                key={line}
-                className="h-4 w-[2px] rounded-full bg-black/35 shadow-[0_1px_0_rgba(255,255,255,0.14)]"
-              />
-            ))}
+      <div className="relative z-[2] shrink-0 px-5 pt-2">
+        <div className="flex items-center justify-between rounded-sm bg-black/45 px-2.5 py-1 font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[#9fe6b8]">
+          <span aria-hidden>
+            {typeof shotsLeft === "number"
+              ? `${String(Math.max(0, shotsLeft)).padStart(3, "0")} LEFT`
+              : String(shotCount).padStart(3, "0")}
           </span>
-
-          {/* Four-way pad and dial ring — plastic, not buttons. */}
-          <span
-            className="relative grid size-14 place-items-center rounded-full"
-            style={{
-              background:
-                "conic-gradient(from 210deg, #7a716a, #4b443f, #6d645e, #3a3430, #7a716a)",
-              boxShadow:
-                "inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 5px rgba(0,0,0,0.6), 0 2px 5px rgba(0,0,0,0.45)",
-            }}
-          >
-            <span
-              className="grid size-6 place-items-center rounded-full"
-              style={{
-                background: "linear-gradient(160deg, #5e5751, #342f2c)",
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.22), 0 1px 3px rgba(0,0,0,0.6)",
-              }}
-            >
-              <span className="size-1 rounded-full bg-white/25" />
-            </span>
+          {/* The zero-padded counter reads as a camera back but as gibberish to
+              a screen reader, so the count is also stated plainly. */}
+          <span className="sr-only" role="status">
+            {typeof shotsLeft === "number"
+              ? `${Math.max(0, shotsLeft)} shots left`
+              : `${shotCount} ${shotCount === 1 ? "shot" : "shots"} taken`}
           </span>
-
-          {/* Two small function pads */}
-          <span className="flex flex-col gap-2">
-            {[0, 1].map((pad) => (
-              <span
-                key={pad}
-                className="h-2.5 w-6 rounded-full"
-                style={{
-                  background: "linear-gradient(160deg, #6b625c, #3b3531)",
-                  boxShadow:
-                    "inset 0 1px 0 rgba(255,255,255,0.25), 0 1px 2px rgba(0,0,0,0.5)",
-                }}
-              />
-            ))}
-          </span>
+          {/* Shown only when armed, so the readout reports the camera's real
+              state rather than listing features it has. */}
+          {dateStamp ? <span>DATE ON</span> : null}
+          <span>{clock}</span>
         </div>
+      </div>
+
+      {/* The dial sits on its own dark strip rather than directly on the body:
+          model names have to stay legible on a cream instant-film shell as well
+          as on black plastic, and one backdrop is simpler than tinting text per
+          model. */}
+      <div className="relative z-[2] mx-5 mt-2 shrink-0 overflow-hidden rounded-full bg-black/35 py-0.5">
+        {dial}
+      </div>
+
+      <div className="relative z-[2] flex shrink-0 items-center justify-center gap-1 px-3 pt-1">
+        {tools}
+      </div>
+
+      <div
+        className="relative z-[2] flex shrink-0 items-center justify-between px-7 pt-2"
+        style={{ paddingBottom: "calc(var(--safe-bottom) + 1rem)" }}
+      >
+        {deck}
       </div>
     </div>
   );

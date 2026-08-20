@@ -325,6 +325,50 @@ export function renderCapture(source: CanvasImageSource, options: RenderOptions)
   return canvas;
 }
 
+/**
+ * Mounts a photograph in an instant-film print.
+ *
+ * A Polaroid is not a colour grade — it is a square image sitting high on a
+ * white card with a deep chin below it. Without the border it is just a soft
+ * warm photo, so the frame is part of what that camera produces.
+ *
+ * The image is cropped square here rather than upstream, because the squareness
+ * belongs to the print format and not to the sensor.
+ */
+export function applyInstantFrame(photo: CanvasImageSource): AnyCanvas {
+  const { width: sourceWidth, height: sourceHeight } = sourceSize(photo);
+  const side = Math.min(sourceWidth, sourceHeight);
+  const crop = centreCrop(sourceWidth, sourceHeight, 1);
+
+  // Proportions taken from a real instant print: an even margin on three sides
+  // and a chin roughly four times deeper.
+  const border = Math.round(side * 0.075);
+  const chin = Math.round(side * 0.3);
+  const width = side + border * 2;
+  const height = side + border + chin;
+
+  const canvas = createCanvas(width, height);
+  const ctx = context2d(canvas);
+  ctx.imageSmoothingQuality = "high";
+
+  // Warm white rather than pure white: instant stock never was #ffffff, and
+  // pure white next to a graded photograph reads as a UI element.
+  ctx.fillStyle = "#f8f6f0";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.drawImage(photo, crop.sx, crop.sy, crop.sw, crop.sh, border, border, side, side);
+
+  // A hairline of shadow where the emulsion meets the card, so the image sits
+  // *in* the print rather than on top of it.
+  ctx.save();
+  ctx.strokeStyle = "rgba(0,0,0,0.18)";
+  ctx.lineWidth = Math.max(1, Math.round(side * 0.003));
+  ctx.strokeRect(border, border, side, side);
+  ctx.restore();
+
+  return canvas;
+}
+
 export async function canvasToBlob(
   canvas: AnyCanvas,
   type = "image/jpeg",

@@ -26,8 +26,8 @@ test("takes a photo and files it under a named roll", async ({ page }) => {
   await shutter.click();
   await expect.poll(() => countStore(page, "captures"), { timeout: 15_000 }).toBe(1);
 
-  // The frame counter is the user-visible confirmation that it landed.
-  await expect(page.getByText(/^1 shot$/)).toBeVisible();
+  // The exposure counter on the camera back is the visible confirmation.
+  await expect(page.getByText("1 shot taken")).toBeAttached();
 });
 
 test("shoots several frames in a row without blocking", async ({ page }) => {

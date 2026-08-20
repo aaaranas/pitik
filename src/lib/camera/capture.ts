@@ -1,9 +1,11 @@
 import {
+  applyInstantFrame,
   canvasToBlob,
   formatCameraTimestamp,
   makeThumbnail,
   renderCapture,
 } from "@/lib/filters/canvas";
+import { getCameraBody } from "./bodies";
 import { composeAdjustments, getProfile } from "@/lib/filters/registry";
 import { addCapture } from "@/lib/db/repo";
 import { ASPECT_RATIOS, type AspectId, type Capture, type CaptureSource } from "@/lib/db/types";
@@ -42,7 +44,7 @@ export async function captureFrame(request: CaptureRequest): Promise<Capture> {
     filterId: request.filterId,
   });
 
-  const canvas = renderCapture(request.source, {
+  const graded = renderCapture(request.source, {
     adjustments,
     mirror: request.mirrored,
     aspect: ASPECT_RATIOS[request.aspect],
@@ -52,6 +54,13 @@ export async function captureFrame(request: CaptureRequest): Promise<Capture> {
     timestamp:
       (request.timestamp ?? profile.timestamp) ? formatCameraTimestamp(new Date()) : null,
   });
+
+  // Some cameras produce a print rather than a bare frame. Applied after the
+  // grade so the border stays white instead of being tinted by the look.
+  const canvas =
+    getCameraBody(request.filterId).print === "instant"
+      ? applyInstantFrame(graded as CanvasImageSource)
+      : graded;
 
   const blob = await canvasToBlob(canvas, "image/jpeg", request.quality ?? 0.92);
   const thumb = await makeThumbnail(canvas as CanvasImageSource);
