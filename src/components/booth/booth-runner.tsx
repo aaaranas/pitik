@@ -44,8 +44,6 @@ interface BoothFrame {
 
 const INTERVAL_OPTIONS = [3, 5, 8] as const;
 
-/** Comfortably above the largest slot any shipped template asks for. */
-const BOOTH_FRAME_MAX_EDGE = 1280;
 
 export function BoothRunner({ template }: { template: BoothTemplate }) {
   const camera = useCamera({ initialFacing: "user" });
@@ -158,12 +156,6 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
         profileId,
         aspectRatio: aspect,
         mirrored,
-        // Booth frames are composited into slots that top out around 1440px
-        // even on a print-scale export, so grading them at full sensor
-        // resolution burns roughly four times the pixels for no visible gain —
-        // and that cost lands as a freeze between shots, when the sequence is
-        // counting you into the next one.
-        maxDimension: BOOTH_FRAME_MAX_EDGE,
       });
       shotCountRef.current += 1;
       bitmapsRef.current.push(frame.bitmap);

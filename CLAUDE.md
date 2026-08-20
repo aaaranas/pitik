@@ -64,6 +64,23 @@ a dependency that phones home, that test will fail and it is right.
 - Skin tone is the judgement criterion. A grade that wrecks midtones is rejected
   regardless of how good the landscape test looks.
 
+## Camera Mode
+
+- The screen is a camera body, edge to edge. Controls live inside the moulding
+  as slots; nothing floats underneath it.
+- **The model dial is the only look control.** Do not reintroduce a filter tray
+  here — two controls for one property will disagree, and a camera is not a
+  filter stacked on another filter.
+- **No aspect-ratio control.** The camera shoots the sensor's framing and the
+  viewfinder is shaped from `frameAspect`, so preview and photograph match. A
+  preview cropped differently from the capture is a lie.
+- A model may produce a *print* rather than a bare frame (`CameraBody.print`).
+  Polaroid is a white border with a chin; a grade alone does not make one.
+- Body furniture is scenery: `aria-hidden`, no button semantics. Anything on the
+  readout must be a real value.
+- Zero-padded camera-back numerals read as gibberish to a screen reader. State
+  the count plainly in an `sr-only` companion.
+
 ## Booth
 
 - Templates are geometry. Positions are **computed** by the grid builder, not

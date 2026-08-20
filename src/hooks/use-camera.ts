@@ -41,6 +41,14 @@ export interface CameraController {
    * the lifetime.
    */
   stream: MediaStream | null;
+  /**
+   * Width/height of the frames the sensor is actually delivering.
+   *
+   * The viewfinder is shaped to this so that what is on screen is exactly what
+   * the shutter will capture — there is no aspect-ratio control any more, and a
+   * preview cropped differently from the photograph would be a lie.
+   */
+  frameAspect: number | null;
   status: CameraStatus;
   error: CameraError | null;
   facing: Facing;
@@ -111,6 +119,7 @@ export function useCamera(options: {
   const [torch, setTorchState] = useState(false);
   const [zoom, setZoomState] = useState(1);
   const [exposure, setExposureState] = useState(0);
+  const [frameAspect, setFrameAspect] = useState<number | null>(null);
   const [permission, setPermission] = useState<PermissionState | "unknown">("unknown");
   // A browser capability, not app state: read through an external store so the
   // server render stays optimistic and hydration doesn't flicker the gate.
@@ -172,6 +181,11 @@ export function useCamera(options: {
       setFacing(camera.facing);
       setCapabilities(camera.capabilities);
       setTorchState(false);
+      setFrameAspect(
+        camera.settings.width && camera.settings.height
+          ? camera.settings.width / camera.settings.height
+          : null,
+      );
       setZoomState(camera.capabilities.zoom?.min ?? 1);
       setExposureState(0);
       wasRunningRef.current = true;
@@ -278,6 +292,7 @@ export function useCamera(options: {
     videoRef,
     attachVideo,
     stream,
+    frameAspect,
     status,
     error,
     facing,

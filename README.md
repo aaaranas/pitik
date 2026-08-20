@@ -65,14 +65,27 @@ create — Pitik works completely without one. See
 
 ### Camera Mode — `/camera`
 
-A full viewfinder with rear/front switching, five aspect ratios (Original, 1:1,
-4:3, 3:2, 16:9), a self-timer, a composition grid, a horizon level,
-tap-to-focus, torch and zoom where the hardware exposes them, gallery import,
-and live filter preview.
+The whole screen is one instrument: a compact camera body, edge to edge, with
+the shutter moulded into it rather than sitting underneath as a web button. Each
+model on the dial is a different camera — its own grade, body colour, accent
+lamp and lens ring.
 
-Shooting is deliberately uninterrupted: the shutter fires, the frame is
-snapshotted immediately, and grading plus encoding happen off the critical path.
-There is **no confirmation screen** between shots.
+Three decisions shape it:
+
+- **The dial is the only look control.** A camera is not a filter you layer on
+  another filter, so there is no separate tray to disagree with it.
+- **No aspect ratios.** The camera shoots the sensor's own framing and the
+  viewfinder is shaped to match, so what is on screen is the photograph.
+- **No confirmation screen.** The shutter fires, the frame is snapshotted
+  immediately, and grading plus encoding happen off the critical path.
+
+**Polaroid is a print, not a grade.** Selecting it mounts the photograph in a
+white instant frame with a deep chin, cropped square — the border is what that
+camera actually produces.
+
+Also here: rear/front switching, a self-timer, a composition grid, a horizon
+level, tap-to-focus, torch and zoom where the hardware exposes them, gallery
+import, and an optional vintage date stamp.
 
 ### Resolution, deliberately
 
@@ -84,12 +97,6 @@ under a second.
 
 It is also the honest resolution for this product: the compacts these filters
 imitate shot between two and five megapixels.
-
-### Date stamp
-
-Optional, off by default, and toggled from the camera's tool row or Settings. It
-burns the date into the corner in the orange-on-glow of a 90s camera back, after
-every grade so it stays legible whatever the filter did.
 
 ### Camera profiles
 
