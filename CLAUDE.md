@@ -1,0 +1,118 @@
+@AGENTS.md
+
+# Pitik — engineering and product rules
+
+Read `README.md` first for what the app is and how it is laid out. This file is
+the set of decisions that are easy to undo by accident.
+
+## The product in one paragraph
+
+Pitik is a camera people open *during* a moment, not after it. Every design
+choice serves that: the shutter is never more than one tap away, nothing blocks
+a capture, and the app is useful with no account and no network. If a change
+makes the first photo slower or more conditional, it is the wrong change.
+
+## Non-negotiable
+
+**The shutter must never silently do nothing.** Any path where a press can be
+dropped is a bug, not an edge case. Two have already been fixed: capturing
+before the roll record loaded, and capturing before the video decoded its first
+frame (`videoWidth` is non-zero at `HAVE_METADATA`, which is *before* there are
+pixels — see `isFrameReady`). Both are covered by tests. If a press cannot be
+served immediately, wait for it to become servable; if it truly fails, say so.
+
+**IndexedDB is the source of truth.** A photo exists the moment the shutter
+fires, with no account and no network. The server mirrors and delivers other
+people's contributions; it never originates, and **nothing it says may delete or
+overwrite a local photo**. The three merge invariants in `lib/sync/merge.ts` are
+what enforce that — they are pure functions with tests, and they are not to be
+relaxed to make a sync case simpler.
+
+**No feature may require an account.** Auth gates exactly three things:
+accounts, backup, shared rolls. Everything else works signed out, and
+`isSupabaseConfigured() === false` is a fully supported mode, not a broken
+install.
+
+**No fake features.** Every switch in Settings is wired. Every capability shown
+in the camera has been checked against the actual device. A control that cannot
+work is not rendered — that is why `CameraCapabilities` exists.
+
+**No third-party requests.** No analytics, no trackers, no remote fonts at
+runtime, no AI services. There is an end-to-end test asserting this; if you add
+a dependency that phones home, that test will fail and it is right.
+
+## Filters
+
+- Filters are **data**. Add presets to `src/lib/filters/presets.ts`; never put
+  grading maths in a component.
+- Preview (`css.ts`) and export (`canvas.ts`) consume the same `Adjustments`
+  object and must obey the same order of operations. Where CSS cannot express an
+  effect, the preview **understates** it — the saved photo may exceed the
+  preview, never disappoint it.
+- Any change to the maths: run `/dev/render-check` and look at it. The unit
+  tests catch monotonicity, range, and preset distinctiveness; they cannot tell
+  you a grade has become ugly.
+- Names describe a feeling or a process, never a brand. Nothing is named after
+  another company's product or film stock.
+- Skin tone is the judgement criterion. A grade that wrecks midtones is rejected
+  regardless of how good the landscape test looks.
+
+## Booth
+
+- Templates are geometry. Positions are **computed** by the grid builder, not
+  typed out, so padding changes cannot drift a layout apart.
+- The compositor must stay template-agnostic. If it needs to know a template's
+  id to render it correctly, the template model is missing a field.
+- Every new template must pass the layout tests (inside canvas, no overlap, slot
+  count matches shots, caption below the photos).
+
+## React
+
+ESLint's React Compiler rules are **correctness requirements**, not style. In
+practice this means:
+
+- No `setState` synchronously in an effect body. Put the work in an async
+  callback or a timer callback — see `useQuery` and the self-timer.
+- No reading or writing `ref.current` during render.
+- No impure calls during render. `Date.now()` goes through `useMinute()`;
+  browser capability checks go through `useCapability()`. Both are
+  `useSyncExternalStore` so the value is stable within a render and hydration
+  cannot mismatch.
+- Destructure hook results before using them in dependency arrays; optional
+  chaining in a dep list defeats memoisation.
+
+## Memory
+
+A camera app leaks megabytes per mistake.
+
+- `createObjectURL` is called **only** by `useObjectUrl` / `useObjectUrls`.
+- Every `ImageBitmap` is `close()`d, including on unmount and on retake.
+- The camera stream is released on unmount and when the page is hidden.
+- Full-resolution work happens once per photo, never per frame.
+
+## Testing
+
+- `pnpm check` must pass before anything is considered done.
+- Unit tests target pure logic — colour maths, geometry, the repository,
+  formatting. They run against a real IndexedDB (`fake-indexeddb`), not a mock.
+- E2E runs against a **production build** with Chromium's synthetic camera, so
+  the real capture path executes. Do not mock the camera to make a test pass.
+- Tests must be deterministic. Two records created in the same millisecond tie;
+  pass explicit timestamps rather than relying on ordering.
+- Playwright can click a server-rendered button before hydration. Navigate with
+  the `open()` helper, which waits for React to take over.
+
+## Writing
+
+Interface copy is plain, warm, and specific. Errors state what happened in one
+sentence and offer the single thing the user can try. Empty states carry the
+product's promise rather than apologising. Never use a technical term where a
+human one exists — "That frame didn't save", not "Capture pipeline error".
+
+## Quality gates
+
+```bash
+pnpm lint && pnpm typecheck && pnpm test && pnpm build
+# or
+pnpm check
+```
