@@ -15,7 +15,12 @@ import {
   toneCurve,
 } from "@/lib/filters/math";
 import { FILTER_PRESETS } from "@/lib/filters/presets";
-import { composeAdjustments, getFilter, listFilters } from "@/lib/filters/registry";
+import {
+  composeAdjustments,
+  getFilter,
+  listFilters,
+  listFiltersForProfile,
+} from "@/lib/filters/registry";
 import { NEUTRAL_ADJUSTMENTS, type Adjustments } from "@/lib/filters/types";
 
 function adjust(patch: Partial<Adjustments>): Adjustments {
@@ -330,5 +335,43 @@ describe("misc", () => {
 
   it("formats a camera-back timestamp", () => {
     expect(formatCameraTimestamp(new Date(2026, 7, 19, 21, 4))).toBe("'26 08 19 21:04");
+  });
+});
+
+/**
+ * Profiles as sections.
+ *
+ * Camera Mode is a digicam, so its dial lists camera models rather than grades.
+ * That mapping lives in the profile data, and a regression here would put the
+ * wrong shelf in front of the shutter.
+ */
+describe("listFiltersForProfile", () => {
+  it("gives the digicam section the camera models and nothing else", () => {
+    const models = listFiltersForProfile("digicam");
+    expect(models.length).toBeGreaterThanOrEqual(10);
+    for (const model of models) expect(model.category).toBe("Digicam");
+  });
+
+  it("includes the model the camera opens on", () => {
+    // `DEFAULT_SETTINGS.defaultFilterId` — a digicam must boot holding a camera.
+    expect(listFiltersForProfile("digicam").map((f) => f.id)).toContain("2003");
+  });
+
+  it("gives a profile with no declared categories the whole shelf", () => {
+    expect(listFiltersForProfile("everyday")).toHaveLength(FILTER_PRESETS.length);
+  });
+
+  it("restricts the other sections to their own categories", () => {
+    for (const filter of listFiltersForProfile("disposable")) {
+      expect(filter.category).toBe("Film");
+    }
+    for (const filter of listFiltersForProfile("soft")) {
+      expect(filter.category).toBe("Dreamy");
+    }
+  });
+
+  it("never returns an empty shelf, even for an unknown profile", () => {
+    // An empty tray would leave the user nothing to select at all.
+    expect(listFiltersForProfile("does-not-exist").length).toBeGreaterThan(0);
   });
 });

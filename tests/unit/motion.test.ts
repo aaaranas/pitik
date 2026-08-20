@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   isWithinMotionBudget,
+  MOTION_BITS_PER_SECOND,
   MOTION_MAX_BYTES,
+  MOTION_MIN_BITS_PER_SECOND,
+  motionBitrateFor,
   MOTION_MIME_CANDIDATES,
   MOTION_MIME_CANDIDATES_WITH_AUDIO,
   motionCandidates,
@@ -128,5 +131,57 @@ describe("motionExtension", () => {
 
   it("defaults to webm for anything unrecognised", () => {
     expect(motionExtension("application/octet-stream")).toBe("webm");
+  });
+});
+
+/**
+ * Bitrate selection.
+ *
+ * Regression cover for a hole that made the feature look broken: a nine-shot
+ * Contact Sheet at a slow interval runs past a minute, blew the size ceiling at
+ * a fixed bitrate, and had its clip silently discarded — after the app had
+ * already told the user the shoot was being filmed.
+ */
+describe("motionBitrateFor", () => {
+  /** Bytes a clip of this length would occupy at the chosen bitrate. */
+  const projectedBytes = (durationMs: number) =>
+    (motionBitrateFor(durationMs) / 8) * (durationMs / 1000);
+
+  it("uses full quality for a short sequence", () => {
+    // Instant Pair: two shots, three second interval.
+    expect(motionBitrateFor(8_000)).toBe(MOTION_BITS_PER_SECOND);
+  });
+
+  it("steps down for a long one rather than overshooting the budget", () => {
+    // Contact Sheet: nine shots at eight seconds is well over a minute.
+    expect(motionBitrateFor(81_000)).toBeLessThan(MOTION_BITS_PER_SECOND);
+  });
+
+  it("keeps every shipped sequence length inside the ceiling", () => {
+    // Longest template (9 shots) against the slowest interval (8s), plus a
+    // second of capture per shot.
+    for (const shots of [1, 2, 3, 4, 6, 9]) {
+      for (const interval of [3, 5, 8]) {
+        const duration = shots * (interval + 1) * 1000;
+        expect(projectedBytes(duration), `${shots} shots at ${interval}s`).toBeLessThanOrEqual(
+          MOTION_MAX_BYTES,
+        );
+      }
+    }
+  });
+
+  it("never drops below the quality floor, however long the shoot", () => {
+    // A soft clip beats no clip; the moment is the point, not the resolution.
+    expect(motionBitrateFor(60 * 60 * 1000)).toBe(MOTION_MIN_BITS_PER_SECOND);
+  });
+
+  it("handles a zero or negative duration without dividing by zero", () => {
+    expect(Number.isFinite(motionBitrateFor(0))).toBe(true);
+    expect(motionBitrateFor(0)).toBe(MOTION_BITS_PER_SECOND);
+    expect(Number.isFinite(motionBitrateFor(-5))).toBe(true);
+  });
+
+  it("respects a caller-supplied budget", () => {
+    expect(motionBitrateFor(30_000, 1024 * 1024)).toBeLessThan(motionBitrateFor(30_000));
   });
 });

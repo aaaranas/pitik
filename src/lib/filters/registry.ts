@@ -46,6 +46,22 @@ export function getFilter(id: string | undefined): FilterDefinition {
   return (id && filters.get(id)) || filters.get(DEFAULT_FILTER_ID)!;
 }
 
+/**
+ * The filters a given profile puts in the tray.
+ *
+ * A profile with no declared categories shows everything. One that declares
+ * them shows only those, in registry order — so Digicam is a shelf of cameras
+ * rather than a grade sitting on top of an unrelated list of looks.
+ */
+export function listFiltersForProfile(profileId: string | undefined): FilterDefinition[] {
+  const categories = getProfile(profileId).filterCategories;
+  if (!categories?.length) return listFilters();
+  const matching = listFilters().filter((filter) => categories.includes(filter.category));
+  // Never hand back an empty tray: a profile pointing at a category with no
+  // filters would leave the user nothing to select.
+  return matching.length ? matching : listFilters();
+}
+
 export function listProfiles(): CameraProfile[] {
   return [...profiles.values()];
 }

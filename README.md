@@ -106,8 +106,10 @@ Three things worth knowing:
   converge on one container, with WebM as the fallback for older Chromium.
 
 Clips are ungraded (`MediaRecorder` sees the raw stream, not the preview's CSS
-filter), capped at 2.5 Mbps, and dropped rather than stored above 12 MB. They
-are **not synced** — see [Supabase](#supabase-optional).
+filter). Bitrate is scaled to the planned length of the sequence so that even a
+nine-shot Contact Sheet fits the 24 MB storage ceiling, and if a clip still
+cannot be kept the app says so rather than dropping it silently. Clips are
+**not synced** — see [Supabase](#supabase-optional).
 
 ### Rolls — `/rolls`
 
@@ -356,7 +358,7 @@ and pulling a shared roll brings the strip without the motion behind it.
 ## Testing
 
 ```bash
-pnpm test        # 184 unit tests
+pnpm test        # 190 unit tests
 pnpm test:e2e    # 24 end-to-end tests, mobile and desktop
 ```
 

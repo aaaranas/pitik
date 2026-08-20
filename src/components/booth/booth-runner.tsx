@@ -210,10 +210,23 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
           // to render a "preparing…" state for something that takes 20ms.
           const recording = recordingRef.current;
           recordingRef.current = null;
-          const clip = recording ? await recording.stop() : null;
+          const result = recording ? await recording.stop() : null;
           if (cancelled) return;
           setRecordingActive(false);
-          setMotion(clip);
+          setMotion(result?.ok ? result.clip : null);
+
+          // The shoot was advertised as filmed, so a clip that didn't survive
+          // has to say so. Silence here is indistinguishable from the feature
+          // being broken.
+          if (result && !result.ok) {
+            toast(
+              result.reason === "too-large"
+                ? "That shoot was too long to keep as a clip."
+                : "The clip didn't record. Your strip is fine.",
+              { detail: "The photos are unaffected.", tone: "error" },
+            );
+          }
+
           setPhase("review");
           setCountdown(null);
         } else {
@@ -228,7 +241,7 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
       cancelled = true;
       window.clearTimeout(handle);
     };
-  }, [countdown, hapticsOn, interval, phase, shootOne, soundOn, template.shots]);
+  }, [countdown, hapticsOn, interval, phase, shootOne, soundOn, template.shots, toast]);
 
   /** Drops everything from the previous shoot. Shared by start and retake. */
   const clearSession = useCallback(() => {
@@ -255,7 +268,11 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
     // Rolls from the first countdown to the last shot, so the clip contains the
     // waiting and the reacting rather than just the poses. A recorder that
     // refuses to start returns null and the sequence carries on regardless.
-    const recording = await startMotionRecording(camera.stream);
+    const recording = await startMotionRecording(camera.stream, {
+      // The countdown plus roughly a second of capture per shot. Used to pick a
+      // bitrate that keeps even a nine-shot sequence inside the storage budget.
+      expectedDurationMs: template.shots * (interval + 1) * 1000,
+    });
 
     // The user may have left while the prompt was open; a recorder must never
     // outlive the screen that started it.
@@ -269,7 +286,7 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
     setPreparing(false);
     setPhase("running");
     setCountdown(interval);
-  }, [camera.stream, clearSession, interval]);
+  }, [camera.stream, clearSession, interval, template.shots]);
 
   const retake = useCallback(() => {
     clearSession();

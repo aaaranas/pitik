@@ -166,7 +166,9 @@ export const DEFAULT_SETTINGS: Omit<Settings, "deviceId"> = {
   gridOverlay: false,
   mirrorSelfie: true,
   defaultAspect: "4:3",
-  defaultFilterId: "natural",
+  // Camera Mode is a digicam, so it opens on a camera model rather than on a
+  // neutral grade. `2003` is PowerShot; see `lib/filters/presets.ts`.
+  defaultFilterId: "2003",
   defaultProfileId: "everyday",
   syncEnabled: false,
   onboarded: false,

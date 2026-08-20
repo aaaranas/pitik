@@ -110,6 +110,14 @@ export interface CameraProfile {
   name: string;
   description: string;
   adjustments: Partial<Adjustments>;
+  /**
+   * Filter categories this profile puts in the tray.
+   *
+   * A profile is a *section* of the camera, not just a grade — picking Digicam
+   * should offer the digicam models, not all forty-five looks in the app.
+   * Omitted means "everything", which is what Everyday wants.
+   */
+  filterCategories?: FilterCategory[];
   /** Burns a date into the corner of the exported frame. */
   timestamp: boolean;
   /** Biases the shutter toward the flash-lit look (brightens the near field). */
