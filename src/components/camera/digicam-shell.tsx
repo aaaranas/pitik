@@ -62,6 +62,8 @@ const CHROME_WIDTH = 24;
 
 export interface DigicamShellProps {
   aspect: AspectId;
+  /** Name of the selected model, printed on the body like a real one. */
+  model?: string;
   /** Numeric framing the camera will actually capture. `null` means fill. */
   aspectRatio: number | null;
   /** Frames taken on this roll, shown on the counter like an exposure count. */
@@ -75,6 +77,7 @@ export interface DigicamShellProps {
 
 export function DigicamShell({
   aspect,
+  model,
   aspectRatio,
   shotCount,
   shotsLeft,
@@ -138,8 +141,8 @@ export function DigicamShell({
               aria-hidden
               className="size-1.5 rounded-full bg-safelight-500 shadow-[0_0_6px_rgba(234,79,52,0.9)]"
             />
-            <span className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-white/45">
-              Digicam
+            <span className="max-w-[9rem] truncate font-mono text-[0.5rem] uppercase tracking-[0.2em] text-white/45">
+              {model ?? "Digicam"}
             </span>
           </span>
         </div>

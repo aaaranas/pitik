@@ -65,14 +65,48 @@ export function motionCandidates(withAudio: boolean): readonly string[] {
   return withAudio ? MOTION_MIME_CANDIDATES_WITH_AUDIO : MOTION_MIME_CANDIDATES;
 }
 
-/** Roughly 15 seconds of booth at the bitrate below. */
-export const MOTION_MAX_BYTES = 12 * 1024 * 1024;
+/**
+ * Ceiling for a stored clip.
+ *
+ * The clip lives in IndexedDB next to full-resolution photographs, so this is
+ * a real budget rather than a formality — but it has to comfortably fit the
+ * longest sequence Pitik offers. Contact Sheet is nine shots, which at an eight
+ * second interval runs well over a minute.
+ */
+export const MOTION_MAX_BYTES = 24 * 1024 * 1024;
+
+/** Bitrate for a short sequence. Long ones are stepped down to fit the budget. */
+export const MOTION_BITS_PER_SECOND = 2_500_000;
 
 /**
- * Modest on purpose. The clip lives in IndexedDB next to full-resolution
- * photographs, and a booth night can hold a lot of both.
+ * Floor below which the clip stops being worth keeping.
+ *
+ * Better a slightly soft clip than no clip: the point is the moment, not the
+ * resolution.
  */
-export const MOTION_BITS_PER_SECOND = 2_500_000;
+export const MOTION_MIN_BITS_PER_SECOND = 700_000;
+
+/**
+ * Picks a bitrate that keeps a sequence of the given length inside the budget.
+ *
+ * Without this, a nine-shot booth at a slow interval sails past the ceiling and
+ * the finished clip is thrown away — after the app has already promised the
+ * shoot was being filmed. Scaling the bitrate to the *planned* duration means
+ * the promise can actually be kept for every template Pitik offers.
+ *
+ * Uses 80% of the budget, because a container carries overhead beyond the
+ * nominal video bitrate and the estimate should not sit on the line.
+ */
+export function motionBitrateFor(
+  expectedDurationMs: number,
+  maxBytes = MOTION_MAX_BYTES,
+): number {
+  const seconds = Math.max(1, expectedDurationMs / 1000);
+  const affordableBitsPerSecond = (maxBytes * 8 * 0.8) / seconds;
+  return Math.round(
+    Math.min(MOTION_BITS_PER_SECOND, Math.max(MOTION_MIN_BITS_PER_SECOND, affordableBitsPerSecond)),
+  );
+}
 
 /**
  * Picks the first container the browser will actually record.
@@ -118,9 +152,28 @@ export interface MotionClip {
   durationMs: number;
 }
 
+/**
+ * Why a recording produced nothing.
+ *
+ * Returned rather than swallowed: a clip that disappears without explanation is
+ * indistinguishable from a broken feature, and the user has just been told the
+ * shoot was being filmed.
+ */
+export type MotionFailure =
+  /** The recorder yielded no data at all. */
+  | "empty"
+  /** Finished, but too large to store. */
+  | "too-large"
+  /** The recorder reported an error mid-shoot. */
+  | "failed";
+
+export type MotionResult =
+  | { ok: true; clip: MotionClip }
+  | { ok: false; reason: MotionFailure };
+
 export interface MotionRecording {
-  /** Finishes and returns the clip, or null if it produced nothing usable. */
-  stop: () => Promise<MotionClip | null>;
+  /** Finishes and returns the clip, or the reason there isn't one. */
+  stop: () => Promise<MotionResult>;
   /** Abandons the recording and releases the recorder. Never throws. */
   cancel: () => void;
 }
@@ -161,6 +214,11 @@ export interface StartMotionOptions {
    * makes booth footage worth keeping.
    */
   withAudio?: boolean;
+  /**
+   * Roughly how long the sequence will run, used to choose a bitrate that
+   * keeps the result inside the storage budget.
+   */
+  expectedDurationMs?: number;
 }
 
 export async function startMotionRecording(
@@ -193,7 +251,9 @@ export async function startMotionRecording(
   try {
     recorder = new MediaRecorder(recorded, {
       mimeType,
-      videoBitsPerSecond: MOTION_BITS_PER_SECOND,
+      videoBitsPerSecond: motionBitrateFor(
+        options.expectedDurationMs ?? 20_000,
+      ),
     });
   } catch {
     stopAudio();
@@ -232,32 +292,40 @@ export async function startMotionRecording(
 
   return {
     stop: () =>
-      new Promise<MotionClip | null>((resolve) => {
+      new Promise<MotionResult>((resolve) => {
         if (recorder.state === "inactive") {
           release();
-          resolve(null);
+          resolve({ ok: false, reason: "empty" });
           return;
         }
 
         recorder.onstop = () => {
           const durationMs = Date.now() - startedAt;
           release();
-          if (failed || chunks.length === 0) {
-            resolve(null);
+          if (failed) {
+            resolve({ ok: false, reason: "failed" });
+            return;
+          }
+          if (chunks.length === 0) {
+            resolve({ ok: false, reason: "empty" });
             return;
           }
           const blob = new Blob(chunks, { type: mimeType });
-          // Oversized clips are dropped rather than stored: a 60MB file in
-          // IndexedDB is a worse outcome than no clip at all, and the strip —
-          // the thing the user asked for — is unaffected either way.
-          resolve(isWithinMotionBudget(blob.size) ? { blob, mimeType, durationMs } : null);
+          // Oversized clips are still dropped rather than stored — but the
+          // bitrate was chosen to make that unlikely, and the caller is told
+          // why so it never looks like the feature simply did nothing.
+          resolve(
+            isWithinMotionBudget(blob.size)
+              ? { ok: true, clip: { blob, mimeType, durationMs } }
+              : { ok: false, reason: "too-large" },
+          );
         };
 
         try {
           recorder.stop();
         } catch {
           release();
-          resolve(null);
+          resolve({ ok: false, reason: "failed" });
         }
       }),
 

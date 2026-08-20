@@ -1,25 +1,35 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { CameraProfile } from "@/lib/filters/types";
 import { cn } from "@/lib/utils";
 
+export interface DialItem {
+  id: string;
+  name: string;
+}
+
 /**
- * The mode dial.
+ * The model dial.
  *
  * Modelled on the click-wheel across the top of a compact camera: names in a
  * row, the selected one under a fixed marker. Implemented as a scroll-snap
  * strip so it responds to a thumb flick with real momentum, and to arrow keys
  * for anyone driving it from a keyboard.
+ *
+ * `selectedId` may match nothing — a look chosen from the full filter tray is
+ * not one of the bodies on the dial — in which case no entry is marked, which
+ * is honest rather than highlighting something that isn't in force.
  */
 export function ProfileDial({
-  profiles,
+  items,
   selectedId,
+  label = "Camera model",
   onSelect,
   className,
 }: {
-  profiles: CameraProfile[];
+  items: DialItem[];
   selectedId: string;
+  label?: string;
   onSelect: (id: string) => void;
   className?: string;
 }) {
@@ -30,54 +40,59 @@ export function ProfileDial({
     active?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
   }, [selectedId]);
 
-  const index = Math.max(
-    0,
-    profiles.findIndex((profile) => profile.id === selectedId),
-  );
+  const selectedIndex = items.findIndex((item) => item.id === selectedId);
+  const index = Math.max(0, selectedIndex);
+  /** A look chosen from the full tray is not one of the bodies on the dial. */
+  const onDial = selectedIndex >= 0;
 
   return (
     <div className={cn("relative", className)}>
       <div
         ref={ref}
         role="radiogroup"
-        aria-label="Camera profile"
+        aria-label={label}
         onKeyDown={(event) => {
           if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
             event.preventDefault();
             const delta = event.key === "ArrowRight" ? 1 : -1;
-            const next = (index + delta + profiles.length) % profiles.length;
-            onSelect(profiles[next].id);
+            const next = (index + delta + items.length) % items.length;
+            onSelect(items[next].id);
           }
         }}
         className="flex snap-x snap-mandatory gap-1 overflow-x-auto px-[42%] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {profiles.map((profile) => {
-          const selected = profile.id === selectedId;
+        {items.map((item) => {
+          const selected = item.id === selectedId;
           return (
             <button
-              key={profile.id}
+              key={item.id}
               type="button"
               role="radio"
               aria-checked={selected}
               data-selected={selected}
-              onClick={() => onSelect(profile.id)}
+              onClick={() => onSelect(item.id)}
               className={cn(
                 "shrink-0 snap-center whitespace-nowrap rounded-full px-3 py-1.5 text-xs uppercase tracking-[0.14em] transition-colors",
                 selected ? "text-safelight-400" : "text-ink-400 hover:text-ink-200",
               )}
             >
-              {profile.name}
+              {item.name}
             </button>
           );
         })}
       </div>
-      {/* Fixed marker beneath the strip, the way a dial has an index mark. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 -bottom-0.5 flex justify-center"
-      >
-        <div className="h-px w-8 bg-safelight-500" />
-      </div>
+      {/* Fixed marker beneath the strip, the way a dial has an index mark.
+          Hidden when the active look is not on the dial at all — the mark sits
+          at a fixed position, so leaving it up would point at whichever entry
+          happened to be centred and imply it was selected. */}
+      {onDial ? (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 -bottom-0.5 flex justify-center"
+        >
+          <div className="h-px w-8 bg-safelight-500" />
+        </div>
+      ) : null}
     </div>
   );
 }

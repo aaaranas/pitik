@@ -34,7 +34,12 @@ import { captureFrame, importFiles } from "@/lib/camera/capture";
 import { waitForFrame } from "@/lib/camera/service";
 import { ASPECT_IDS, ASPECT_RATIOS, type AspectId, type Capture, type Roll } from "@/lib/db/types";
 import { playShutter, primeAudio, vibrate } from "@/lib/feedback";
-import { composeAdjustments, listFilters, listProfiles } from "@/lib/filters/registry";
+import {
+  composeAdjustments,
+  getFilter,
+  listFilters,
+  listFiltersForProfile,
+} from "@/lib/filters/registry";
 import { cn } from "@/lib/utils";
 
 /**
@@ -51,6 +56,16 @@ import { cn } from "@/lib/utils";
  */
 
 const TIMER_OPTIONS = [0, 3, 10] as const;
+
+/**
+ * Camera Mode is the digicam.
+ *
+ * The dial selects which body you are shooting with, so there is no separate
+ * "profile" to choose and the profile layer is pinned neutral — the model
+ * filter carries the entire look.
+ */
+const DEFAULT_MODEL_ID = "2003";
+const NEUTRAL_PROFILE_ID = "everyday";
 
 export function CameraScreen({
   roll,
@@ -70,8 +85,7 @@ export function CameraScreen({
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [filterId, setFilterId] = useState("natural");
-  const [profileId, setProfileId] = useState("everyday");
+  const [filterId, setFilterId] = useState(DEFAULT_MODEL_ID);
   const [aspect, setAspect] = useState<AspectId>("4:3");
   const [timer, setTimer] = useState<number>(0);
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -81,8 +95,15 @@ export function CameraScreen({
   const [busy, setBusy] = useState(false);
   const [levelOn, setLevelOn] = useState(false);
 
+  /** The bodies on the dial: one entry per camera model. */
+  const models = useMemo(() => listFiltersForProfile("digicam"), []);
+  /** The full shelf, for anyone who wants a look that isn't a camera. */
   const filters = useMemo(() => listFilters(), []);
-  const profiles = useMemo(() => listProfiles(), []);
+
+  /** Falls back to a real model if a stored id no longer exists. */
+  const activeFilterId = filters.some((filter) => filter.id === filterId)
+    ? filterId
+    : DEFAULT_MODEL_ID;
   const deviceRoll = useDeviceRoll(levelOn);
   const rollId = roll?.id ?? null;
 
@@ -93,13 +114,15 @@ export function CameraScreen({
     if (!settings || hydratedRef.current) return;
     hydratedRef.current = true;
     setFilterId(settings.defaultFilterId);
-    setProfileId(settings.defaultProfileId);
     setAspect(settings.defaultAspect);
   }, [settings]);
 
   const adjustments = useMemo(
-    () => composeAdjustments({ profileId, filterId }),
-    [profileId, filterId],
+    // No profile layer: the model *is* the look, and stacking a body grade on
+    // top of it would double the sharpening and contrast the models already
+    // carry.
+    () => composeAdjustments({ profileId: NEUTRAL_PROFILE_ID, filterId: activeFilterId }),
+    [activeFilterId],
   );
 
   // Read out of the settings record once. Optional chaining inside a callback's
@@ -116,9 +139,6 @@ export function CameraScreen({
   const shotsLeft =
     roll?.mode === "disposable" && roll.shotLimit ? roll.shotLimit - captureCount : null;
   const rollFull = shotsLeft !== null && shotsLeft <= 0;
-
-  /** Which profiles get dressed as a physical camera body. */
-  const bodyStyle = profileId === "digicam" ? "digicam" : "plain";
 
   // -------------------------------------------------------------- capture
 
@@ -149,8 +169,8 @@ export function CameraScreen({
       await captureFrame({
         source: bitmap,
         rollId: targetRollId,
-        filterId,
-        profileId,
+        filterId: activeFilterId,
+        profileId: NEUTRAL_PROFILE_ID,
         aspect,
         mirrored,
       });
@@ -164,7 +184,7 @@ export function CameraScreen({
       bitmap?.close();
       setBusy(false);
     }
-  }, [aspect, ensureRoll, videoRef, filterId, hapticsOn, mirrored, profileId, rollId, soundOn, toast]);
+  }, [activeFilterId, aspect, ensureRoll, videoRef, hapticsOn, mirrored, rollId, soundOn, toast]);
 
   const onShutter = useCallback(() => {
     primeAudio();
@@ -220,8 +240,8 @@ export function CameraScreen({
         const { captures, failures } = await importFiles({
           files,
           rollId,
-          filterId,
-          profileId,
+          filterId: activeFilterId,
+          profileId: NEUTRAL_PROFILE_ID,
           aspect,
         });
         if (captures.length) {
@@ -239,7 +259,7 @@ export function CameraScreen({
         setBusy(false);
       }
     },
-    [aspect, filterId, profileId, rollId, toast],
+    [activeFilterId, aspect, rollId, toast],
   );
 
   const cycleAspect = () => {
@@ -304,30 +324,16 @@ export function CameraScreen({
             onPointerDown={onViewfinderTap}
             role="presentation"
           >
-            {/* Picking Digicam changes the instrument, not just the grade — the
-                viewfinder is dressed as the back of a compact camera. */}
-            {bodyStyle === "digicam" ? (
-              <DigicamShell
-                aspect={aspect}
-                aspectRatio={ASPECT_RATIOS[aspect]}
-                shotCount={captureCount}
-                shotsLeft={shotsLeft}
-                busy={busy}
-              >
-                <FilteredPreview
-                  videoRef={attachVideo}
-                  adjustments={adjustments}
-                  mirrored={mirrored}
-                  aspectRatio={ASPECT_RATIOS[aspect]}
-                  livePreview={livePreview}
-                >
-                  <GridOverlay visible={gridOn} />
-                  <LevelIndicator roll={deviceRoll} />
-                  <FocusReticle point={focusPoint} />
-                  <ShutterFlash flashKey={flashKey} />
-                </FilteredPreview>
-              </DigicamShell>
-            ) : (
+            {/* The viewfinder is always the back of a compact camera — that is
+                what Camera Mode is. */}
+            <DigicamShell
+              aspect={aspect}
+              model={getFilter(activeFilterId).name}
+              aspectRatio={ASPECT_RATIOS[aspect]}
+              shotCount={captureCount}
+              shotsLeft={shotsLeft}
+              busy={busy}
+            >
               <FilteredPreview
                 videoRef={attachVideo}
                 adjustments={adjustments}
@@ -340,7 +346,7 @@ export function CameraScreen({
                 <FocusReticle point={focusPoint} />
                 <ShutterFlash flashKey={flashKey} />
               </FilteredPreview>
-            )}
+            </DigicamShell>
           </div>
         ) : (
           <PermissionGate
@@ -372,11 +378,12 @@ export function CameraScreen({
           ) : null}
 
           <ProfileDial
-            profiles={profiles}
-            selectedId={profileId}
+            items={models}
+            selectedId={activeFilterId}
+            label="Camera model"
             onSelect={(id) => {
-              setProfileId(id);
-              void update({ defaultProfileId: id });
+              setFilterId(id);
+              void update({ defaultFilterId: id });
             }}
             className="mb-2"
           />
@@ -384,7 +391,7 @@ export function CameraScreen({
           {trayOpen ? (
             <FilterTray
               filters={filters}
-              selectedId={filterId}
+              selectedId={activeFilterId}
               referenceFrame={referenceFrame}
               onSelect={(id) => {
                 setFilterId(id);
