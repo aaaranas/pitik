@@ -37,3 +37,42 @@ export async function countStore(page: Page, store: string): Promise<number> {
     });
   }, store);
 }
+
+export interface StoredStripMotion {
+  strips: number;
+  hasMotion: boolean;
+  size: number;
+  mimeType: string | null;
+}
+
+/**
+ * Reads back the motion clip stored with the most recent strip.
+ *
+ * Goes through IndexedDB rather than the UI because the point is to prove the
+ * bytes were actually persisted, not that a button rendered.
+ */
+export async function readStripMotion(page: Page): Promise<StoredStripMotion> {
+  return page.evaluate(async () => {
+    const request = indexedDB.open("pitik");
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    if (!db.objectStoreNames.contains("strips")) {
+      return { strips: 0, hasMotion: false, size: 0, mimeType: null };
+    }
+    const all = await new Promise<Record<string, unknown>[]>((resolve) => {
+      const read = db.transaction("strips").objectStore("strips").getAll();
+      read.onsuccess = () => resolve(read.result);
+      read.onerror = () => resolve([]);
+    });
+    const latest = all[all.length - 1] as { motion?: { blob: Blob; mimeType: string } } | undefined;
+    const motion = latest?.motion;
+    return {
+      strips: all.length,
+      hasMotion: Boolean(motion),
+      size: motion?.blob?.size ?? 0,
+      mimeType: motion?.mimeType ?? null,
+    };
+  });
+}

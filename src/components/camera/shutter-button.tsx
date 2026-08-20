@@ -74,6 +74,12 @@ export function ShutterButton({
  *
  * Keyed by capture count so React remounts it — restarting a CSS animation by
  * toggling a class requires a reflow hack that is easy to get subtly wrong.
+ *
+ * `opacity-0` is the base state and is load-bearing. A CSS animation only
+ * controls the property while it is running; the moment it ends the element
+ * falls back to its own styles. Without this the flash would finish and then
+ * snap to a fully opaque white sheet, blanking the viewfinder until the next
+ * shutter press restarted the animation.
  */
 export function ShutterFlash({ flashKey }: { flashKey: number }) {
   if (!flashKey) return null;
@@ -81,7 +87,7 @@ export function ShutterFlash({ flashKey }: { flashKey: number }) {
     <div
       key={flashKey}
       aria-hidden
-      className="animate-shutter-flash pointer-events-none absolute inset-0 z-30 bg-white"
+      className="animate-shutter-flash pointer-events-none absolute inset-0 z-30 bg-white opacity-0"
     />
   );
 }

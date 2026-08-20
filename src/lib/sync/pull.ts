@@ -187,6 +187,8 @@ async function pullStrips(
           height: remote.height,
           captureIds: [],
           caption: remote.caption,
+          // No `motion`: clips are not synced. See the note on `pushStrip`.
+          // A pulled strip is the print, without the shoot behind it.
           createdAt: toEpoch(remote.created_at) ?? Date.now(),
           authorId: remote.author_id,
           remoteId: remote.id,

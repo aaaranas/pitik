@@ -81,6 +81,28 @@ practice this means:
 - Destructure hook results before using them in dependency arrays; optional
   chaining in a dep list defeats memoisation.
 
+## Booth clips
+
+- Recording is **never** allowed to affect the shoot. Every function in
+  `lib/camera/motion.ts` fails by returning null, never by throwing into the
+  capture path. A browser that cannot record still runs the sequence and still
+  composes the strip.
+- If the device cannot record, **no clip control is rendered**. Same rule as
+  every other capability.
+- A recorder must not outlive its session: cancelled on unmount, on retake, and
+  when leaving mid-sequence.
+- Clips carry sound, but the microphone is requested **only** when a booth
+  session starts. Never widen the camera's own `getUserMedia` to include audio:
+  taking a photograph must not cost a mic prompt.
+- The recorder owns the microphone tracks it opened and must stop them; the
+  camera's video tracks belong to `useCamera` and must be left alone.
+- MP4 is preferred over WebM on purpose — a clip that will not open on the
+  recipient's phone is a broken feature. Don't reorder for file size.
+- Clips are ungraded. Grading motion means rendering every frame through the
+  canvas pipeline and recording that — a real feature, not a tweak.
+- Anything stored must stay reachable. A clip the user can save but never get
+  back out is worse than no clip.
+
 ## Memory
 
 A camera app leaks megabytes per mistake.

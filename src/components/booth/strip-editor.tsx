@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, Download, RotateCcw, Share2 } from "lucide-react";
+import { Check, Download, Film, RotateCcw, Share2 } from "lucide-react";
+import { ClipDialog } from "./clip-dialog";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -11,12 +12,14 @@ import {
   type BoothTemplate,
   DEFAULT_STRIP_STYLE,
   PAPERS,
+  paperBackgroundCss,
   PAPER_IDS,
   type PaperId,
   type StripStyle,
 } from "@/lib/booth/types";
+import type { MotionClip } from "@/lib/camera/motion";
 import { addStrip } from "@/lib/db/repo";
-import { extensionFor, downloadBlob, shareImage } from "@/lib/share";
+import { extensionFor, downloadBlob, shareFile } from "@/lib/share";
 import { cn, slugify } from "@/lib/utils";
 
 /**
@@ -30,10 +33,13 @@ import { cn, slugify } from "@/lib/utils";
 export function StripEditor({
   template,
   frames,
+  motion,
   onRetake,
 }: {
   template: BoothTemplate;
   frames: ImageBitmap[];
+  /** Clip of the whole shoot, when the device could record one. */
+  motion?: MotionClip | null;
   onRetake: () => void;
 }) {
   const router = useRouter();
@@ -47,6 +53,7 @@ export function StripEditor({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [clipOpen, setClipOpen] = useState(false);
 
   const filename = useMemo(
     () => `pitik-${slugify(style.caption || template.name)}-strip.png`,
@@ -112,6 +119,7 @@ export function StripEditor({
         height: composed.height,
         captureIds: [],
         caption: style.caption || null,
+        motion: motion ?? undefined,
       });
       setSaved(true);
       toast("Strip saved to your roll.", { tone: "success" });
@@ -124,12 +132,12 @@ export function StripEditor({
     } finally {
       setSaving(false);
     }
-  }, [buildFullSize, ensureRoll, router, style.caption, template.id, toast]);
+  }, [buildFullSize, ensureRoll, motion, router, style.caption, template.id, toast]);
 
   const share = useCallback(async () => {
     try {
       const { blob } = await buildFullSize();
-      const outcome = await shareImage({ blob, filename, title: "A strip from Pitik" });
+      const outcome = await shareFile({ blob, filename, title: "A strip from Pitik" });
       if (outcome === "downloaded") toast("Saved to your downloads.", { tone: "success" });
       if (outcome === "failed") toast("Couldn't share that strip.", { tone: "error" });
     } catch {
@@ -151,6 +159,12 @@ export function StripEditor({
 
   return (
     <div className="flex h-full flex-col bg-ink-950">
+      <ClipDialog
+        clip={motion ?? null}
+        title={style.caption || template.name}
+        open={clipOpen}
+        onOpenChange={setClipOpen}
+      />
       <div className="min-h-0 flex-1 overflow-y-auto px-4" style={{ paddingTop: "calc(var(--safe-top) + 1rem)" }}>
         <div className="mx-auto w-full max-w-md">
           <h1 className="text-center font-display text-3xl text-paper">Your strip</h1>
@@ -158,6 +172,7 @@ export function StripEditor({
             {frames.length === template.shots
               ? "All frames in. Finish it however you like."
               : `${frames.length} of ${template.shots} frames came out.`}
+            {motion ? " A clip of the shoot is saved with it." : ""}
           </p>
 
           <div className="mt-5 flex justify-center">
@@ -219,7 +234,9 @@ export function StripEditor({
               <span className="mb-2 block text-[0.6875rem] uppercase tracking-[0.16em] text-ink-400">
                 Paper
               </span>
-              <div className="flex gap-2">
+              {/* Wraps rather than scrolls: sixteen papers in a row would hide
+                  most of the choice behind a swipe people don't know to make. */}
+              <div className="flex flex-wrap gap-2">
                 {PAPER_IDS.map((id) => (
                   <PaperSwatch
                     key={id}
@@ -263,9 +280,22 @@ export function StripEditor({
           <Button variant="ghost" size="icon" onClick={() => void download()} aria-label="Save to device">
             <Download className="size-5" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => void share()} aria-label="Share">
+          <Button variant="ghost" size="icon" onClick={() => void share()} aria-label="Share the strip">
             <Share2 className="size-5" />
           </Button>
+          {/* Only rendered when there is a clip to hand over. A device that
+              cannot record shows no control for recording. */}
+          {motion ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setClipOpen(true)}
+              aria-label="Watch the clip of this shoot"
+              data-testid="clip-action"
+            >
+              <Film className="size-5" />
+            </Button>
+          ) : null}
           <Button
             variant="primary"
             size="lg"
@@ -305,7 +335,7 @@ function PaperSwatch({
           ? "ring-2 ring-safelight-500 ring-offset-2 ring-offset-ink-950"
           : "ring-1 ring-white/15 hover:ring-white/40",
       )}
-      style={{ background: paper.background }}
+      style={{ background: paperBackgroundCss(paper) }}
     />
   );
 }

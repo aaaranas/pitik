@@ -42,7 +42,7 @@ export function downloadBlob(blob: Blob, filename: string): ShareOutcome {
   }
 }
 
-export async function shareImage(options: {
+export async function shareFile(options: {
   blob: Blob;
   filename: string;
   title?: string;

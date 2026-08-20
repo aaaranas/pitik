@@ -10,7 +10,7 @@ import { useObjectUrl } from "@/hooks/use-object-url";
 import { deleteCapture, toggleFavorite } from "@/lib/db/repo";
 import type { Capture } from "@/lib/db/types";
 import { getFilter, getProfile } from "@/lib/filters/registry";
-import { downloadBlob, extensionFor, shareImage } from "@/lib/share";
+import { downloadBlob, extensionFor, shareFile } from "@/lib/share";
 import { cn, slugify } from "@/lib/utils";
 
 /**
@@ -64,7 +64,7 @@ export function CaptureViewer({
   const filename = `pitik-${slugify(rollTitle)}-${index! + 1}.${extensionFor(capture.blob)}`;
 
   const onShare = async () => {
-    const outcome = await shareImage({
+    const outcome = await shareFile({
       blob: capture.blob,
       filename,
       title: rollTitle,
