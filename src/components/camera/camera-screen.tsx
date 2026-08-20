@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  CalendarClock,
   ChevronLeft,
   Grid3x3,
   ImageDown,
@@ -9,6 +10,7 @@ import {
   SlidersHorizontal,
   Sparkles,
   Timer,
+  X,
   Zap,
   ZapOff,
 } from "lucide-react";
@@ -81,7 +83,7 @@ export function CameraScreen({
   // rather than on the controller object, which changes every render.
   const { videoRef, attachVideo, focusAt: focusCameraAt } = camera;
   const { settings, update } = useSettings();
-  const { ensureRoll } = useSession();
+  const { destinationFor, setActiveRoll } = useSession();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -131,10 +133,14 @@ export function CameraScreen({
   const hapticsOn = settings?.haptics !== false;
   const gridOn = settings?.gridOverlay ?? false;
   const livePreview = settings?.livePreview !== false;
+  const dateStamp = settings?.dateStamp ?? false;
 
   const mirrored = camera.facing === "user" && (settings?.mirrorSelfie ?? true);
   const referenceFrame = useReferenceFrame(videoRef, trayOpen && camera.status === "ready");
   const lastThumbUrl = useObjectUrl(lastCapture?.thumb ?? null);
+
+  /** True only when the user deliberately started a named roll. */
+  const shootingIntoRoll = Boolean(roll && roll.kind !== "library");
 
   const shotsLeft =
     roll?.mode === "disposable" && roll.shotLimit ? roll.shotLimit - captureCount : null;
@@ -162,10 +168,10 @@ export function CameraScreen({
       }
       // Snapshot now, grade later — this is what unblocks rapid shooting.
       bitmap = await createImageBitmap(video);
-      // Only *then* resolve where it goes. The roll record loads asynchronously
-      // from IndexedDB, and someone who opens the app and immediately taps must
-      // not lose that first frame to a race they cannot see.
-      const targetRollId = rollId ?? (await ensureRoll()).id;
+      // Only *then* resolve where it goes: the named roll if one is active,
+      // otherwise the camera library. Resolved after the snapshot so a tap that
+      // lands before the roll record has loaded still keeps its frame.
+      const targetRollId = await destinationFor("camera");
       await captureFrame({
         source: bitmap,
         rollId: targetRollId,
@@ -173,6 +179,7 @@ export function CameraScreen({
         profileId: NEUTRAL_PROFILE_ID,
         aspect,
         mirrored,
+        timestamp: dateStamp,
       });
     } catch (error) {
       toast("That frame didn't save.", {
@@ -184,7 +191,7 @@ export function CameraScreen({
       bitmap?.close();
       setBusy(false);
     }
-  }, [activeFilterId, aspect, ensureRoll, videoRef, hapticsOn, mirrored, rollId, soundOn, toast]);
+  }, [activeFilterId, aspect, dateStamp, destinationFor, videoRef, hapticsOn, mirrored, soundOn, toast]);
 
   const onShutter = useCallback(() => {
     primeAudio();
@@ -234,12 +241,12 @@ export function CameraScreen({
 
   const onPickFiles = useCallback(
     async (files: FileList | null) => {
-      if (!files?.length || !rollId) return;
+      if (!files?.length) return;
       setBusy(true);
       try {
         const { captures, failures } = await importFiles({
           files,
-          rollId,
+          rollId: await destinationFor("camera"),
           filterId: activeFilterId,
           profileId: NEUTRAL_PROFILE_ID,
           aspect,
@@ -259,7 +266,7 @@ export function CameraScreen({
         setBusy(false);
       }
     },
-    [activeFilterId, aspect, rollId, toast],
+    [activeFilterId, aspect, destinationFor, toast],
   );
 
   const cycleAspect = () => {
@@ -282,7 +289,7 @@ export function CameraScreen({
         style={{ paddingTop: "calc(var(--safe-top) + 0.5rem)" }}
       >
         <Link
-          href={rollId ? `/rolls/${rollId}` : "/"}
+          href={shootingIntoRoll && rollId ? `/rolls/${rollId}` : "/rolls?tab=camera"}
           className="grid size-10 place-items-center rounded-full text-ink-200 transition hover:bg-ink-800"
           aria-label="Leave the camera"
         >
@@ -290,9 +297,27 @@ export function CameraScreen({
         </Link>
 
         <div className="min-w-0 flex-1 text-center">
-          <p className="truncate text-sm font-medium text-ink-100">
-            {roll?.emoji ? `${roll.emoji} ` : ""}
-            {roll?.title ?? "New roll"}
+          <p className="flex items-center justify-center gap-1.5 truncate text-sm font-medium text-ink-100">
+            {shootingIntoRoll ? (
+              <>
+                <span className="truncate">
+                  {roll?.emoji ? `${roll.emoji} ` : ""}
+                  {roll?.title}
+                </span>
+                {/* A roll you started should be one you can step out of, or
+                    every later photo silently joins a session that ended. */}
+                <button
+                  type="button"
+                  onClick={() => setActiveRoll(null)}
+                  aria-label="Stop shooting into this roll"
+                  className="grid size-5 shrink-0 place-items-center rounded-full text-ink-400 transition hover:bg-ink-800 hover:text-ink-100"
+                >
+                  <X className="size-3" />
+                </button>
+              </>
+            ) : (
+              <span className="truncate">Camera</span>
+            )}
           </p>
           <p className="text-[0.6875rem] uppercase tracking-[0.16em] text-ink-400">
             {shotsLeft !== null
@@ -317,7 +342,7 @@ export function CameraScreen({
       </header>
 
       {/* --------------------------------------------------- viewfinder */}
-      <div className="relative min-h-0 flex-1 overflow-hidden px-3 py-1">
+      <div className="relative min-h-0 flex-1 overflow-hidden">
         {live ? (
           <div
             className="size-full"
@@ -329,6 +354,7 @@ export function CameraScreen({
             <DigicamShell
               aspect={aspect}
               model={getFilter(activeFilterId).name}
+              modelId={activeFilterId}
               aspectRatio={ASPECT_RATIOS[aspect]}
               shotCount={captureCount}
               shotsLeft={shotsLeft}
@@ -430,6 +456,14 @@ export function CameraScreen({
               <Grid3x3 className="size-4" aria-hidden />
             </ToolButton>
 
+            <ToolButton
+              label={dateStamp ? "Date stamp on" : "Date stamp off"}
+              onClick={() => void update({ dateStamp: !dateStamp })}
+              active={dateStamp}
+            >
+              <CalendarClock className="size-4" aria-hidden />
+            </ToolButton>
+
             <ToolButton label="Level" onClick={() => setLevelOn((on) => !on)} active={levelOn}>
               <SlidersHorizontal className="size-4" aria-hidden />
             </ToolButton>
@@ -446,9 +480,9 @@ export function CameraScreen({
           >
             {lastCapture && lastThumbUrl ? (
               <Link
-                href={rollId ? `/rolls/${rollId}` : "/rolls"}
+                href={shootingIntoRoll && rollId ? `/rolls/${rollId}` : "/rolls?tab=camera"}
                 className="size-12 shrink-0 overflow-hidden rounded-lg ring-1 ring-white/20 transition hover:ring-white/50"
-                aria-label="Open this roll"
+                aria-label={shootingIntoRoll ? "Open this roll" : "Open your camera photos"}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={lastThumbUrl} alt="" className="size-full object-cover" />

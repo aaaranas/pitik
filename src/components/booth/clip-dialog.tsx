@@ -2,9 +2,11 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { Download, Share2, X } from "lucide-react";
+import { useCallback } from "react";
 import { useToast } from "@/components/providers/toast-provider";
 import { useObjectUrl } from "@/hooks/use-object-url";
 import { motionExtension } from "@/lib/camera/motion";
+import { CLIP_SPEED } from "@/lib/camera/motion-speed";
 import type { MotionAttachment } from "@/lib/db/types";
 import { downloadBlob, shareFile } from "@/lib/share";
 import { slugify } from "@/lib/utils";
@@ -20,7 +22,16 @@ import { slugify } from "@/lib/utils";
  * Not muted: sound is the point of recording the shoot rather than
  * photographing it. Autoplay with audio may be refused, which is why the
  * native controls are always present rather than a custom play button.
+ *
+ * Played fast, the way a mall photobooth replays your session — the dead air
+ * during a countdown is not interesting, and the speed-up makes the whole thing
+ * read as a highlight rather than as footage.
+ *
+ * The speed is normally baked into the file itself, in which case this plays at
+ * 1x. Only a clip that could not be re-encoded gets it applied here, so what you
+ * watch matches what you would share either way.
  */
+
 export function ClipDialog({
   clip,
   title,
@@ -37,6 +48,26 @@ export function ClipDialog({
   // Only materialised while the dialog is open: a clip is megabytes, and an
   // object URL pins every one of them until it is revoked.
   const url = useObjectUrl(open && clip ? clip.blob : null);
+
+  /**
+   * Sets the speed as the element mounts.
+   *
+   * A callback ref rather than an effect: `playbackRate` is reset to 1 whenever
+   * a new source loads, so it has to be re-applied to the actual element each
+   * time rather than set once against a ref that may point somewhere else.
+   */
+  const playbackRate = CLIP_SPEED / (clip?.speed ?? 1);
+  const applyPlaybackRate = useCallback(
+    (node: HTMLVideoElement | null) => {
+      if (!node) return;
+      node.preservesPitch = true;
+      node.playbackRate = playbackRate;
+      node.addEventListener("loadedmetadata", () => {
+        node.playbackRate = playbackRate;
+      });
+    },
+    [playbackRate],
+  );
 
   if (!clip) return null;
 
@@ -63,7 +94,8 @@ export function ClipDialog({
               <X className="size-5" />
             </Dialog.Close>
             <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-ink-300">
-              {Math.round(clip.durationMs / 1000)}s · the whole shoot
+              {Math.round(clip.durationMs / 1000 / playbackRate)}s · the whole shoot
+              at {CLIP_SPEED}x
             </p>
             <span className="size-10" aria-hidden />
           </header>
@@ -71,13 +103,14 @@ export function ClipDialog({
           <div className="flex min-h-0 flex-1 items-center justify-center px-3 py-4">
             {url ? (
               <video
+                ref={applyPlaybackRate}
                 src={url}
                 controls
                 autoPlay
                 loop
                 playsInline
                 data-testid="clip-video"
-                aria-label={`Clip from ${title}`}
+                aria-label={`Clip from ${title}, played at ${CLIP_SPEED}x`}
                 className="max-h-full max-w-full rounded-xl bg-black"
               />
             ) : (

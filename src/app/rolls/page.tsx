@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { RollsScreen } from "@/components/roll/rolls-screen";
+import { LibraryRoute } from "@/components/roll/library-route";
 
 export const metadata: Metadata = {
-  title: "Rolls",
+  title: "Your photos",
 };
 
 export default function Page() {
-  return <RollsScreen />;
+  return <LibraryRoute />;
 }

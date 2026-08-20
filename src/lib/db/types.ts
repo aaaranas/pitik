@@ -18,6 +18,20 @@ export type SyncState =
   /** Upload failed permanently enough to tell the user about. */
   | "error";
 
+/**
+ * What a roll is for.
+ *
+ * `roll` is a named moment somebody deliberately started. `library` is one of
+ * the two standing collections — everything shot in Camera Mode, and every
+ * booth strip — which exist so a photograph never has to belong to a session
+ * the user did not ask to create.
+ *
+ * Libraries are real rolls with real ids, not sentinels: that keeps every
+ * query, foreign key and sync path working unchanged. They are simply hidden
+ * from the list of rolls.
+ */
+export type RollKind = "roll" | "library";
+
 export type RollMode =
   /** Photos appear the instant they are taken. */
   | "standard"
@@ -33,6 +47,8 @@ export type AspectId = "original" | "1:1" | "4:3" | "3:2" | "16:9";
 
 export interface Roll {
   id: string;
+  /** Absent on records written before libraries existed; treat as "roll". */
+  kind?: RollKind;
   title: string;
   emoji: string | null;
   coverStyle: CoverStyle;
@@ -96,6 +112,15 @@ export interface MotionAttachment {
   blob: Blob;
   mimeType: string;
   durationMs: number;
+  /**
+   * Playback speed already encoded into the file, relative to real time.
+   *
+   * `1.5` means the frames themselves are sped up, the way a mall photobooth
+   * hands you a recap that is already fast. `1` (or absent, on clips recorded
+   * before this existed) means real time, and the player makes up the
+   * difference so viewing is consistent either way.
+   */
+  speed?: number;
 }
 
 export interface Strip {
@@ -152,6 +177,16 @@ export interface Settings {
   defaultAspect: AspectId;
   defaultFilterId: string;
   defaultProfileId: string;
+  /**
+   * Ids of the two standing collections, minted per device.
+   *
+   * Per-device rather than a fixed constant so two accounts syncing into the
+   * same project cannot collide on a shared primary key.
+   */
+  cameraLibraryId?: string;
+  boothLibraryId?: string;
+  /** Burn a vintage date into the corner of each photograph. */
+  dateStamp: boolean;
   /** Off by default — sync is opt-in, not a dark pattern. */
   syncEnabled: boolean;
   onboarded: boolean;
@@ -170,6 +205,7 @@ export const DEFAULT_SETTINGS: Omit<Settings, "deviceId"> = {
   // neutral grade. `2003` is PowerShot; see `lib/filters/presets.ts`.
   defaultFilterId: "2003",
   defaultProfileId: "everyday",
+  dateStamp: false,
   syncEnabled: false,
   onboarded: false,
   livePreview: true,

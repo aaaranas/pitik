@@ -28,6 +28,13 @@ overwrite a local photo**. The three merge invariants in `lib/sync/merge.ts` are
 what enforce that — they are pure functions with tests, and they are not to be
 relaxed to make a sync case simpler.
 
+**A photograph never creates a roll.** Camera Mode files into the camera
+library and the booth into the booth library; a roll is something the user
+deliberately starts. Libraries are real roll records with `kind: "library"`,
+hidden from `listRolls()` — never sentinel ids, which would break foreign keys
+and sync. If you add a third kind of shooting, give it a library rather than
+inventing a session on the user's behalf.
+
 **No feature may require an account.** Auth gates exactly three things:
 accounts, backup, shared rolls. Everything else works signed out, and
 `isSupabaseConfigured() === false` is a fully supported mode, not a broken
@@ -100,8 +107,29 @@ practice this means:
   recipient's phone is a broken feature. Don't reorder for file size.
 - Clips are ungraded. Grading motion means rendering every frame through the
   canvas pipeline and recording that — a real feature, not a tweak.
+- The 1.5x speed-up is **baked into the file**, never left to the player. A clip
+  is shared far more often than it is watched in-app, and a player setting does
+  not travel with the file. `MotionAttachment.speed` records what the frames
+  already carry; the player multiplies up only what is missing, so a clip whose
+  re-encode failed still *looks* right in-app.
+- The re-encode is real-time work. Run it while the user is occupied, never as
+  a wait after they tap save, and always fall back to the original.
 - Anything stored must stay reachable. A clip the user can save but never get
   back out is worse than no clip.
+
+## Performance
+
+The capture pipeline runs on the main thread, so pixel count is the budget.
+
+- The sensor is asked for **1920x1080, never 4K**. Raising it multiplies the
+  cost of every preview frame *and* every capture; 4K measured at ~3s per photo
+  against ~0.9s at 1080p. Measure before changing it.
+- `DEFAULT_MAX_DIMENSION` must not exceed what the stream delivers — upscaling
+  past the sensor costs the whole pipeline proportionally and adds no detail.
+- Booth frames are graded at a lower ceiling again: they land in slots a few
+  hundred pixels wide, and the cost shows up as a freeze between shots.
+- The live preview must not run JavaScript per frame. Blended overlay layers are
+  GPU work on every paint, so keep them few — grain is deliberately export-only.
 
 ## Memory
 

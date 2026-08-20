@@ -25,7 +25,7 @@ test("runs a booth sequence and composes a strip", async ({ page }) => {
   await page.getByLabel("Caption").fill("e2e");
   await page.getByRole("button", { name: "Keep it" }).click();
 
-  await expect(page).toHaveURL(/\/rolls\//, { timeout: 20_000 });
+  await expect(page).toHaveURL(/\/rolls\?tab=booth/, { timeout: 20_000 });
   await expect.poll(() => countStore(page, "strips"), { timeout: 20_000 }).toBe(1);
 });
 
@@ -46,6 +46,11 @@ test("records the whole shoot and saves the clip with the strip", async ({ page 
 
   // The shoot is advertised as filmed before it starts, not after.
   await expect(page.getByText(/The whole shoot is filmed, with sound/)).toBeVisible();
+
+  // Timed, so the speed assertion below can be relative to how long the shoot
+  // actually ran. A fixed threshold is flaky: the sequence takes longer on a
+  // loaded machine, and a longer shoot makes a longer clip.
+  const startedAt = Date.now();
   await start.click();
 
   // Recording runs for the whole sequence, so the indicator is live mid-shoot.
@@ -56,6 +61,7 @@ test("records the whole shoot and saves the clip with the strip", async ({ page 
   await expect(page.getByRole("heading", { name: "Your strip" })).toBeVisible({
     timeout: 30_000,
   });
+  const shootSeconds = (Date.now() - startedAt) / 1000;
 
   // A clip exists, so the editor offers it as its own action.
   const clipAction = page.getByTestId("clip-action");
@@ -82,7 +88,7 @@ test("records the whole shoot and saves the clip with the strip", async ({ page 
   await page.getByRole("button", { name: "Close" }).click();
 
   await page.getByRole("button", { name: "Keep it" }).click();
-  await expect(page).toHaveURL(/\/rolls\//, { timeout: 20_000 });
+  await expect(page).toHaveURL(/\/rolls\?tab=booth/, { timeout: 20_000 });
   await expect.poll(() => countStore(page, "strips"), { timeout: 20_000 }).toBe(1);
 
   // The bytes actually landed in IndexedDB, and are a real clip.
@@ -91,8 +97,23 @@ test("records the whole shoot and saves the clip with the strip", async ({ page 
   expect(motion.size).toBeGreaterThan(1000);
   expect(motion.mimeType).toMatch(/^video\/(webm|mp4)/);
 
+  // The speed-up is baked into the file, not applied by the player: a mall
+  // photobooth hands you a recap that is already fast, and so does this. The
+  // stored bytes are decoded above, so this is the real playable duration.
+  expect(motion.speed).toBe(1.5);
+  expect(motion.playableSeconds).toBeGreaterThan(0);
+  // Instant Pair at a three second interval runs roughly eight seconds; at
+  // 1.5x the file itself should come out appreciably shorter than that.
+  expect(motion.playableSeconds).toBeGreaterThan(0);
+  // The stored file is meaningfully shorter than the shoot it came from, which
+  // is only true if the frames themselves were re-encoded faster.
+  expect(motion.playableSeconds).toBeLessThan(shootSeconds * 0.85);
+
   // And it stays reachable once the editor is gone.
-  await expect(page.getByRole("tab", { name: "strips" })).toBeVisible();
-  await page.getByRole("tab", { name: "strips" }).click();
+  // Saving lands on the booth shelf, where the clip stays reachable.
+  await expect(page.getByRole("tab", { name: "Booth" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
   await expect(page.getByRole("button", { name: "Watch the clip of this shoot" })).toBeVisible();
 });

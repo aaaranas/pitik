@@ -37,7 +37,14 @@ export interface RenderOptions {
   seed?: number;
 }
 
-export const DEFAULT_MAX_DIMENSION = 2560;
+/**
+ * Longest edge of an exported frame.
+ *
+ * Matched to the sensor request rather than set above it: upscaling past what
+ * the camera delivers costs the whole pipeline proportionally and adds no
+ * detail whatsoever.
+ */
+export const DEFAULT_MAX_DIMENSION = 1920;
 
 export function createCanvas(width: number, height: number): AnyCanvas {
   if (typeof OffscreenCanvas !== "undefined") {

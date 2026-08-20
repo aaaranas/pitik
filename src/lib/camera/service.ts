@@ -111,10 +111,23 @@ function readCapabilities(
 }
 
 /**
+ * Longest edge requested from the sensor.
+ *
+ * Deliberately not 4K. A 3840x2160 track is 8.3 megapixels arriving sixty times
+ * a second, and every one of them has to be scaled for the preview and pushed
+ * through the grading pipeline on capture — which measured at roughly three
+ * seconds per photograph. 1920 is a quarter of the pixels, and it is also the
+ * honest resolution for this product: the cameras these filters imitate shot
+ * between two and five megapixels.
+ */
+const IDEAL_WIDTH = 1920;
+const IDEAL_HEIGHT = 1080;
+
+/**
  * Opens a camera.
  *
- * Resolution is requested as an *ideal*, never exact: asking for exact 4K on a
- * device that can't do it fails the whole call, and a lower-resolution photo is
+ * Resolution is requested as an *ideal*, never exact: asking for an exact size
+ * a device can't do fails the whole call, and a lower-resolution photo is
  * infinitely better than no photo. If the browser still refuses, we retry once
  * with bare constraints before giving up.
  */
@@ -133,11 +146,15 @@ export async function openCamera(options: {
   const ideal: MediaStreamConstraints = {
     audio: false,
     video: options.deviceId
-      ? { deviceId: { exact: options.deviceId }, width: { ideal: 3840 }, height: { ideal: 2160 } }
+      ? {
+          deviceId: { exact: options.deviceId },
+          width: { ideal: IDEAL_WIDTH },
+          height: { ideal: IDEAL_HEIGHT },
+        }
       : {
           facingMode: { ideal: options.facing },
-          width: { ideal: 3840 },
-          height: { ideal: 2160 },
+          width: { ideal: IDEAL_WIDTH },
+          height: { ideal: IDEAL_HEIGHT },
         },
   };
 

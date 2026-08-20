@@ -150,6 +150,8 @@ export interface MotionClip {
   blob: Blob;
   mimeType: string;
   durationMs: number;
+  /** Speed baked into the frames. Absent means real time. */
+  speed?: number;
 }
 
 /**

@@ -73,6 +73,13 @@ export function SettingsScreen() {
         />
         <Toggle
           settings={settings}
+          field="dateStamp"
+          label="Date stamp"
+          hint="Burns the date into the corner of each photo, the way a camera back did."
+          onChange={update}
+        />
+        <Toggle
+          settings={settings}
           field="gridOverlay"
           label="Composition grid"
           hint="Thirds guides over the viewfinder."
@@ -178,8 +185,14 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
+/**
+ * Keys of `Settings` whose value is a boolean.
+ *
+ * `-?` strips optionality before the check: without it, optional keys make the
+ * mapped type optional too and `undefined` leaks into the union.
+ */
 type BooleanSetting = {
-  [K in keyof Settings]: Settings[K] extends boolean ? K : never;
+  [K in keyof Settings]-?: Settings[K] extends boolean ? K : never;
 }[keyof Settings];
 
 function Toggle({

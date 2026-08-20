@@ -74,6 +74,23 @@ Shooting is deliberately uninterrupted: the shutter fires, the frame is
 snapshotted immediately, and grading plus encoding happen off the critical path.
 There is **no confirmation screen** between shots.
 
+### Resolution, deliberately
+
+The sensor is asked for **1920x1080, not 4K**. A 3840x2160 track is 8.3
+megapixels arriving sixty times a second, and every one of them has to be scaled
+for the preview and pushed through the grading pipeline on capture — which
+measured at roughly three seconds per photograph. Dropping to 1920 cuts that to
+under a second.
+
+It is also the honest resolution for this product: the compacts these filters
+imitate shot between two and five megapixels.
+
+### Date stamp
+
+Optional, off by default, and toggled from the camera's tool row or Settings. It
+burns the date into the corner in the orange-on-glow of a 90s camera back, after
+every grade so it stays legible whatever the filter did.
+
 ### Camera profiles
 
 A second, orthogonal stack to filters — the *body* rather than the *grade*:
@@ -105,16 +122,43 @@ Three things worth knowing:
   everywhere. Chromium has recorded MP4 since 2023, so both platforms now
   converge on one container, with WebM as the fallback for older Chromium.
 
+Clips come out at **1.5x**, the way a mall photobooth hands you a recap that is
+already fast — the dead air during a countdown is not interesting, and the
+speed-up makes the whole thing read as a highlight rather than as footage.
+
+The speed is **baked into the file**, not applied by the player, so a clip you
+share or download is fast for whoever receives it. `MediaRecorder` stamps frames
+with wall-clock time, so this is a genuine re-encode: the clip is played back at
+speed into a canvas and re-recorded, with audio riding through a WebAudio graph
+so voices speed up without rising in pitch. It runs in the background while you
+are choosing paper and captions, which is time you were spending anyway. If it
+cannot run, the original is kept and the player makes up the difference — so
+what you watch matches what you would share either way.
+
 Clips are ungraded (`MediaRecorder` sees the raw stream, not the preview's CSS
 filter). Bitrate is scaled to the planned length of the sequence so that even a
 nine-shot Contact Sheet fits the 24 MB storage ceiling, and if a clip still
 cannot be kept the app says so rather than dropping it silently. Clips are
 **not synced** — see [Supabase](#supabase-optional).
 
-### Rolls — `/rolls`
+### Your photos — `/rolls`
 
-Every capture belongs to a roll. Rolls render as contact sheets with frame
-numbers, and can be renamed, favourited from, shared by code or QR, and deleted.
+Three shelves. **Camera** holds everything shot in Camera Mode, **Booth** holds
+every strip with its clip, and **Rolls** holds the moments you deliberately
+started.
+
+Taking a photograph never creates a roll. Most shooting is not a named session,
+and filing it under an invented "Thursday night" was a lie about what the user
+did — so the two libraries exist and a roll stays something you choose to begin.
+Start one from the home screen and the camera files into it until you tap the ×
+beside its name; after that, photos go back to the camera shelf.
+
+Libraries are ordinary roll records marked `kind: "library"` and hidden from the
+list, rather than sentinel ids — which keeps every query, foreign key and sync
+path working unchanged.
+
+Rolls render as contact sheets with frame numbers, and can be renamed, favourited
+from, shared by code or QR, and deleted.
 
 ### Shared rolls
 
@@ -358,7 +402,7 @@ and pulling a shared roll brings the strip without the motion behind it.
 ## Testing
 
 ```bash
-pnpm test        # 190 unit tests
+pnpm test        # 205 unit tests
 pnpm test:e2e    # 24 end-to-end tests, mobile and desktop
 ```
 

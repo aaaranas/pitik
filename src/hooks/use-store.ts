@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as repo from "@/lib/db/repo";
 import type { Capture, Roll, Settings, Strip } from "@/lib/db/types";
+import type { LibraryKind } from "@/lib/db/repo";
 
 /**
  * React bindings for the local store.
@@ -164,5 +165,18 @@ export function useRollCounts(rolls: Roll[]): Record<string, number> {
   }, [ids]);
   const query = useQuery(run, {} as Record<string, number>);
   useStoreSubscription("captures", query.refresh);
+  return query.data;
+}
+
+/**
+ * The id of a standing collection, creating it if this device has none.
+ *
+ * Returns null until it resolves, which callers treat as "still loading"
+ * rather than as "empty".
+ */
+export function useLibraryId(kind: LibraryKind): string | null {
+  const run = useCallback(async () => (await repo.ensureLibrary(kind)).id, [kind]);
+  const query = useQuery(run, null as string | null);
+  useStoreSubscription("rolls", query.refresh);
   return query.data;
 }
