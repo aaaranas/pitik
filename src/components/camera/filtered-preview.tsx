@@ -21,7 +21,8 @@ import { cn } from "@/lib/utils";
  */
 
 export interface FilteredPreviewProps {
-  videoRef: React.RefObject<HTMLVideoElement | null>;
+  /** Callback ref from `useCamera().attachVideo`. */
+  videoRef: React.Ref<HTMLVideoElement>;
   adjustments: Adjustments;
   mirrored: boolean;
   /** `null` fills the container with the sensor's native framing. */

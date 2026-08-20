@@ -23,12 +23,15 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,
     trace: "on-first-retry",
-    // Grant camera up front so specs exercise the app rather than the browser's
-    // own permission dialog, which Playwright cannot click.
-    permissions: ["camera"],
+    // Granted up front so specs exercise the app rather than the browser's own
+    // permission dialogs, which Playwright cannot click. The microphone is
+    // needed because a booth session records the shoot with sound.
+    permissions: ["camera", "microphone"],
     launchOptions: {
       args: [
         "--use-fake-ui-for-media-stream",
+        // Supplies a synthetic camera *and* microphone, so the whole recording
+        // path runs on a machine with neither.
         "--use-fake-device-for-media-stream",
         // A moving synthetic scene, so frames differ between captures.
         "--allow-file-access-from-files",

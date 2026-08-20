@@ -86,7 +86,28 @@ Ten data-driven layouts across Classic, Minimal, Cute, Y2K, Film, Friends,
 Party, and Date Night. Pick one, choose an interval, press start, and the booth
 takes over: it counts you in and fires on its own schedule until the strip is
 full. Then you finish it — paper, caption, typeface, date, corners, keyline —
-and export a PNG with no watermark.
+and export a PNG with no watermark. Sixteen papers, five of them gradients.
+
+The whole shoot is also **recorded as a short clip, with sound** — countdowns,
+flinches and all — so a session produces both a printable strip and something
+shareable with motion in it, the way a Live Photo pairs the two. Clips play
+in-app and can be shared or saved from there.
+
+Three things worth knowing:
+
+- **Recording never affects the shoot.** If the browser cannot record, the
+  sequence runs anyway and no clip control is shown at all.
+- **The microphone is requested only when a booth session starts**, never when
+  the camera opens — taking a photograph should not cost you a mic prompt. If
+  the prompt is declined, the clip is simply silent.
+- **MP4 is preferred over WebM**, deliberately. A clip exists to be sent to the
+  people in it, and WebM does not play on iOS; H.264 plays essentially
+  everywhere. Chromium has recorded MP4 since 2023, so both platforms now
+  converge on one container, with WebM as the fallback for older Chromium.
+
+Clips are ungraded (`MediaRecorder` sees the raw stream, not the preview's CSS
+filter), capped at 2.5 Mbps, and dropped rather than stored above 12 MB. They
+are **not synced** — see [Supabase](#supabase-optional).
 
 ### Rolls — `/rolls`
 
@@ -250,7 +271,7 @@ IndexedDB (via `idb`), four stores plus settings:
 |---|---|
 | `rolls` | Sessions, with mode, shot limit, reveal time, share code |
 | `captures` | Full-resolution JPEG and thumbnail, per frame |
-| `strips` | Composed booth prints |
+| `strips` | Composed booth prints, plus the optional clip of the shoot |
 | `outbox` | Pending sync work, with exponential backoff |
 
 Everything is soft-deleted so a deletion made offline can still propagate later;
@@ -323,13 +344,20 @@ Only roll *metadata* is ever refreshed from the server, and only when the local
 copy is confirmed synced. A background loop runs a round every five minutes
 while sync is on, the user is signed in, and the browser is online.
 
+**Booth clips are excluded from sync.** The `strips` table has no column for
+one, a clip is an order of magnitude larger than the strip it accompanies and
+would dominate a free storage tier within a few sessions, and unlike a
+photograph it is a by-product rather than the thing the user asked to keep. The
+consequence is worth knowing: a clip lives only on the device that recorded it,
+and pulling a shared roll brings the strip without the motion behind it.
+
 ---
 
 ## Testing
 
 ```bash
-pnpm test        # 166 unit tests
-pnpm test:e2e    # 22 end-to-end tests, mobile and desktop
+pnpm test        # 184 unit tests
+pnpm test:e2e    # 24 end-to-end tests, mobile and desktop
 ```
 
 **Unit** (Vitest) covers the parts where correctness is invisible to the eye:

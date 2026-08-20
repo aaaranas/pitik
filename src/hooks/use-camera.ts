@@ -21,7 +21,26 @@ import {
 export type CameraStatus = "idle" | "starting" | "ready" | "error";
 
 export interface CameraController {
+  /** Read `.current` to grab a frame. Do NOT put this on the element. */
   videoRef: React.RefObject<HTMLVideoElement | null>;
+  /**
+   * Callback ref for the <video> element itself.
+   *
+   * A callback ref rather than the object above, because the preview can be
+   * re-parented — swapping camera profiles wraps it in a body shell, which
+   * unmounts one element and mounts another. An object ref would silently point
+   * at the new node with no signal to re-bind, leaving a black preview behind a
+   * perfectly healthy stream. This fires on every mount, so binding cannot be
+   * missed.
+   */
+  attachVideo: (node: HTMLVideoElement | null) => void;
+  /**
+   * The live stream, for consumers that need the media itself rather than a
+   * preview of it — currently the booth's clip recorder. Null whenever the
+   * camera is not running. Consumers must never stop its tracks; this hook owns
+   * the lifetime.
+   */
+  stream: MediaStream | null;
   status: CameraStatus;
   error: CameraError | null;
   facing: Facing;
@@ -68,6 +87,15 @@ export function useCamera(options: {
   resumeOnVisible?: boolean;
 } = {}): CameraController {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  /**
+   * Bumped every time a <video> element mounts.
+   *
+   * The element itself stays in a ref rather than in state: it is a mutable DOM
+   * node that the binding effect writes `srcObject` to, and state is supposed
+   * to hold values nobody mutates. This counter carries the *signal* that a new
+   * element has arrived, which is all the effect actually needs.
+   */
+  const [videoGeneration, setVideoGeneration] = useState(0);
   const cameraRef = useRef<ActiveCamera | null>(null);
   /** Guards against overlapping start calls (double-tap, fast flip). */
   const startingRef = useRef<Promise<void> | null>(null);
@@ -103,15 +131,24 @@ export function useCamera(options: {
    * unset on the element that eventually mounts — a permanently black preview
    * with a perfectly healthy MediaStream behind it.
    */
+  const attachVideo = useCallback((node: HTMLVideoElement | null) => {
+    if (node) {
+      // Set here, on arrival, rather than in the binding effect. Both are also
+      // declared as JSX attributes, but iOS is unreliable about `muted` unless
+      // the property itself is set, and without it Safari hijacks the preview
+      // into a fullscreen native player.
+      node.playsInline = true;
+      node.muted = true;
+    }
+    videoRef.current = node;
+    if (node) setVideoGeneration((generation) => generation + 1);
+  }, []);
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !stream) return;
 
     video.srcObject = stream;
-    // Set declaratively too, but iOS needs both to avoid hijacking the preview
-    // into a fullscreen native player.
-    video.playsInline = true;
-    video.muted = true;
     void video.play().catch(() => {
       // Autoplay can be refused before the first gesture; the stream is live
       // either way and the next tap starts it.
@@ -120,7 +157,7 @@ export function useCamera(options: {
     return () => {
       if (video.srcObject === stream) video.srcObject = null;
     };
-  }, [stream, status]);
+  }, [stream, videoGeneration]);
 
   const openInternal = useCallback(async (nextFacing: Facing) => {
     setStatus("starting");
@@ -239,6 +276,8 @@ export function useCamera(options: {
 
   return {
     videoRef,
+    attachVideo,
+    stream,
     status,
     error,
     facing,

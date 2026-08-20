@@ -18,6 +18,7 @@ import { FilteredPreview } from "./filtered-preview";
 import { FilterTray, useReferenceFrame } from "./filter-tray";
 import { FocusReticle, type FocusPoint } from "./focus-reticle";
 import { GridOverlay, LevelIndicator } from "./grid-overlay";
+import { DigicamShell } from "./digicam-shell";
 import { PermissionGate } from "./permission-gate";
 import { ProfileDial } from "./profile-dial";
 import { ShutterButton, ShutterFlash } from "./shutter-button";
@@ -63,7 +64,7 @@ export function CameraScreen({
   const camera = useCamera({ initialFacing: "user" });
   // Destructured so the memoised callbacks below depend on stable identities
   // rather than on the controller object, which changes every render.
-  const { videoRef, focusAt: focusCameraAt } = camera;
+  const { videoRef, attachVideo, focusAt: focusCameraAt } = camera;
   const { settings, update } = useSettings();
   const { ensureRoll } = useSession();
   const { toast } = useToast();
@@ -115,6 +116,9 @@ export function CameraScreen({
   const shotsLeft =
     roll?.mode === "disposable" && roll.shotLimit ? roll.shotLimit - captureCount : null;
   const rollFull = shotsLeft !== null && shotsLeft <= 0;
+
+  /** Which profiles get dressed as a physical camera body. */
+  const bodyStyle = profileId === "digicam" ? "digicam" : "plain";
 
   // -------------------------------------------------------------- capture
 
@@ -300,18 +304,43 @@ export function CameraScreen({
             onPointerDown={onViewfinderTap}
             role="presentation"
           >
-            <FilteredPreview
-              videoRef={videoRef}
-              adjustments={adjustments}
-              mirrored={mirrored}
-              aspectRatio={ASPECT_RATIOS[aspect]}
-              livePreview={livePreview}
-            >
-              <GridOverlay visible={gridOn} />
-              <LevelIndicator roll={deviceRoll} />
-              <FocusReticle point={focusPoint} />
-              <ShutterFlash flashKey={flashKey} />
-            </FilteredPreview>
+            {/* Picking Digicam changes the instrument, not just the grade — the
+                viewfinder is dressed as the back of a compact camera. */}
+            {bodyStyle === "digicam" ? (
+              <DigicamShell
+                aspect={aspect}
+                aspectRatio={ASPECT_RATIOS[aspect]}
+                shotCount={captureCount}
+                shotsLeft={shotsLeft}
+                busy={busy}
+              >
+                <FilteredPreview
+                  videoRef={attachVideo}
+                  adjustments={adjustments}
+                  mirrored={mirrored}
+                  aspectRatio={ASPECT_RATIOS[aspect]}
+                  livePreview={livePreview}
+                >
+                  <GridOverlay visible={gridOn} />
+                  <LevelIndicator roll={deviceRoll} />
+                  <FocusReticle point={focusPoint} />
+                  <ShutterFlash flashKey={flashKey} />
+                </FilteredPreview>
+              </DigicamShell>
+            ) : (
+              <FilteredPreview
+                videoRef={attachVideo}
+                adjustments={adjustments}
+                mirrored={mirrored}
+                aspectRatio={ASPECT_RATIOS[aspect]}
+                livePreview={livePreview}
+              >
+                <GridOverlay visible={gridOn} />
+                <LevelIndicator roll={deviceRoll} />
+                <FocusReticle point={focusPoint} />
+                <ShutterFlash flashKey={flashKey} />
+              </FilteredPreview>
+            )}
           </div>
         ) : (
           <PermissionGate

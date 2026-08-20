@@ -6,12 +6,14 @@ import {
   Download,
   LayoutGrid,
   Lock,
+  Film,
   Share2,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { ClipDialog } from "@/components/booth/clip-dialog";
 import { CaptureViewer } from "./capture-viewer";
 import { ContactSheet } from "./contact-sheet";
 import { ShareSheet } from "./share-sheet";
@@ -23,7 +25,7 @@ import { useObjectUrl } from "@/hooks/use-object-url";
 import { useCaptures, useRoll, useStrips } from "@/hooks/use-store";
 import { deleteRoll, updateRoll } from "@/lib/db/repo";
 import type { Strip } from "@/lib/db/types";
-import { downloadBlob, extensionFor, shareImage } from "@/lib/share";
+import { downloadBlob, extensionFor, shareFile } from "@/lib/share";
 import { cn, formatCount, formatTimeUntil, relativeDay, slugify } from "@/lib/utils";
 
 /**
@@ -300,10 +302,17 @@ function DevelopingState({
 
 function StripTile({ strip, rollTitle }: { strip: Strip; rollTitle: string }) {
   const url = useObjectUrl(strip.thumb);
+  const [clipOpen, setClipOpen] = useState(false);
   const filename = `pitik-${slugify(rollTitle)}-strip.${extensionFor(strip.blob)}`;
 
   return (
     <figure className="group relative">
+      <ClipDialog
+        clip={strip.motion ?? null}
+        title={strip.caption || rollTitle}
+        open={clipOpen}
+        onOpenChange={setClipOpen}
+      />
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -330,12 +339,24 @@ function StripTile({ strip, rollTitle }: { strip: Strip; rollTitle: string }) {
           </button>
           <button
             type="button"
-            onClick={() => void shareImage({ blob: strip.blob, filename, title: rollTitle })}
+            onClick={() => void shareFile({ blob: strip.blob, filename, title: rollTitle })}
             aria-label="Share this strip"
             className="grid size-7 place-items-center rounded-full text-ink-400 transition hover:bg-ink-800 hover:text-ink-100"
           >
             <Share2 className="size-3.5" />
           </button>
+          {/* A clip saved with the strip has to stay reachable, or it is data
+              the user can never get back out. */}
+          {strip.motion ? (
+            <button
+              type="button"
+              onClick={() => setClipOpen(true)}
+              aria-label="Watch the clip of this shoot"
+              className="grid size-7 place-items-center rounded-full text-ink-400 transition hover:bg-ink-800 hover:text-ink-100"
+            >
+              <Film className="size-3.5" />
+            </button>
+          ) : null}
         </span>
       </figcaption>
     </figure>

@@ -140,7 +140,14 @@ export function composeStrip(options: ComposeOptions): AnyCanvas {
     roundedRect(ctx, 0, 0, width, height, 18 * scale);
     ctx.clip();
   }
-  ctx.fillStyle = paper.background;
+  if (paper.gradient) {
+    const wash = ctx.createLinearGradient(0, 0, 0, height);
+    wash.addColorStop(0, paper.gradient[0]);
+    wash.addColorStop(1, paper.gradient[1]);
+    ctx.fillStyle = wash;
+  } else {
+    ctx.fillStyle = paper.background;
+  }
   ctx.fillRect(0, 0, width, height);
 
   template.slots.forEach((slot, index) => {

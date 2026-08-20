@@ -77,6 +77,8 @@ export async function renderFrame(request: {
   aspectRatio: number | null;
   mirrored: boolean;
   quality?: number;
+  /** Longest edge of the result. Defaults to the full capture ceiling. */
+  maxDimension?: number;
 }): Promise<{ blob: Blob; bitmap: ImageBitmap; width: number; height: number }> {
   const profile = getProfile(request.profileId);
   const canvas = renderCapture(request.source, {
@@ -86,6 +88,7 @@ export async function renderFrame(request: {
     }),
     mirror: request.mirrored,
     aspect: request.aspectRatio,
+    maxDimension: request.maxDimension,
     seed: Date.now() & 0xffff,
     timestamp: profile.timestamp ? formatCameraTimestamp(new Date()) : null,
   });

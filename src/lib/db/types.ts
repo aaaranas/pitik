@@ -85,6 +85,19 @@ export interface Capture {
   deletedAt: number | null;
 }
 
+/**
+ * A clip of the booth sequence, paired with the strip it came from.
+ *
+ * Optional on purpose: strips recorded before this existed, and strips from
+ * browsers that cannot record, simply have no motion. Making it optional is
+ * what lets the field be added without a schema version bump.
+ */
+export interface MotionAttachment {
+  blob: Blob;
+  mimeType: string;
+  durationMs: number;
+}
+
 export interface Strip {
   id: string;
   rollId: string;
@@ -96,6 +109,12 @@ export interface Strip {
   captureIds: string[];
   caption: string | null;
   createdAt: number;
+  /**
+   * The whole shoot as a short clip, when the device could record one.
+   *
+   * Deliberately excluded from sync — see `lib/sync/engine.ts`.
+   */
+  motion?: MotionAttachment;
   /** Supabase user id of whoever composed it. `null` means this device. */
   authorId: string | null;
   remoteId: string | null;

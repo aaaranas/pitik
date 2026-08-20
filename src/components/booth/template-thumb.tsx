@@ -1,6 +1,6 @@
 "use client";
 
-import { PAPERS, type BoothTemplate } from "@/lib/booth/types";
+import { PAPERS, paperBackgroundCss, type BoothTemplate } from "@/lib/booth/types";
 import { cn } from "@/lib/utils";
 
 /**
@@ -34,7 +34,7 @@ export function TemplateThumb({
         width: "100%",
         maxWidth: `${Math.round(maxHeight * aspect)}px`,
         aspectRatio: aspect,
-        background: paper.background,
+        background: paperBackgroundCss(paper),
       }}
       aria-hidden
     >

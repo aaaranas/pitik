@@ -13,6 +13,12 @@ import { useToast } from "@/components/providers/toast-provider";
 import { useCamera } from "@/hooks/use-camera";
 import { useSettings } from "@/hooks/use-store";
 import { renderFrame } from "@/lib/camera/capture";
+import {
+  isMotionSupported,
+  type MotionClip,
+  type MotionRecording,
+  startMotionRecording,
+} from "@/lib/camera/motion";
 import { waitForFrame } from "@/lib/camera/service";
 import { templateAspect } from "@/lib/booth/templates";
 import type { BoothTemplate } from "@/lib/booth/types";
@@ -38,6 +44,9 @@ interface BoothFrame {
 
 const INTERVAL_OPTIONS = [3, 5, 8] as const;
 
+/** Comfortably above the largest slot any shipped template asks for. */
+const BOOTH_FRAME_MAX_EDGE = 1600;
+
 export function BoothRunner({ template }: { template: BoothTemplate }) {
   const camera = useCamera({ initialFacing: "user" });
   const { settings } = useSettings();
@@ -50,6 +59,21 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
   const [flashKey, setFlashKey] = useState(0);
   const [trayOpen, setTrayOpen] = useState(false);
   const [filterId, setFilterId] = useState("booth-classic");
+  /** The finished clip of this sequence, once the shoot has ended. */
+  const [motion, setMotion] = useState<MotionClip | null>(null);
+  /** True while a recorder is actually running, so the indicator never lies. */
+  const [recordingActive, setRecordingActive] = useState(false);
+  /** True between tapping Start and the countdown beginning. */
+  const [preparing, setPreparing] = useState(false);
+
+  /**
+   * The in-flight recorder.
+   *
+   * A ref rather than state: it is a live browser object with a lifetime, not a
+   * value to render, and it must be reachable from cleanup paths that run
+   * without a re-render.
+   */
+  const recordingRef = useRef<MotionRecording | null>(null);
 
   const profileId = settings?.defaultProfileId ?? "everyday";
   const soundOn = settings?.shutterSound !== false;
@@ -61,6 +85,9 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
     [filterId, profileId],
   );
   const aspect = useMemo(() => templateAspect(template), [template]);
+  // Checked once: whether this browser can record at all decides whether the
+  // shoot is advertised as filmed. No promise is made that can't be kept.
+  const canRecord = useMemo(() => isMotionSupported(), []);
   const mirrored = camera.facing === "user" && (settings?.mirrorSelfie ?? true);
   const referenceFrame = useReferenceFrame(camera.videoRef, trayOpen && camera.status === "ready");
 
@@ -83,6 +110,25 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
     for (const bitmap of bitmapsRef.current) bitmap.close();
     bitmapsRef.current = [];
   }, []);
+
+  /** Abandons any recording in flight. Safe to call when there isn't one. */
+  const cancelRecording = useCallback(() => {
+    recordingRef.current?.cancel();
+    recordingRef.current = null;
+    setRecordingActive(false);
+  }, []);
+
+  /** Guards async work that resolves after the screen has gone. */
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    // A recorder must never outlive its session — not on unmount, and not when
+    // the user leaves the page mid-sequence.
+    return () => {
+      mountedRef.current = false;
+      cancelRecording();
+    };
+  }, [cancelRecording]);
 
   /** Kept in a ref so the sequence timer can read the count synchronously. */
   const shotCountRef = useRef(0);
@@ -112,6 +158,12 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
         profileId,
         aspectRatio: aspect,
         mirrored,
+        // Booth frames are composited into slots that top out around 1440px
+        // even on a print-scale export, so grading them at full sensor
+        // resolution burns roughly four times the pixels for no visible gain —
+        // and that cost lands as a freeze between shots, when the sequence is
+        // counting you into the next one.
+        maxDimension: BOOTH_FRAME_MAX_EDGE,
       });
       shotCountRef.current += 1;
       bitmapsRef.current.push(frame.bitmap);
@@ -148,12 +200,20 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
         setCountdown(countdown - 1);
         return;
       }
-      void shootOne().then(() => {
+      void shootOne().then(async () => {
         if (cancelled) return;
         // Bail out rather than looping forever if the camera keeps handing back
         // unusable frames — the user gets whatever did come out.
         const exhausted = attemptsRef.current >= template.shots + 3;
         if (shotCountRef.current >= template.shots || exhausted) {
+          // Finish the clip before switching screens, so the editor never has
+          // to render a "preparing…" state for something that takes 20ms.
+          const recording = recordingRef.current;
+          recordingRef.current = null;
+          const clip = recording ? await recording.stop() : null;
+          if (cancelled) return;
+          setRecordingActive(false);
+          setMotion(clip);
           setPhase("review");
           setCountdown(null);
         } else {
@@ -170,30 +230,60 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
     };
   }, [countdown, hapticsOn, interval, phase, shootOne, soundOn, template.shots]);
 
-  const reset = useCallback(
-    (nextPhase: Phase) => {
-      releaseFrames();
-      setFrames([]);
-      shotCountRef.current = 0;
-      attemptsRef.current = 0;
-      setPhase(nextPhase);
-      setCountdown(nextPhase === "running" ? interval : null);
-    },
-    [interval, releaseFrames],
-  );
+  /** Drops everything from the previous shoot. Shared by start and retake. */
+  const clearSession = useCallback(() => {
+    releaseFrames();
+    cancelRecording();
+    setMotion(null);
+    setFrames([]);
+    shotCountRef.current = 0;
+    attemptsRef.current = 0;
+  }, [cancelRecording, releaseFrames]);
 
-  const start = () => {
+  /**
+   * Begins the shoot.
+   *
+   * Async because the recorder may need to ask for the microphone, and that
+   * prompt has to resolve *before* the countdown starts — a permission dialog
+   * appearing over "3… 2… 1…" would eat the first shot.
+   */
+  const start = useCallback(async () => {
     primeAudio();
-    reset("running");
-  };
+    clearSession();
+    setPreparing(true);
 
-  const retake = () => reset("setup");
+    // Rolls from the first countdown to the last shot, so the clip contains the
+    // waiting and the reacting rather than just the poses. A recorder that
+    // refuses to start returns null and the sequence carries on regardless.
+    const recording = await startMotionRecording(camera.stream);
+
+    // The user may have left while the prompt was open; a recorder must never
+    // outlive the screen that started it.
+    if (!mountedRef.current) {
+      recording?.cancel();
+      return;
+    }
+
+    recordingRef.current = recording;
+    setRecordingActive(recording !== null);
+    setPreparing(false);
+    setPhase("running");
+    setCountdown(interval);
+  }, [camera.stream, clearSession, interval]);
+
+  const retake = useCallback(() => {
+    clearSession();
+    setPreparing(false);
+    setPhase("setup");
+    setCountdown(null);
+  }, [clearSession]);
 
   if (phase === "review") {
     return (
       <StripEditor
         template={template}
         frames={frames.map((frame) => frame.bitmap)}
+        motion={motion}
         onRetake={retake}
       />
     );
@@ -223,13 +313,26 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
               : formatCount(template.shots, "shot")}
           </p>
         </div>
-        <span className="size-10" aria-hidden />
+        {/* Being filmed is something you should be able to see, not something
+            you find out about afterwards. Shown only while a recorder is in
+            flight, so it can never claim a recording that isn't happening. */}
+        {recordingActive ? (
+          <span className="flex size-10 items-center justify-center gap-1" role="status">
+            <span
+              aria-hidden
+              className="size-2 animate-pulse rounded-full bg-safelight-500 shadow-[0_0_8px_rgba(234,79,52,0.9)]"
+            />
+            <span className="sr-only">Recording a clip of this shoot</span>
+          </span>
+        ) : (
+          <span className="size-10" aria-hidden />
+        )}
       </header>
 
       <div className="relative min-h-0 flex-1 overflow-hidden px-3 py-1">
         {live ? (
           <FilteredPreview
-            videoRef={camera.videoRef}
+            videoRef={camera.attachVideo}
             adjustments={adjustments}
             mirrored={mirrored}
             aspectRatio={aspect}
@@ -313,6 +416,13 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
             </Button>
           </div>
 
+          {canRecord ? (
+            <p className="px-6 pb-1 text-center text-[0.6875rem] text-ink-500">
+              The whole shoot is filmed, with sound — you get a clip as well as the
+              strip.
+            </p>
+          ) : null}
+
           <div
             className="flex items-center gap-3 px-6 pt-1"
             style={{ paddingBottom: "calc(var(--safe-bottom) + 1.25rem)" }}
@@ -326,8 +436,14 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
             >
               <RefreshCcw className="size-5" />
             </Button>
-            <Button variant="primary" size="lg" className="flex-1" onClick={start}>
-              Start the booth
+            <Button
+              variant="primary"
+              size="lg"
+              className="flex-1"
+              onClick={() => void start()}
+              disabled={preparing}
+            >
+              {preparing ? "Getting ready…" : "Start the booth"}
             </Button>
           </div>
         </div>

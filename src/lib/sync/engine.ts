@@ -109,6 +109,19 @@ async function pushCapture(client: Client, capture: Capture, userId: string): Pr
   await updateCapture(capture.id, { storagePath: path, remoteId: capture.id, syncState: "synced" });
 }
 
+/**
+ * Booth clips are deliberately **not** synced.
+ *
+ * Three reasons, in order of weight: the `strips` table has no column for one,
+ * so it would need a migration; a clip is an order of magnitude larger than the
+ * strip it accompanies, which would dominate a free storage tier within a
+ * handful of sessions; and unlike a photograph, a clip is a by-product rather
+ * than the thing the user asked to keep.
+ *
+ * The consequence is honest and worth knowing: a clip lives only on the device
+ * that recorded it. Pulling a shared roll brings the strip, not the motion. If
+ * that changes, add a `motion_path` column and upload it like any other object.
+ */
 async function pushStrip(client: Client, strip: Strip, userId: string): Promise<void> {
   const path = storagePath(userId, strip.rollId, `strip-${strip.id}`, extensionFor(strip.blob));
   const upload = await client.storage.from(PHOTO_BUCKET).upload(path, strip.blob, {

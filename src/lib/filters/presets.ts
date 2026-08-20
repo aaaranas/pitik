@@ -6,8 +6,11 @@ import type { CameraProfile, FilterDefinition } from "./types";
  * Rules for adding to this list:
  *  - Every preset must be visibly distinct from its neighbours at thumbnail
  *    size. If two presets are hard to tell apart, one of them should not exist.
- *  - Names describe a feeling or a process, never a brand. Nothing here is
- *    named after another company's product or film stock.
+ *  - The Digicam presets are named after the compact cameras whose look they
+ *    imitate, at the product owner's explicit request, because that is what
+ *    makes them findable. Those names are third-party trademarks and imply no
+ *    affiliation or endorsement; rename them before any public or commercial
+ *    release. Every other category uses feeling-or-process names.
  *  - Skin tone is the thing people actually judge. Grades that wreck midtones
  *    stay out no matter how good the landscape test looks.
  */
@@ -266,7 +269,7 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   // ---------------------------------------------------------------- Digicam
   {
     id: "2003",
-    name: "2003",
+    name: "PowerShot",
     category: "Digicam",
     description: "Four megapixels and proud of it.",
     adjustments: {
@@ -280,7 +283,7 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   },
   {
     id: "ccd",
-    name: "CCD",
+    name: "Coolpix",
     category: "Digicam",
     description: "Cool whites, crunchy detail.",
     adjustments: {
@@ -293,8 +296,124 @@ export const FILTER_PRESETS: FilterDefinition[] = [
     },
   },
   {
+    id: "1999",
+    name: "FinePix",
+    category: "Digicam",
+    description: "Two megapixels, one AA battery left.",
+    adjustments: {
+      temperature: -0.24,
+      contrast: 1.28,
+      saturation: 0.92,
+      sharpness: 0.95,
+      shadows: -0.12,
+      vignette: 0.28,
+      grain: 0.18,
+      splitShadow: { color: "#1b2733", amount: 0.3 },
+    },
+  },
+  {
+    id: "2007",
+    name: "Lumix",
+    category: "Digicam",
+    description: "Slim silver body, punchy little sensor.",
+    adjustments: {
+      contrast: 1.18,
+      saturation: 1.3,
+      sharpness: 0.72,
+      highlights: 0.12,
+      temperature: 0.06,
+      vignette: 0.1,
+    },
+  },
+  {
+    id: "point-and-shoot",
+    name: "EasyShare",
+    category: "Digicam",
+    description: "Auto everything. Honest results.",
+    adjustments: {
+      contrast: 1.08,
+      saturation: 1.12,
+      sharpness: 0.45,
+      brightness: 1.03,
+    },
+  },
+  {
+    id: "camcorder",
+    name: "Handycam",
+    category: "Digicam",
+    description: "Interlaced holiday footage, paused.",
+    adjustments: {
+      saturation: 0.95,
+      contrast: 0.94,
+      shadows: 0.24,
+      tint: -0.18,
+      bloom: 0.22,
+      grain: 0.22,
+      splitShadow: { color: "#1f3329", amount: 0.34 },
+      splitHighlight: { color: "#e8f4dd", amount: 0.2 },
+    },
+  },
+  {
+    id: "mini-dv",
+    name: "Mini DV",
+    category: "Digicam",
+    description: "Tape softness, faint magenta bloom.",
+    adjustments: {
+      saturation: 1.05,
+      contrast: 1.02,
+      tint: 0.16,
+      shadows: 0.18,
+      grain: 0.3,
+      bloom: 0.3,
+      splitHighlight: { color: "#ffdcf0", amount: 0.26 },
+    },
+  },
+  {
+    id: "superzoom",
+    name: "Camedia",
+    category: "Digicam",
+    description: "All the way out, hazy at the end.",
+    adjustments: {
+      contrast: 0.88,
+      saturation: 0.94,
+      temperature: 0.16,
+      fade: 0.2,
+      sharpness: 0.25,
+      bloom: 0.18,
+    },
+  },
+  {
+    id: "webcam",
+    name: "Webcam",
+    category: "Digicam",
+    description: "Bad light, worse sensor, great night.",
+    adjustments: {
+      temperature: -0.2,
+      contrast: 0.9,
+      saturation: 0.85,
+      shadows: 0.3,
+      grain: 0.55,
+      sharpness: 0.2,
+      vignette: 0.22,
+    },
+  },
+  {
+    id: "pocket-cam",
+    name: "Exilim",
+    category: "Digicam",
+    description: "Warm CCD, always in someone's bag.",
+    adjustments: {
+      temperature: 0.22,
+      contrast: 1.14,
+      saturation: 1.18,
+      sharpness: 0.6,
+      grain: 0.16,
+      splitHighlight: { color: "#ffe3bd", amount: 0.24 },
+    },
+  },
+  {
     id: "flash",
-    name: "Flash",
+    name: "Cyber-shot",
     category: "Digicam",
     description: "Bright subject, world falls away.",
     adjustments: {
