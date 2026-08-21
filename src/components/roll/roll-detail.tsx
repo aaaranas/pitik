@@ -118,7 +118,7 @@ export function RollDetail({ rollId }: { rollId: string }) {
               if (event.key === "Escape") setRenaming(false);
             }}
             aria-label="Roll name"
-            className="w-full border-b border-safelight-500 bg-transparent pb-1 font-display text-4xl text-paper focus:outline-none"
+            className="w-full border-b border-safelight-500 bg-transparent pb-1 text-3xl font-semibold tracking-tight text-paper focus:outline-none"
           />
         ) : (
           <button
@@ -127,7 +127,7 @@ export function RollDetail({ rollId }: { rollId: string }) {
               setDraftTitle(roll.title);
               setRenaming(true);
             }}
-            className="text-left font-display text-4xl leading-tight text-paper"
+            className="text-left text-3xl font-semibold leading-tight tracking-tight text-paper"
             aria-label={`Rename ${roll.title}`}
           >
             {roll.emoji ? <span className="mr-2">{roll.emoji}</span> : null}

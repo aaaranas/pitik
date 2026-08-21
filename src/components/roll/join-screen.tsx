@@ -115,7 +115,7 @@ export function JoinScreen({ code }: { code: string }) {
 
         {state.kind === "local" ? (
           <>
-            <h1 className="mt-4 font-display text-2xl text-ink-100">{state.title}</h1>
+            <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink-100">{state.title}</h1>
             <p className="mt-2 text-sm text-ink-400">This roll is already on your device.</p>
             <Link
               href={`/rolls/${state.rollId}`}

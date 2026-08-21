@@ -27,7 +27,7 @@ export function TabBar() {
   return (
     <nav
       aria-label="Main"
-      className="shrink-0 border-t border-ink-850 bg-ink-950/95 backdrop-blur"
+      className="shrink-0 border-t-2 border-ink-800 bg-ink-950/95 backdrop-blur"
       style={{ paddingBottom: "var(--safe-bottom)" }}
     >
       <ul className="mx-auto flex max-w-md items-stretch">
@@ -49,7 +49,7 @@ export function TabBar() {
                 )}
               >
                 <Icon className="size-5" aria-hidden strokeWidth={active ? 2.2 : 1.8} />
-                <span className="text-[0.625rem] uppercase tracking-[0.1em]">{tab.label}</span>
+                <span className="font-mono text-[0.5625rem] uppercase tracking-[0.2em]">{tab.label}</span>
               </Link>
             </li>
           );

@@ -12,6 +12,7 @@ import {
   focusAt as focusTrackAt,
   isCameraSupported,
   listCameras,
+  ultraWideZoom,
   openCamera,
   permissionState,
   setExposure as setTrackExposure,
@@ -80,6 +81,14 @@ export interface CameraController {
   /** Which lens is live. */
   lens: Lens;
   setLens: (lens: Lens) => Promise<void>;
+  /**
+   * Labels of every camera this browser will name.
+   *
+   * Surfaced in Settings purely as a diagnostic: lens detection depends on
+   * vendor labels, and when it fails the only way to find out why is to see
+   * what the device actually reported.
+   */
+  cameraLabels: string[];
 }
 
 /** 1x main camera, or the 0.5x ultra-wide module beside it. */
@@ -149,6 +158,8 @@ export function useCamera(options: {
   const [lens, setLensState] = useState<Lens>("wide");
   /** Device id of the ultra-wide on this side, once labels are readable. */
   const [ultraWideId, setUltraWideId] = useState<string | null>(null);
+  /** Every video device this browser will name, for the diagnostic. */
+  const [cameraLabels, setCameraLabels] = useState<string[]>([]);
   const [permission, setPermission] = useState<PermissionState | "unknown">("unknown");
   // A browser capability, not app state: read through an external store so the
   // server render stays optimistic and hydration doesn't flicker the gate.
@@ -225,7 +236,9 @@ export function useCamera(options: {
       // Labels — and therefore both the camera count and any ultra-wide — only
       // become readable once permission has been granted.
       setPermission(await permissionState());
-      setUltraWideId(findUltraWide(await listCameras(), camera.facing)?.deviceId ?? null);
+      const cameras = await listCameras();
+      setCameraLabels(cameras.map((device) => device.label).filter(Boolean));
+      setUltraWideId(findUltraWide(cameras, camera.facing)?.deviceId ?? null);
     } catch (cause) {
       cameraRef.current = null;
       setStream(null);
@@ -256,8 +269,23 @@ export function useCamera(options: {
   const setLens = useCallback(
     async (next: Lens) => {
       if (next === lens) return;
-      // The ultra-wide is a separate camera, so switching lens means reopening
-      // the stream rather than applying a zoom constraint.
+
+      // Route two: where the wider view lives on the main track's zoom range
+      // rather than on its own device, a constraint is all that is needed and
+      // reopening the stream would be both slower and wrong.
+      const track = cameraRef.current?.track;
+      const wideZoom = capabilities ? ultraWideZoom(capabilities) : null;
+      if (!ultraWideId && wideZoom !== null && track) {
+        const target = next === "ultra" ? wideZoom : 1;
+        if (await setTrackZoom(track, target)) {
+          setZoomState(target);
+          setLensState(next);
+        }
+        return;
+      }
+
+      // Route one: the ultra-wide is a separate camera, so switching lens
+      // means reopening the stream on that device.
       if (next === "ultra" && !ultraWideId) return;
       setLensState(next);
       if (startingRef.current) await startingRef.current;
@@ -270,7 +298,7 @@ export function useCamera(options: {
       startingRef.current = pending;
       return pending;
     },
-    [facing, lens, openInternal, ultraWideId],
+    [capabilities, facing, lens, openInternal, ultraWideId],
   );
 
   const flip = useCallback(async () => {
@@ -389,8 +417,10 @@ export function useCamera(options: {
     setZoom,
     setExposure,
     focusAt,
-    hasUltraWide: ultraWideId !== null,
+    hasUltraWide:
+      ultraWideId !== null || (capabilities ? ultraWideZoom(capabilities) !== null : false),
     lens,
     setLens,
+    cameraLabels,
   };
 }

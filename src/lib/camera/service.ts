@@ -122,19 +122,36 @@ function readCapabilities(
  * Returns null when there is no such lens, which is how the control stays
  * hidden on devices that cannot honour it.
  */
+const ULTRA_WIDE_LABEL =
+  /(ultra[\s._-]?wide|wide[\s._-]?angle|超広角|0[.,]5\s?x)/i;
+
 export function findUltraWide(
   devices: MediaDeviceInfo[],
   facing: Facing,
 ): MediaDeviceInfo | null {
   const candidates = devices.filter(
-    (device) => device.kind === "videoinput" && /ultra[\s-]?wide/i.test(device.label),
+    (device) => device.kind === "videoinput" && ULTRA_WIDE_LABEL.test(device.label),
   );
   if (candidates.length === 0) return null;
 
   // Labels are unreliable about which way a lens points, so prefer one that
   // names the side we want and fall back to the only ultra-wide there is.
-  const side = facing === "user" ? /front/i : /back|rear/i;
+  const side = facing === "user" ? /front/i : /back|rear|environment/i;
   return candidates.find((device) => side.test(device.label)) ?? candidates[0];
+}
+
+/**
+ * Zoom range that reaches wider than the main lens.
+ *
+ * Some Android builds expose the ultra-wide as a sub-1x zoom on the main track
+ * rather than as a separate device, so this is the second way in. Anything at
+ * or below 0.7 is a genuinely wider view rather than rounding noise.
+ */
+export function ultraWideZoom(
+  capabilities: CameraCapabilities,
+): number | null {
+  const zoom = capabilities.zoom;
+  return zoom && zoom.min <= 0.7 ? zoom.min : null;
 }
 
 /**

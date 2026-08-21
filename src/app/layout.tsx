@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Serif, Inter, JetBrains_Mono } from "next/font/google";
+import { Archivo, Bebas_Neue, Courier_Prime } from "next/font/google";
 import { AppFrame } from "@/components/shell/app-frame";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
@@ -7,28 +7,36 @@ import { ServiceWorkerBridge } from "@/components/pwa/service-worker-bridge";
 import "./globals.css";
 
 /**
- * Three faces, each with a job:
- *  - a serif for anything the user wrote or named, so their words look printed
- *  - a grotesque for interface text
- *  - a monospace for machine facts: counts, timestamps, frame numbers
+ * Three faces, borrowed from the packaging this app is about.
+ *
+ *  - **Bebas Neue** for mastheads and titles: the condensed all-caps of a film
+ *    carton, a cinema one-sheet, a darkroom door sign. It carries the period
+ *    without costing legibility at small sizes.
+ *  - **Archivo** for interface text — a grotesque with actual character, where
+ *    a neutral UI sans would drag the whole thing back to the present day.
+ *  - **Courier Prime** for machine facts: counts, timestamps, frame numbers,
+ *    spec lines. Typewriter, because that is what a photo lab labelled things
+ *    with.
+ *
  * Nothing else gets added without removing one of these.
  */
-const display = Instrument_Serif({
+const display = Bebas_Neue({
   weight: "400",
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-display-face",
   display: "swap",
 });
 
-const sans = Inter({
+const sans = Archivo({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-sans-face",
   display: "swap",
 });
 
-const mono = JetBrains_Mono({
+const mono = Courier_Prime({
+  weight: ["400", "700"],
   subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--font-mono-face",
   display: "swap",
 });
 

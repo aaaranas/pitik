@@ -95,7 +95,7 @@ export function RollCard({
         </div>
 
         <div className="relative z-[2] px-3 pb-3 pt-2.5">
-          <h3 className="truncate font-display text-lg leading-tight">
+          <h3 className="truncate text-lg font-semibold leading-tight tracking-tight">
             {roll.emoji ? <span className="mr-1.5">{roll.emoji}</span> : null}
             {roll.title}
           </h3>

@@ -43,9 +43,15 @@
   --color-signal-warn: #e0b155;
   --color-signal-bad: #e3654f;
 
-  --font-display: var(--font-display), ui-serif, Georgia, serif;
-  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono), ui-monospace, "SF Mono", monospace;
+  /*
+   * next/font hashes its family names, so it publishes them as
+   * `--font-*-face` on <html> and the theme keys point at those. Naming the
+   * two sides differently keeps this from being a self-referential custom
+   * property, which resolves to nothing the moment stylesheet order shifts.
+   */
+  --font-display: var(--font-display-face), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, "SF Mono", monospace;
 
   --radius-frame: 0.125rem;
 
@@ -177,5 +183,79 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Vintage print furniture
+
+   The app is about photographic objects, so the interface borrows from
+   what those objects were printed on: film cartons, envelopes, lab
+   tickets. These are the reusable pieces of that vocabulary.
+   ------------------------------------------------------------------ */
+
+@layer components {
+  /* Double rule, as on the top and bottom of a film-carton masthead. */
+  .rule-double {
+    border-top: 3px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    height: 5px;
+  }
+
+  /* The torn edge of a lab ticket. Notches are punched out of the paper
+     with radial gradients rather than drawn on top of it, so whatever is
+     behind the element shows through the holes. */
+  .perforated-y {
+    -webkit-mask-image:
+      radial-gradient(circle at 5px 50%, transparent 5px, black 5.5px),
+      radial-gradient(circle at calc(100% - 5px) 50%, transparent 5px, black 5.5px);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      radial-gradient(circle at 5px 50%, transparent 5px, black 5.5px),
+      radial-gradient(circle at calc(100% - 5px) 50%, transparent 5px, black 5.5px);
+    mask-composite: intersect;
+  }
+
+  /* Offset-printed halftone. Sits above a surface at low opacity so flat
+     colour reads as ink on paper rather than as a CSS rectangle. */
+  .halftone::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.14;
+    background-image: radial-gradient(currentColor 0.5px, transparent 0.6px);
+    background-size: 4px 4px;
+  }
+
+  /* Rubber-stamped label: slightly rotated, ink-bled edges. */
+  .stamp {
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    letter-spacing: 0.18em;
+    opacity: 0.75;
+  }
+
+  /* Sprocket holes down both long edges of a film strip. */
+  .film-edge::before,
+  .film-edge::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 9px;
+    background-image: radial-gradient(
+      circle at center,
+      var(--color-ink-950) 0 2px,
+      transparent 2.2px
+    );
+    background-size: 11px 9px;
+    background-repeat: repeat-x;
+  }
+  .film-edge::before {
+    top: 0;
+  }
+  .film-edge::after {
+    bottom: 0;
   }
 }
