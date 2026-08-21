@@ -48,6 +48,29 @@ work is not rendered — that is why `CameraCapabilities` exists.
 runtime, no AI services. There is an end-to-end test asserting this; if you add
 a dependency that phones home, that test will fail and it is right.
 
+## Typography
+
+The app is dressed as film packaging, not as a product page. Three faces, all
+self-hosted through `next/font`, all declared once in `layout.tsx`:
+
+- `font-display` (Bebas Neue) is **caps-only**. It is for our words —
+  headings, labels, the wordmark. Never put a user's text in it: a roll named
+  "Dinner with Sam" would be shouted back at them as DINNER WITH SAM.
+- `font-sans` (Archivo) carries body copy **and everything the user typed**.
+  Roll titles, captions, names.
+- `font-mono` (Courier Prime) is the typewritten furniture — spec lines, dates,
+  frame numbers, counters. Tracked out wide and uppercase.
+
+next/font hashes its family names, so it publishes them as `--font-*-face` and
+the Tailwind theme keys point at those. Keep the two names distinct — a
+self-referential custom property silently resolves to nothing. Canvas cannot
+read a CSS variable at all, so `compositor.ts` resolves the stack off the
+document and falls back to generics in workers and tests.
+
+Vintage print utilities (`rule-double`, `perforated-y`, `halftone`, `stamp`,
+`film-edge`) live in `globals.css`. Reach for those before inventing a new
+rounded card.
+
 ## Filters
 
 - Filters are **data**. Add presets to `src/lib/filters/presets.ts`; never put

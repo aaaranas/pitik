@@ -4,6 +4,7 @@ import { ChevronLeft, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AccountPanel } from "./account-panel";
+import { CameraReport } from "./camera-report";
 import { Button } from "@/components/ui/button";
 import { Modal, SheetRoot } from "@/components/ui/sheet";
 import { useToast } from "@/components/providers/toast-provider";
@@ -102,6 +103,7 @@ export function SettingsScreen() {
       </Group>
 
       <Group title="On this device">
+        <CameraReport />
         <div className="px-4 py-3.5">
           <p className="text-sm text-ink-100">Storage</p>
           <p className="mt-1 text-xs leading-relaxed text-ink-400">

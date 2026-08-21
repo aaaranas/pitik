@@ -134,7 +134,7 @@ export function NewRollSheet({
               placeholder="Dinner with Sam"
               aria-invalid={Boolean(error)}
               aria-describedby={error ? "roll-title-error" : undefined}
-              className="w-full border-b border-ink-600 bg-transparent pb-2 font-display text-3xl text-ink-100 placeholder:text-ink-500 focus:border-safelight-500 focus:outline-none"
+              className="w-full border-b border-ink-600 bg-transparent pb-2 text-2xl font-semibold tracking-tight text-ink-100 placeholder:text-ink-500 focus:border-safelight-500 focus:outline-none"
             />
             {error ? (
               <p id="roll-title-error" className="mt-2 text-sm text-signal-bad">

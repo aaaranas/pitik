@@ -18,7 +18,7 @@ export function Wordmark({ className }: { className?: string }) {
   return (
     <span className={cn("flex items-center gap-2", className)}>
       <PitikMark className="size-6 text-paper" />
-      <span className="font-display text-2xl leading-none tracking-tight text-paper">
+      <span className="font-display text-3xl leading-none tracking-[0.03em] text-paper">
         Pitik
       </span>
     </span>

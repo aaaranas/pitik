@@ -46,3 +46,6 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Screenshot output from tests/e2e/shots.spec.ts
+.shots/

@@ -19,11 +19,27 @@ export interface ComposeOptions {
   scale?: number;
 }
 
-const FONT_STACKS: Record<StripStyle["captionFont"], string> = {
-  display: '"Instrument Serif", ui-serif, Georgia, serif',
-  sans: '"Inter", ui-sans-serif, system-ui, sans-serif',
+/**
+ * Canvas cannot read `var(--font-display)`, and next/font family names are
+ * hashed at build time, so a hard-coded family here would silently fall back
+ * to the generic. Ask the document what the variable actually resolved to and
+ * keep a real stack behind it for workers and tests, where there is no
+ * document at all.
+ */
+const FONT_FALLBACKS: Record<StripStyle["captionFont"], string> = {
+  display: "ui-serif, Georgia, serif",
+  sans: "ui-sans-serif, system-ui, sans-serif",
   mono: 'ui-monospace, "SF Mono", Menlo, monospace',
 };
+
+function fontStack(kind: StripStyle["captionFont"]): string {
+  const fallback = FONT_FALLBACKS[kind];
+  if (typeof document === "undefined") return fallback;
+  const loaded = getComputedStyle(document.documentElement)
+    .getPropertyValue(`--font-${kind}`)
+    .trim();
+  return loaded ? `${loaded}, ${fallback}` : fallback;
+}
 
 function roundedRect(
   ctx: AnyContext,
@@ -174,7 +190,7 @@ export function composeStrip(options: ComposeOptions): AnyCanvas {
     if (template.numbered) {
       const size = Math.max(10, 13 * scale);
       ctx.save();
-      ctx.font = `${size}px ${FONT_STACKS.mono}`;
+      ctx.font = `${size}px ${fontStack("mono")}`;
       ctx.fillStyle = paper.muted;
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
@@ -202,7 +218,7 @@ export function composeStrip(options: ComposeOptions): AnyCanvas {
   if (caption && style.caption.trim()) {
     const text = style.caption.trim().slice(0, caption.maxLength);
     ctx.save();
-    ctx.font = `${caption.size * scale}px ${FONT_STACKS[style.captionFont]}`;
+    ctx.font = `${caption.size * scale}px ${fontStack(style.captionFont)}`;
     ctx.fillStyle = paper.ink;
     ctx.textAlign = caption.align;
     ctx.textBaseline = "alphabetic";
@@ -213,7 +229,7 @@ export function composeStrip(options: ComposeOptions): AnyCanvas {
   if (style.showDate) {
     const size = Math.max(11, 15 * scale);
     ctx.save();
-    ctx.font = `${size}px ${FONT_STACKS.mono}`;
+    ctx.font = `${size}px ${fontStack("mono")}`;
     ctx.fillStyle = paper.muted;
     ctx.textAlign = "center";
     ctx.textBaseline = "bottom";
