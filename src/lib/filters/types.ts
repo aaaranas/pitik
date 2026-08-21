@@ -88,7 +88,18 @@ export type FilterCategory = (typeof FILTER_CATEGORIES)[number];
 
 export interface FilterDefinition {
   id: string;
+  /**
+   * The model designation alone — "PowerShot A80", not "Canon PowerShot A80".
+   *
+   * Kept separate from `maker` so the dial can print the maker small above the
+   * model, the way it is moulded into a real body.
+   */
   name: string;
+  /**
+   * Who made the camera this grade imitates. Digicam models only; a grade named
+   * after a feeling has no maker and omits this.
+   */
+  maker?: string;
   category: FilterCategory;
   /** One line shown in the filter tray. Keep it evocative, not technical. */
   description: string;

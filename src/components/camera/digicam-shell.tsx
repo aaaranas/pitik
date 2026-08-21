@@ -127,7 +127,7 @@ export function DigicamShell({
             style={{ background: shell.accent, boxShadow: `0 0 6px ${shell.accent}` }}
           />
           <span
-            className="max-w-[10rem] truncate font-mono text-[0.5rem] uppercase tracking-[0.2em]"
+            className="max-w-[13.5rem] truncate font-mono text-[0.5rem] uppercase tracking-[0.12em]"
             style={{ color: shell.ink, opacity: 0.6 }}
           >
             {model}

@@ -52,6 +52,15 @@ import { cn } from "@/lib/utils";
  *    so the next tap never waits on the last photo's JPEG.
  */
 
+/**
+ * What is printed on the body: maker then model, the way it is moulded into a
+ * real camera. A grade with no maker prints its name alone.
+ */
+function modelPlate(filterId: string): string {
+  const filter = getFilter(filterId);
+  return filter.maker ? `${filter.maker} ${filter.name}` : filter.name;
+}
+
 const TIMER_OPTIONS = [0, 3, 10] as const;
 
 /** The model the camera opens on, and the neutral body underneath it. */
@@ -503,7 +512,7 @@ export function CameraScreen({
       ) : null}
 
       <DigicamShell
-      model={getFilter(activeModelId).name}
+      model={modelPlate(activeModelId)}
       modelId={activeModelId}
       aspectRatio={frameAspect}
       shotCount={captureCount}

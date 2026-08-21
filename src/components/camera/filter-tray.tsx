@@ -66,7 +66,7 @@ function FilterChip({ filter, selected, referenceFrame, onSelect }: FilterChipPr
       type="button"
       onClick={onSelect}
       aria-pressed={selected}
-      className="group flex w-16 shrink-0 flex-col items-center gap-1.5 outline-offset-4"
+      className="group flex w-[4.75rem] shrink-0 flex-col items-center gap-1.5 outline-offset-4"
     >
       <span
         className={cn(
@@ -111,13 +111,28 @@ function FilterChip({ filter, selected, referenceFrame, onSelect }: FilterChipPr
           />
         ))}
       </span>
-      <span
-        className={cn(
-          "max-w-full truncate text-[0.6875rem] leading-none transition-colors",
-          selected ? "text-safelight-400" : "text-ink-300 group-hover:text-ink-100",
-        )}
-      >
-        {filter.name}
+      {/* Maker above model, as it is moulded into a real body. Model names run
+          long — "Handycam DCR-TRV350" — so this wraps rather than truncating a
+          camera down to something you cannot identify. */}
+      <span className="flex w-full flex-col items-center gap-0.5">
+        {filter.maker ? (
+          <span
+            className={cn(
+              "max-w-full truncate font-mono text-[0.5rem] uppercase leading-none tracking-[0.14em] transition-colors",
+              selected ? "text-safelight-400/80" : "text-ink-500 group-hover:text-ink-400",
+            )}
+          >
+            {filter.maker}
+          </span>
+        ) : null}
+        <span
+          className={cn(
+            "w-full text-balance text-center text-[0.625rem] leading-tight transition-colors",
+            selected ? "text-safelight-400" : "text-ink-300 group-hover:text-ink-100",
+          )}
+        >
+          {filter.name}
+        </span>
       </span>
     </button>
   );

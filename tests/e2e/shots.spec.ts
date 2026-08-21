@@ -4,6 +4,9 @@ import { open } from "./helpers";
 test("landing", async ({ page }) => {
   await open(page, "/camera");
   await page.getByRole("button", { name: "Take a photo" }).waitFor({ timeout: 15000 });
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: ".shots/camera.png" });
+
   for (let i = 0; i < 3; i++) {
     await page.getByRole("button", { name: "Take a photo" }).click();
     await page.waitForTimeout(300);

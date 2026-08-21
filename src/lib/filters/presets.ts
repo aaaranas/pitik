@@ -6,11 +6,13 @@ import type { CameraProfile, FilterDefinition } from "./types";
  * Rules for adding to this list:
  *  - Every preset must be visibly distinct from its neighbours at thumbnail
  *    size. If two presets are hard to tell apart, one of them should not exist.
- *  - The Digicam presets are named after the compact cameras whose look they
- *    imitate, at the product owner's explicit request, because that is what
- *    makes them findable. Those names are third-party trademarks and imply no
- *    affiliation or endorsement; rename them before any public or commercial
- *    release. Every other category uses feeling-or-process names.
+ *  - The Digicam presets carry the maker and the exact model of the camera
+ *    whose look they imitate, at the product owner's explicit request, because
+ *    that is what makes them findable. These are approximations of an era, not
+ *    measured emulations of a specific body. Those names are third-party
+ *    trademarks and imply no affiliation or endorsement; rename them before any
+ *    public or commercial release. Every other category uses
+ *    feeling-or-process names.
  *  - Skin tone is the thing people actually judge. Grades that wreck midtones
  *    stay out no matter how good the landscape test looks.
  */
@@ -269,7 +271,8 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   // ---------------------------------------------------------------- Digicam
   {
     id: "2003",
-    name: "PowerShot",
+    maker: "Canon",
+    name: "PowerShot A80",
     category: "Digicam",
     description: "Four megapixels and proud of it.",
     adjustments: {
@@ -283,7 +286,8 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   },
   {
     id: "ccd",
-    name: "Coolpix",
+    maker: "Nikon",
+    name: "Coolpix 4300",
     category: "Digicam",
     description: "Cool whites, crunchy detail.",
     adjustments: {
@@ -297,7 +301,8 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   },
   {
     id: "1999",
-    name: "FinePix",
+    maker: "Fujifilm",
+    name: "FinePix 2600 Zoom",
     category: "Digicam",
     description: "Two megapixels, one AA battery left.",
     adjustments: {
@@ -313,7 +318,8 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   },
   {
     id: "2007",
-    name: "Lumix",
+    maker: "Panasonic",
+    name: "Lumix DMC-FX07",
     category: "Digicam",
     description: "Slim silver body, punchy little sensor.",
     adjustments: {
@@ -327,7 +333,8 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   },
   {
     id: "point-and-shoot",
-    name: "EasyShare",
+    maker: "Kodak",
+    name: "EasyShare C300",
     category: "Digicam",
     description: "Auto everything. Honest results.",
     adjustments: {
@@ -339,7 +346,8 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   },
   {
     id: "camcorder",
-    name: "Handycam",
+    maker: "Sony",
+    name: "Handycam DCR-TRV350",
     category: "Digicam",
     description: "Interlaced holiday footage, paused.",
     adjustments: {
@@ -355,7 +363,8 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   },
   {
     id: "mini-dv",
-    name: "Mini DV",
+    maker: "Canon",
+    name: "ZR60 MiniDV",
     category: "Digicam",
     description: "Tape softness, faint magenta bloom.",
     adjustments: {
@@ -370,7 +379,8 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   },
   {
     id: "superzoom",
-    name: "Camedia",
+    maker: "Olympus",
+    name: "Camedia C-750",
     category: "Digicam",
     description: "All the way out, hazy at the end.",
     adjustments: {
@@ -384,7 +394,8 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   },
   {
     id: "webcam",
-    name: "Webcam",
+    maker: "Logitech",
+    name: "QuickCam Pro 4000",
     category: "Digicam",
     description: "Bad light, worse sensor, great night.",
     adjustments: {
@@ -399,7 +410,8 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   },
   {
     id: "pocket-cam",
-    name: "Exilim",
+    maker: "Casio",
+    name: "Exilim EX-Z750",
     category: "Digicam",
     description: "Warm CCD, always in someone's bag.",
     adjustments: {
@@ -413,7 +425,8 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   },
   {
     id: "polaroid",
-    name: "Polaroid",
+    maker: "Polaroid",
+    name: "OneStep 600",
     category: "Digicam",
     description: "Instant film. Wave it around while it develops.",
     adjustments: {
@@ -432,7 +445,8 @@ export const FILTER_PRESETS: FilterDefinition[] = [
   },
   {
     id: "flash",
-    name: "Cyber-shot",
+    maker: "Sony",
+    name: "Cyber-shot DSC-P73",
     category: "Digicam",
     description: "Bright subject, world falls away.",
     adjustments: {
