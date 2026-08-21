@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 export interface DialItem {
   id: string;
   name: string;
+  /** Printed small above the model, the way a real body is badged. */
+  maker?: string;
 }
 
 /**
@@ -72,11 +74,23 @@ export function ProfileDial({
               data-selected={selected}
               onClick={() => onSelect(item.id)}
               className={cn(
-                "shrink-0 snap-center whitespace-nowrap rounded-full px-3 py-1.5 text-xs uppercase tracking-[0.14em] transition-colors",
+                "flex shrink-0 snap-center flex-col items-center gap-0.5 whitespace-nowrap rounded-full px-3 py-1 transition-colors",
                 selected ? "text-safelight-400" : "text-ink-400 hover:text-ink-200",
               )}
             >
-              {item.name}
+              {item.maker ? (
+                <span
+                  className={cn(
+                    "font-mono text-[0.5rem] uppercase leading-none tracking-[0.2em]",
+                    selected ? "opacity-80" : "opacity-55",
+                  )}
+                >
+                  {item.maker}
+                </span>
+              ) : null}
+              <span className="text-[0.6875rem] uppercase leading-none tracking-[0.12em]">
+                {item.name}
+              </span>
             </button>
           );
         })}
