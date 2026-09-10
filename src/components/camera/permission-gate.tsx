@@ -45,7 +45,7 @@ export function PermissionGate({
           ) : null}
           <div className="mt-6 flex flex-col gap-2">
             {recoverable ? (
-              <Button variant="paper" size="lg" onClick={onStart}>
+              <Button variant="soft" size="lg" onClick={onStart}>
                 Try again
               </Button>
             ) : null}
@@ -72,7 +72,7 @@ export function PermissionGate({
           Pitik needs your camera to shoot. Photos stay on this device unless you
           choose to share them.
         </p>
-        <Button variant="paper" size="lg" className="mt-6 w-full" onClick={onStart}>
+        <Button variant="soft" size="lg" className="mt-6 w-full" onClick={onStart}>
           Turn on the camera
         </Button>
         {onImport ? (

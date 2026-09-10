@@ -12,25 +12,25 @@ import { cn } from "@/lib/utils";
  * on a camera screen being tapped one-handed in the dark.
  */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-[background-color,color,border-color,transform] duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40",
+  "squish inline-flex items-center justify-center gap-2 whitespace-nowrap font-semibold disabled:pointer-events-none disabled:opacity-40",
   {
     variants: {
       variant: {
+        // A pastel fill demands dark ink — white on sky is 1.7:1.
         primary:
-          "bg-safelight-500 text-white hover:bg-safelight-400 shadow-lg shadow-safelight-600/25",
-        paper: "bg-paper text-ink-900 hover:bg-white",
-        subtle: "bg-ink-800 text-ink-100 hover:bg-ink-700 hairline",
-        outline:
-          "border border-ink-600 text-ink-100 hover:border-ink-500 hover:bg-ink-800/60",
-        ghost: "text-ink-200 hover:bg-ink-800/70 hover:text-ink-100",
-        danger: "bg-signal-bad/15 text-signal-bad hover:bg-signal-bad/25",
+          "bg-sky-base text-cocoa-900 hover:bg-sky-base/85 shadow-[0_2px_8px_color-mix(in_srgb,var(--color-sky-deep)_22%,transparent)]",
+        soft: "bg-cream-50 text-cocoa-900 hover:bg-white hairline",
+        subtle: "bg-cream-200 text-cocoa-800 hover:bg-cream-300",
+        outline: "border border-edge-strong text-cocoa-800 hover:bg-cream-100",
+        ghost: "text-cocoa-600 hover:bg-cream-200 hover:text-cocoa-900",
+        danger: "bg-blush-tint text-blush-deep hover:bg-blush-base/60",
       },
       size: {
-        sm: "h-9 rounded-lg px-3 text-[0.8125rem]",
-        md: "h-11 rounded-xl px-4 text-sm",
-        lg: "h-14 rounded-2xl px-6 text-base",
-        icon: "size-11 rounded-full",
-        "icon-sm": "size-9 rounded-full",
+        sm: "h-9 rounded-pill px-3.5 text-[0.8125rem]",
+        md: "h-11 rounded-pill px-5 text-sm",
+        lg: "h-14 rounded-pill px-7 text-base",
+        icon: "size-11 rounded-pill",
+        "icon-sm": "size-9 rounded-pill",
       },
     },
     defaultVariants: { variant: "subtle", size: "md" },
