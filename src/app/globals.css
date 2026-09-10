@@ -11,6 +11,61 @@
    ------------------------------------------------------------------ */
 
 @theme {
+  /* ---------------------------------------------------------------
+     Pastel identity. Ground is milk and cream; ink is a soft brown
+     rather than black, because black on cream reads as a printed
+     form. Every pastel carries three steps and they are not
+     interchangeable: `tint` is a surface, `base` is a fill, and
+     `deep` is the only step that may be small text.
+
+     Solved against WCAG, not chosen by eye — see
+     scripts/check-contrast.mjs, which reads these very lines.
+     --------------------------------------------------------------- */
+
+  --color-cream-50: #FDFBF7;
+  --color-cream-100: #F9F5EF;
+  --color-cream-200: #F3ECE2;
+  --color-cream-300: #E8DED0;
+
+  /* cocoa-400 is decorative and disabled-state only: it does not
+     clear 4.5:1 on any ground in this palette. Muted text is 600. */
+  --color-cocoa-400: #A8998A;
+  --color-cocoa-600: #756658;
+  --color-cocoa-800: #4A4038;
+  --color-cocoa-900: #2F2823;
+
+  --color-sky-tint: #E4EEFA;
+  --color-sky-base: #A8C9F0;
+  --color-sky-deep: #3A6A9C;
+
+  --color-blush-tint: #FCEAF0;
+  --color-blush-base: #F5B8CB;
+  --color-blush-deep: #A64A6E;
+
+  --color-butter-tint: #FDF6E0;
+  --color-butter-base: #F7E3A1;
+  --color-butter-deep: #856825;
+
+  --color-mint-tint: #E6F5EF;
+  --color-mint-base: #B6E3D4;
+  --color-mint-deep: #2C7660;
+
+  --color-lilac-tint: #F1EBFB;
+  --color-lilac-base: #D4C4EE;
+  --color-lilac-deep: #6752A0;
+
+  /* A lit indicator on a light body has to be *darker*, not brighter.
+     Every accent in bodies.ts obeys the same rule. */
+  --color-blush-lamp: #C96284;
+
+  /* For a boundary that is the only affordance of a control.
+     cream-300 is a decorative divider and does not clear 3:1. */
+  --color-edge-strong: #979088;
+
+  --radius-pill: 999px;
+  --radius-card: 1.5rem;
+  --radius-slot: 1rem;
+
   /* Chrome: warm neutrals, darkest to lightest */
   --color-ink-950: #0b0908;
   --color-ink-900: #121010;
@@ -53,7 +108,7 @@
   --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-face), ui-monospace, "SF Mono", monospace;
 
-  --radius-frame: 0.125rem;
+  --radius-frame: 0.75rem;
 
   --ease-shutter: cubic-bezier(0.16, 1, 0.3, 1);
 
