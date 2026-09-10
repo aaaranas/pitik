@@ -27,12 +27,15 @@ export interface ComposeOptions {
  * document at all.
  */
 const FONT_FALLBACKS: Record<StripStyle["captionFont"], string> = {
-  display: "ui-serif, Georgia, serif",
+  // A rounded sans, so a serif fallback would print a visibly different
+  // strip wherever there is no document to read the real family from.
+  display: "ui-rounded, ui-sans-serif, system-ui, sans-serif",
   sans: "ui-sans-serif, system-ui, sans-serif",
   mono: 'ui-monospace, "SF Mono", Menlo, monospace',
 };
 
-function fontStack(kind: StripStyle["captionFont"]): string {
+/** Exported for the unit suite: the no-document path is the one that bites. */
+export function fontStack(kind: StripStyle["captionFont"]): string {
   const fallback = FONT_FALLBACKS[kind];
   if (typeof document === "undefined") return fallback;
   const loaded = getComputedStyle(document.documentElement)

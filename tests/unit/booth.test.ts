@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { fontStack } from "@/lib/booth/compositor";
 import {
   BOOTH_TEMPLATES,
   getTemplate,
@@ -106,5 +107,23 @@ describe("papers", () => {
       expect(paper.ink).toMatch(/^#[0-9a-f]{6}$/i);
       expect(paper.muted).toMatch(/^#[0-9a-f]{6}$/i);
     }
+  });
+});
+
+describe("compositor font fallbacks", () => {
+  it("falls back to a sans stack for the display face", () => {
+    // jsdom defines `document` but resolves no custom properties, so this
+    // exercises exactly the path a worker takes.
+    const stack = fontStack("display");
+    expect(stack).toContain("sans-serif");
+    // The old value was "ui-serif, Georgia, serif" — assert against those
+    // two names specifically. Do not assert on the substring "serif,": it
+    // occurs inside "ui-sans-serif," and would fail a correct stack.
+    expect(stack).not.toContain("ui-serif");
+    expect(stack).not.toContain("Georgia");
+  });
+
+  it("keeps a real monospace stack for machine text", () => {
+    expect(fontStack("mono")).toContain("monospace");
   });
 });
