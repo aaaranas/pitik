@@ -8,8 +8,9 @@ import { cn } from "@/lib/utils";
  * A single-value slider for camera controls.
  *
  * Styled as a thin track with an oversized invisible hit area — the visible
- * rail can be 2px because the thumb and the padding around it are what your
- * finger actually needs to find.
+ * rail is a 4px hairline (a 2px line reads fine on near-black but disappears
+ * on cream) while the thumb and the padding around it are what your finger
+ * actually needs to find.
  */
 export const Slider = React.forwardRef<
   React.ComponentRef<typeof SliderPrimitive.Root>,
@@ -24,11 +25,11 @@ export const Slider = React.forwardRef<
     )}
     {...props}
   >
-    <SliderPrimitive.Track className="relative h-0.5 w-full grow overflow-hidden rounded-full bg-ink-600 data-[orientation=vertical]:h-full data-[orientation=vertical]:w-0.5">
-      <SliderPrimitive.Range className="absolute h-full bg-safelight-500 data-[orientation=vertical]:w-full" />
+    <SliderPrimitive.Track className="relative h-1 w-full grow overflow-hidden rounded-pill bg-cream-300 data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1">
+      <SliderPrimitive.Range className="absolute h-full bg-sky-base data-[orientation=vertical]:w-full" />
     </SliderPrimitive.Track>
     <SliderPrimitive.Thumb
-      className="block size-5 rounded-full border-2 border-ink-950 bg-paper shadow-md shadow-black/40 transition-transform active:scale-110 disabled:opacity-40"
+      className="block size-5 rounded-pill border-2 border-cream-50 bg-sky-deep shadow-[0_1px_4px_color-mix(in_srgb,var(--color-cocoa-900)_25%,transparent)] transition-transform active:scale-110 disabled:opacity-40"
       aria-label={props["aria-label"]}
     />
   </SliderPrimitive.Root>

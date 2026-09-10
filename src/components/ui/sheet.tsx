@@ -22,7 +22,7 @@ function Overlay({ className }: { className?: string }) {
   return (
     <Dialog.Overlay
       className={cn(
-        "fixed inset-0 z-50 bg-ink-950/70 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in",
+        "fixed inset-0 z-50 bg-cocoa-900/35 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in",
         className,
       )}
     />
@@ -45,7 +45,7 @@ export const Sheet = React.forwardRef<HTMLDivElement, SheetContentProps>(
       <Dialog.Content
         ref={ref}
         className={cn(
-          "fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[88svh] w-full max-w-lg flex-col rounded-t-3xl border border-b-0 border-ink-700 bg-ink-900 shadow-2xl shadow-black/60",
+          "fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[88svh] w-full max-w-lg flex-col rounded-t-3xl border border-b-0 border-cream-300 bg-cream-50 shadow-[0_1px_2px_color-mix(in_srgb,var(--color-cocoa-900)_4%,transparent),0_8px_24px_color-mix(in_srgb,var(--color-cocoa-900)_8%,transparent)]",
           "duration-300 data-[state=open]:animate-rise",
           className,
         )}
@@ -55,23 +55,23 @@ export const Sheet = React.forwardRef<HTMLDivElement, SheetContentProps>(
         {/* Grab handle: signals draggability and gives a thumb somewhere safe
             to land when reaching for the top of the sheet. */}
         <div className="flex justify-center pt-3" aria-hidden>
-          <div className="h-1 w-10 rounded-full bg-ink-600" />
+          <div className="h-1 w-10 rounded-full bg-cream-300" />
         </div>
 
         <header className="flex items-start justify-between gap-4 px-5 pb-2 pt-3">
           <div className={cn(hideTitle && "sr-only")}>
-            <Dialog.Title className="font-display text-2xl leading-tight text-ink-100">
+            <Dialog.Title className="font-display text-2xl leading-tight text-cocoa-900">
               {title}
             </Dialog.Title>
             {description ? (
-              <Dialog.Description className="mt-1 text-sm text-ink-300">
+              <Dialog.Description className="mt-1 text-sm text-cocoa-600">
                 {description}
               </Dialog.Description>
             ) : null}
           </div>
           {!hideTitle ? (
             <Dialog.Close
-              className="-mr-1 -mt-1 grid size-9 shrink-0 place-items-center rounded-full text-ink-300 transition hover:bg-ink-800 hover:text-ink-100"
+              className="-mr-1 -mt-1 grid size-9 shrink-0 place-items-center rounded-full text-cocoa-600 transition hover:bg-cream-200 hover:text-cocoa-900"
               aria-label="Close"
             >
               <X className="size-5" />
@@ -83,7 +83,7 @@ export const Sheet = React.forwardRef<HTMLDivElement, SheetContentProps>(
           {children}
         </div>
 
-        {footer ? <div className="border-t border-ink-800 px-5 py-4">{footer}</div> : null}
+        {footer ? <div className="border-t border-cream-300 px-5 py-4">{footer}</div> : null}
       </Dialog.Content>
     </Dialog.Portal>
   ),
@@ -98,14 +98,14 @@ export const Modal = React.forwardRef<HTMLDivElement, SheetContentProps>(
       <Dialog.Content
         ref={ref}
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-ink-700 bg-ink-900 p-5 shadow-2xl shadow-black/60 data-[state=open]:animate-rise",
+          "fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-cream-300 bg-cream-50 p-5 shadow-[0_1px_2px_color-mix(in_srgb,var(--color-cocoa-900)_4%,transparent),0_8px_24px_color-mix(in_srgb,var(--color-cocoa-900)_8%,transparent)] data-[state=open]:animate-rise",
           className,
         )}
         {...props}
       >
-        <Dialog.Title className="font-display text-xl text-ink-100">{title}</Dialog.Title>
+        <Dialog.Title className="font-display text-xl text-cocoa-900">{title}</Dialog.Title>
         {description ? (
-          <Dialog.Description className="mt-2 text-sm leading-relaxed text-ink-300">
+          <Dialog.Description className="mt-2 text-sm leading-relaxed text-cocoa-600">
             {description}
           </Dialog.Description>
         ) : null}
