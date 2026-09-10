@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { NewRollSheet } from "@/components/roll/new-roll-sheet";
 import { RollCard } from "@/components/roll/roll-card";
+import { Button } from "@/components/ui/button";
 import { useSession } from "@/components/providers/session-provider";
 import { useObjectUrl } from "@/hooks/use-object-url";
 import { useRecentCaptures, useRollCounts, useRollCovers, useRolls } from "@/hooks/use-store";
@@ -14,11 +15,10 @@ import { relativeDay } from "@/lib/utils";
 /**
  * Home.
  *
- * Built as a film carton rather than a landing page: masthead between two
- * rules, a typewritten spec line, a perforated lab ticket for the one decision
- * that matters, and a contact strip of what you last shot. Everything borrows
- * from the packaging photographs used to come in, because that is the feeling
- * the whole app is trading on.
+ * A soft pastel card for the one decision that matters — start a roll — sat
+ * above a strip of what was last shot. The masthead is a mixed-case wordmark
+ * and a chip, not a film-carton label; the screen grounds itself in cream so
+ * it reads as its own object while the rest of the shell is still dark.
  *
  * There are no statistics here and there never should be — nobody opens a
  * camera to review their usage.
@@ -35,37 +35,28 @@ export function HomeScreen() {
 
   return (
     <div
-      className="mx-auto w-full max-w-2xl px-5 pb-12"
+      className="mx-auto min-h-full w-full max-w-2xl bg-cream-50 px-5 pb-12"
       style={{ paddingTop: "calc(var(--safe-top) + 1.25rem)" }}
     >
       {/* ------------------------------------------------------- masthead */}
-      <header className="text-paper">
-        <div className="flex items-center justify-between font-mono text-[0.625rem] uppercase tracking-[0.28em] text-ink-400">
-          <span>Est. MMXXVI</span>
+      <header className="text-cocoa-900">
+        <div className="flex items-center justify-between">
+          <span className="chip tint-sky">Made for moments together</span>
           <Link
             href="/settings"
-            className="transition-colors hover:text-paper"
+            className="rounded-pill p-2 text-cocoa-600 transition-colors hover:bg-cream-200 hover:text-cocoa-900"
             aria-label="Settings"
           >
-            <Settings2 className="size-4" />
+            <Settings2 className="size-5" />
           </Link>
         </div>
 
-        <div className="rule-double mt-3 text-paper/80" aria-hidden />
-
-        <h1 className="mt-4 font-display text-[5.5rem] leading-[0.82] tracking-[0.02em] text-paper">
+        <h1 className="mt-5 font-display text-[4rem] font-semibold leading-[0.95] text-cocoa-900">
           Pitik
         </h1>
 
-        <p className="mt-2 font-mono text-[0.6875rem] uppercase leading-relaxed tracking-[0.24em] text-safelight-400">
-          Made for moments together
-        </p>
-
-        <div className="rule-double mt-4 rotate-180 text-paper/80" aria-hidden />
-
-        {/* The spec line off the side of a film box. Every value is real. */}
-        <p className="mt-3 font-mono text-[0.625rem] uppercase tracking-[0.16em] text-ink-500">
-          Digital compact · 11 bodies · Booth · Develops on device
+        <p className="mt-2 font-sans text-sm leading-relaxed text-cocoa-600">
+          A camera for the people you&apos;re with. Shoot a roll, print a strip, keep the night.
         </p>
       </header>
 
@@ -74,19 +65,16 @@ export function HomeScreen() {
         <button
           type="button"
           onClick={() => setNewRollOpen(true)}
-          className="paper-grain halftone group relative block w-full overflow-hidden bg-paper text-left text-ink-900 shadow-[0_10px_0_-4px_rgba(0,0,0,0.45)] transition-transform active:translate-y-[2px]"
+          className="pillow squish soft-grain group relative block w-full overflow-hidden text-left"
         >
-          <span className="relative z-[2] block px-5 pb-5 pt-4">
-            <span className="flex items-baseline justify-between font-mono text-[0.5625rem] uppercase tracking-[0.24em] text-ink-500">
-              <span>No. 001</span>
-              <span>Admit one</span>
-            </span>
+          <span className="relative z-[2] block px-6 pb-6 pt-5">
+            <span className="chip tint-butter">New</span>
 
-            <span className="mt-2 block font-display text-[3.25rem] leading-[0.86] tracking-[0.01em]">
+            <span className="mt-3 block font-display text-[2.5rem] font-semibold leading-tight text-cocoa-900">
               Start a roll
             </span>
 
-            <span className="mt-3 flex items-center gap-3 border-t border-dashed border-ink-900/30 pt-3 font-mono text-[0.625rem] uppercase tracking-[0.18em] text-ink-500">
+            <span className="mt-2 flex items-center gap-2 font-sans text-sm text-cocoa-600">
               Name it · Shoot it · Keep it
             </span>
           </span>
@@ -102,12 +90,10 @@ export function HomeScreen() {
       {/* -------------------------------------------------- contact strip */}
       {recent.length ? (
         <Section label="Latest frames" action={{ href: "/rolls?tab=camera", label: "All" }}>
-          <div className="film-edge relative -mx-5 bg-ink-900 px-5 py-3">
-            <div className="flex gap-[3px] overflow-x-auto py-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {recent.map((capture, index) => (
-                <ContactFrame key={capture.id} capture={capture} index={index} />
-              ))}
-            </div>
+          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {recent.map((capture, index) => (
+              <ContactFrame key={capture.id} capture={capture} index={index} />
+            ))}
           </div>
         </Section>
       ) : null}
@@ -116,7 +102,7 @@ export function HomeScreen() {
       {loading ? (
         <div className="mt-10 grid grid-cols-2 gap-3" aria-hidden>
           {[0, 1].map((index) => (
-            <div key={index} className="h-52 animate-pulse bg-ink-900" />
+            <div key={index} className="pillow h-52 animate-pulse" />
           ))}
         </div>
       ) : activeRoll ? (
@@ -134,8 +120,7 @@ export function HomeScreen() {
       ) : null}
 
       <footer className="mt-12 text-center">
-        <div className="rule-double text-ink-800" aria-hidden />
-        <p className="mt-3 font-mono text-[0.5625rem] uppercase tracking-[0.28em] text-ink-600">
+        <p className="font-sans text-xs text-cocoa-600">
           Keep away from heat · Process before expiry
         </p>
       </footer>
@@ -146,10 +131,10 @@ export function HomeScreen() {
 }
 
 /**
- * A stamped panel, as on the end flap of a carton.
+ * A quick-start panel for the two ways to begin shooting.
  *
- * Square corners, a printed keyline, and caps — deliberately not the rounded
- * card with a coloured icon that every app ships.
+ * A soft card with a hairline edge, sized to sit two across under the
+ * masthead.
  */
 function StampedPanel({
   href,
@@ -165,14 +150,12 @@ function StampedPanel({
   return (
     <Link
       href={href}
-      className="halftone group relative flex flex-col justify-between border-2 border-ink-700 px-4 py-4 text-paper transition-colors hover:border-safelight-500 hover:text-safelight-400"
+      className="squish hairline group relative flex flex-col justify-between rounded-card bg-cream-50 px-4 py-4 text-cocoa-900 transition-colors hover:bg-cream-100"
     >
-      <Icon className="size-5" aria-hidden strokeWidth={1.5} />
+      <Icon className="size-5 text-cocoa-600" aria-hidden strokeWidth={1.5} />
       <span className="mt-6 block">
-        <span className="block font-display text-2xl leading-none tracking-wide">{label}</span>
-        <span className="mt-1 block font-mono text-[0.5625rem] uppercase tracking-[0.2em] text-ink-400">
-          {note}
-        </span>
+        <span className="block font-display text-2xl leading-none text-cocoa-900">{label}</span>
+        <span className="mt-1 block font-sans text-xs text-cocoa-600">{note}</span>
       </span>
     </Link>
   );
@@ -184,7 +167,7 @@ function ContactFrame({ capture, index }: { capture: Capture; index: number }) {
   return (
     <Link
       href={`/rolls/${capture.rollId}`}
-      className="relative size-[4.5rem] shrink-0 overflow-hidden bg-ink-950"
+      className="hairline relative size-[4.5rem] shrink-0 overflow-hidden rounded-slot bg-cream-200"
       aria-label={`Frame from ${relativeDay(capture.createdAt)}`}
     >
       {url ? (
@@ -193,7 +176,7 @@ function ContactFrame({ capture, index }: { capture: Capture; index: number }) {
       ) : null}
       <span
         aria-hidden
-        className="absolute left-1 top-0.5 font-mono text-[0.5rem] text-amber-warm mix-blend-difference"
+        className="absolute left-1 top-0.5 font-mono text-[0.5rem] text-butter-deep mix-blend-difference"
       >
         {String(index + 1).padStart(2, "0")}
       </span>
@@ -213,14 +196,12 @@ function Section({
   return (
     <section className="mt-9">
       <div className="mb-2 flex items-center justify-between gap-3">
-        <h2 className="font-mono text-[0.625rem] uppercase tracking-[0.28em] text-ink-400">
-          {label}
-        </h2>
-        <span className="h-px flex-1 bg-ink-800" aria-hidden />
+        <h2 className="font-sans text-xs font-semibold text-cocoa-600">{label}</h2>
+        <span className="h-px flex-1 bg-cream-200" aria-hidden />
         {action ? (
           <Link
             href={action.href}
-            className="font-mono text-[0.625rem] uppercase tracking-[0.2em] text-ink-400 transition-colors hover:text-paper"
+            className="font-sans text-xs font-semibold text-cocoa-600 transition-colors hover:text-cocoa-900"
           >
             {action.label}
           </Link>
@@ -237,26 +218,20 @@ function Section({
  */
 function EmptyState({ onStart }: { onStart: () => void }) {
   return (
-    <section className="mt-10 border-2 border-dashed border-ink-700 px-6 py-9 text-center">
-      <p className="stamp mx-auto inline-block px-2 py-1 font-mono text-[0.5625rem] uppercase text-safelight-400">
-        Unexposed
-      </p>
-      <p className="mt-4 font-display text-3xl leading-tight text-paper">
+    <section className="mt-10 rounded-card border-2 border-dashed border-cream-300 px-6 py-9 text-center">
+      <span className="chip tint-lilac">Unexposed</span>
+      <p className="mt-4 font-display text-3xl leading-tight text-cocoa-900">
         Nothing here yet — which
         <br />
         is the best time to start
       </p>
-      <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-ink-400">
+      <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-cocoa-600">
         A roll is one evening, one trip, one ordinary afternoon. Name it, and every
         photo you take lands in the same place.
       </p>
-      <button
-        type="button"
-        onClick={onStart}
-        className="mt-5 font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-safelight-400 underline underline-offset-4"
-      >
+      <Button type="button" variant="soft" onClick={onStart} className="mt-5">
         Load your first roll
-      </button>
+      </Button>
     </section>
   );
 }
