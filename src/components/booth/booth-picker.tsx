@@ -26,12 +26,12 @@ export function BoothPicker() {
 
   return (
     <div
-      className="mx-auto w-full max-w-2xl px-4 pb-10"
+      className="mx-auto min-h-full w-full max-w-2xl bg-cream-50 px-4 pb-10"
       style={{ paddingTop: "calc(var(--safe-top) + 1.5rem)" }}
     >
       <header>
-        <h1 className="font-display text-4xl leading-none text-paper">Choose a booth</h1>
-        <p className="mt-2 max-w-sm text-sm leading-relaxed text-ink-300">
+        <h1 className="font-display text-4xl leading-none text-cocoa-900">Choose a booth</h1>
+        <p className="mt-2 max-w-sm text-sm leading-relaxed text-cocoa-600">
           Pick a layout, line everyone up, and let it count you in. The strip prints
           itself when the last shot lands.
         </p>
@@ -50,10 +50,10 @@ export function BoothPicker() {
             aria-selected={category === name}
             onClick={() => setCategory(name)}
             className={cn(
-              "shrink-0 rounded-full px-3 py-1.5 text-xs transition",
+              "shrink-0 rounded-pill px-3 py-1.5 text-xs transition",
               category === name
-                ? "bg-paper text-ink-900"
-                : "bg-ink-900 text-ink-300 hover:bg-ink-800",
+                ? "bg-sky-tint text-sky-deep ring-1 ring-sky-base"
+                : "bg-cream-200 text-cocoa-600 hover:bg-cream-300",
             )}
           >
             {name}
@@ -66,7 +66,7 @@ export function BoothPicker() {
           <li key={template.id}>
             <Link
               href={`/booth/run?template=${template.id}`}
-              className="group block rounded-xl p-2 transition-colors hover:bg-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-safelight-400"
+              className="group block rounded-card p-2 transition-colors hover:bg-cream-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-deep"
             >
               {/* Fixed-height stage so every layout is shown at a comparable
                   size and the cards line up regardless of proportion. */}
@@ -77,17 +77,17 @@ export function BoothPicker() {
                 />
               </div>
               <div className="mt-3">
-                <p className="flex items-center gap-1 text-sm font-medium text-ink-100">
+                <p className="flex items-center gap-1 text-sm font-medium text-cocoa-900">
                   {template.name}
                   <ChevronRight
-                    className="size-3.5 text-ink-500 transition-transform group-hover:translate-x-0.5"
+                    className="size-3.5 text-cocoa-600 transition-transform group-hover:translate-x-0.5"
                     aria-hidden
                   />
                 </p>
-                <p className="mt-0.5 font-mono text-[0.625rem] uppercase tracking-[0.12em] text-ink-500">
+                <p className="mt-0.5 font-mono text-[0.625rem] uppercase tracking-[0.12em] text-cocoa-600">
                   {formatCount(template.shots, "shot")} · {template.category}
                 </p>
-                <p className="mt-1 text-xs leading-snug text-ink-400">{template.description}</p>
+                <p className="mt-1 text-xs leading-snug text-cocoa-600">{template.description}</p>
               </div>
             </Link>
           </li>

@@ -76,7 +76,7 @@ export function ClipDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-ink-950/95 backdrop-blur-sm" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-cream-50/95 backdrop-blur-sm" />
         <Dialog.Content
           className="fixed inset-0 z-50 flex flex-col outline-none"
           aria-describedby={undefined}
@@ -88,12 +88,12 @@ export function ClipDialog({
             style={{ paddingTop: "calc(var(--safe-top) + 0.5rem)" }}
           >
             <Dialog.Close
-              className="grid size-10 place-items-center rounded-full text-ink-100 transition hover:bg-white/10"
+              className="grid size-10 place-items-center rounded-pill text-cocoa-600 transition hover:bg-cream-200 hover:text-cocoa-900"
               aria-label="Close"
             >
               <X className="size-5" />
             </Dialog.Close>
-            <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-ink-300">
+            <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-cocoa-600">
               {Math.round(clip.durationMs / 1000 / playbackRate)}s · the whole shoot
               at {CLIP_SPEED}x
             </p>
@@ -111,10 +111,10 @@ export function ClipDialog({
                 playsInline
                 data-testid="clip-video"
                 aria-label={`Clip from ${title}, played at ${CLIP_SPEED}x`}
-                className="max-h-full max-w-full rounded-xl bg-black"
+                className="max-h-full max-w-full rounded-frame bg-black"
               />
             ) : (
-              <div className="size-16 animate-pulse rounded-full bg-ink-800" />
+              <div className="size-16 animate-pulse rounded-pill bg-cream-200" />
             )}
           </div>
 
@@ -129,7 +129,7 @@ export function ClipDialog({
                 if (outcome === "downloaded") toast("Clip saved.", { tone: "success" });
                 if (outcome === "failed") toast("Couldn't share that clip.", { tone: "error" });
               }}
-              className="flex h-11 items-center gap-2 rounded-xl bg-paper px-5 text-sm font-medium text-ink-900"
+              className="squish hairline flex h-11 items-center gap-2 rounded-pill bg-cream-50 px-5 text-sm font-medium text-cocoa-900"
             >
               <Share2 className="size-4" aria-hidden />
               Share clip
@@ -141,7 +141,7 @@ export function ClipDialog({
                 toast("Clip saved to your downloads.", { tone: "success" });
               }}
               aria-label="Save the clip to this device"
-              className="grid size-11 place-items-center rounded-xl bg-ink-800 text-ink-100 transition hover:bg-ink-700"
+              className="squish grid size-11 place-items-center rounded-pill bg-cream-200 text-cocoa-900 transition hover:bg-cream-300"
             >
               <Download className="size-5" />
             </button>

@@ -302,21 +302,21 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
   const shotsTaken = frames.length;
 
   return (
-    <div className="flex h-full flex-col bg-ink-950">
+    <div className="flex h-full flex-col bg-cocoa-900">
       <header
         className="flex shrink-0 items-center gap-1 px-2 pb-2"
         style={{ paddingTop: "calc(var(--safe-top) + 0.5rem)" }}
       >
         <Link
           href="/booth"
-          className="grid size-10 place-items-center rounded-full text-ink-200 transition hover:bg-ink-800"
+          className="grid size-10 place-items-center rounded-pill text-cream-50 transition hover:bg-cocoa-800"
           aria-label="Choose a different booth"
         >
           <ChevronLeft className="size-5" />
         </Link>
         <div className="min-w-0 flex-1 text-center">
-          <p className="truncate text-sm font-medium text-ink-100">{template.name}</p>
-          <p className="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-ink-400">
+          <p className="truncate text-sm font-medium text-cream-50">{template.name}</p>
+          <p className="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-cocoa-400">
             {phase === "running"
               ? `Shot ${Math.min(shotsTaken + 1, template.shots)} of ${template.shots}`
               : formatCount(template.shots, "shot")}
@@ -329,7 +329,7 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
           <span className="flex size-10 items-center justify-center gap-1" role="status">
             <span
               aria-hidden
-              className="size-2 animate-pulse rounded-full bg-safelight-500 shadow-[0_0_8px_rgba(234,79,52,0.9)]"
+              className="size-2 animate-pulse rounded-pill bg-blush-lamp shadow-[0_0_8px_rgba(201,98,132,0.9)]"
             />
             <span className="sr-only">Recording a clip of this shoot</span>
           </span>
@@ -350,7 +350,7 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
             <ShutterFlash flashKey={flashKey} />
             {phase === "running" && countdown !== null && countdown > 0 ? (
               <div className="absolute inset-0 z-20 grid place-items-center">
-                <span className="font-display text-[7rem] leading-none text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.6)]">
+                <span className="font-display text-[7rem] leading-none text-blush-lamp drop-shadow-[0_2px_24px_rgba(0,0,0,0.6)]">
                   {countdown}
                 </span>
               </div>
@@ -372,8 +372,8 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
             key={index}
             aria-hidden
             className={cn(
-              "h-1.5 rounded-full transition-all duration-300",
-              index < shotsTaken ? "w-6 bg-safelight-500" : "w-3 bg-ink-700",
+              "h-1.5 rounded-pill transition-all duration-300",
+              index < shotsTaken ? "w-6 bg-sky-base" : "w-3 bg-cocoa-600",
             )}
           />
         ))}
@@ -394,7 +394,7 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
           ) : null}
 
           <div className="flex items-center justify-center gap-2 px-4 py-2">
-            <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-400">
+            <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-cocoa-400">
               Interval
             </span>
             {INTERVAL_OPTIONS.map((option) => (
@@ -404,10 +404,10 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
                 aria-pressed={interval === option}
                 onClick={() => setIntervalSeconds(option)}
                 className={cn(
-                  "rounded-full px-3 py-1 font-mono text-xs transition",
+                  "rounded-pill px-3 py-1 font-mono text-xs transition",
                   interval === option
-                    ? "bg-paper text-ink-900"
-                    : "bg-ink-800 text-ink-300 hover:bg-ink-700",
+                    ? "bg-cream-50 text-cocoa-900"
+                    : "bg-cocoa-800 text-cocoa-400 hover:bg-cocoa-600",
                 )}
               >
                 {option}s
@@ -418,7 +418,10 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
               size="sm"
               aria-pressed={trayOpen}
               onClick={() => setTrayOpen((open) => !open)}
-              className={cn("ml-1", trayOpen && "text-safelight-400")}
+              className={cn(
+                "ml-1 text-cream-50 hover:bg-cocoa-800 hover:text-cream-50",
+                trayOpen && "text-sky-base",
+              )}
             >
               <Sparkles className="size-4" aria-hidden />
               Look
@@ -426,7 +429,7 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
           </div>
 
           {canRecord ? (
-            <p className="px-6 pb-1 text-center text-[0.6875rem] text-ink-500">
+            <p className="px-6 pb-1 text-center text-[0.6875rem] text-cocoa-400">
               The whole shoot is filmed, with sound — you get a clip as well as the
               strip.
             </p>
@@ -442,6 +445,7 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
               onClick={() => void camera.flip()}
               disabled={!camera.capabilities?.multipleCameras}
               aria-label="Switch camera"
+              className="text-cream-50 hover:bg-cocoa-800 hover:text-cream-50"
             >
               <RefreshCcw className="size-5" />
             </Button>
