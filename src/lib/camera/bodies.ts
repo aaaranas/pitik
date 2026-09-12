@@ -18,8 +18,9 @@ export interface CameraBody {
   /**
    * Colour for text printed on the body.
    *
-   * Carried per model rather than assumed white: the instant-film body is
-   * cream, and white-on-cream makes the wordmark and the model name vanish.
+   * Carried per model rather than assumed constant: every body in this set is
+   * pale, but the field stays per-model so a future dark or saturated body
+   * cannot silently inherit ink that vanishes on it.
    */
   ink: string;
   /**
@@ -31,51 +32,57 @@ export interface CameraBody {
   print?: "instant";
 }
 
-/** Printed ink for a dark body, and for a light one. */
-const LIGHT_INK = "#f5f0e7";
-const DARK_INK = "#2a2520";
+/**
+ * Printed ink for these bodies.
+ *
+ * Every body in the pastel set is pale, so cocoa is the only ink used. The
+ * field stays per-model rather than becoming a constant: it is what stops a
+ * future body from being given white text on cream, which is the bug it was
+ * added to prevent.
+ */
+const COCOA_INK = "#2F2823";
 
 const DEFAULT_BODY: CameraBody = {
-  body: ["#6f6660", "#3d3733", "#2e2926"],
-  accent: "#ea4f34",
-  lens: "#8d8279",
-  ink: LIGHT_INK,
+  body: ["#E9E3DA", "#CFC6B9", "#9A9086"],
+  accent: "#A4506C",
+  lens: "#F2EDE6",
+  ink: COCOA_INK,
 };
 
 const BODIES: Record<string, CameraBody> = {
-  // Warm champagne silver.
-  "2003": { body: ["#a99d8c", "#6d6355", "#3c352d"], accent: "#e0533a", lens: "#cbbfa8", ink: DARK_INK },
-  // Cool graphite with a yellow flash lamp.
-  ccd: { body: ["#7e858c", "#464c52", "#25292d"], accent: "#f0c419", lens: "#aab3bb", ink: LIGHT_INK },
-  // Near-black with a blue indicator.
-  flash: { body: ["#5a5e66", "#2f3238", "#15171a"], accent: "#3f9bff", lens: "#8b929c", ink: LIGHT_INK },
-  // Retro chrome and green.
-  "1999": { body: ["#b9b2a3", "#7b7466", "#403b32"], accent: "#3fae6b", lens: "#d6cfbd", ink: DARK_INK },
-  // Slim gunmetal blue.
-  "2007": { body: ["#6b7684", "#3a434f", "#1d2229"], accent: "#4fc3d9", lens: "#96a3b2", ink: LIGHT_INK },
-  // Cream plastic and a red shutter lamp.
+  // Warm butter plastic.
+  "2003": { body: ["#FDF2D8", "#F7E3A1", "#B99C4E"], accent: "#B36F4A", lens: "#FFF8E8", ink: COCOA_INK },
+  // Powder blue with a mustard flash lamp.
+  ccd: { body: ["#E6F0FB", "#C3D9F3", "#7E9AC0"], accent: "#8F7226", lens: "#F4F8FE", ink: COCOA_INK },
+  // Baby blue with a deep blue indicator.
+  flash: { body: ["#E2ECFA", "#A8C9F0", "#6484B0"], accent: "#3F6E9B", lens: "#EFF5FD", ink: COCOA_INK },
+  // Mint, with a green tell.
+  "1999": { body: ["#E8F5EE", "#B6E3D4", "#6FA695"], accent: "#3F8664", lens: "#F3FAF7", ink: COCOA_INK },
+  // Pale teal slimline.
+  "2007": { body: ["#E7F3F6", "#BADCE6", "#74A2AF"], accent: "#3A808F", lens: "#F2F9FB", ink: COCOA_INK },
+  // Blush compact with a rose shutter lamp.
   "point-and-shoot": {
-    body: ["#d8cdb4", "#9a8f74", "#4f4838"],
-    accent: "#e8453c",
-    lens: "#efe6ce",
-    ink: DARK_INK,
+    body: ["#FFF1F4", "#F5B8CB", "#B87A90"],
+    accent: "#B24A62",
+    lens: "#FFF7F9",
+    ink: COCOA_INK,
   },
-  // Big black camcorder body, red record lamp.
-  camcorder: { body: ["#4a4a4a", "#262626", "#101010"], accent: "#ff3b30", lens: "#7d7d7d", ink: LIGHT_INK },
-  // Tape: dark charcoal with a magenta tell.
-  "mini-dv": { body: ["#55505c", "#302c36", "#17151b"], accent: "#e26bb0", lens: "#8b8494", ink: LIGHT_INK },
-  // Bright silver superzoom.
-  superzoom: { body: ["#b7bcc0", "#787d82", "#3c4044"], accent: "#2f7fd0", lens: "#d9dde0", ink: DARK_INK },
-  // Matte white plastic.
-  webcam: { body: ["#d6d6d2", "#95958f", "#4c4c48"], accent: "#5bb85b", lens: "#eaeae6", ink: DARK_INK },
-  // Candy-shell compact.
-  "pocket-cam": { body: ["#c9a2a6", "#8b5f66", "#402a2f"], accent: "#ff7a9c", lens: "#e6c4c8", ink: DARK_INK },
-  // Instant film: the white body everyone pictures.
+  // Lilac camcorder, rose record lamp.
+  camcorder: { body: ["#EFE9FA", "#D4C4EE", "#8E7BB5"], accent: "#A8526E", lens: "#F6F2FD", ink: COCOA_INK },
+  // Tape: orchid with a magenta tell.
+  "mini-dv": { body: ["#FBEAF6", "#EEC4E4", "#A87BA0"], accent: "#A7558E", lens: "#FDF4FA", ink: COCOA_INK },
+  // Cool pearl superzoom.
+  superzoom: { body: ["#EDEFF2", "#CFD6DE", "#8C96A3"], accent: "#4D77A6", lens: "#F6F8FA", ink: COCOA_INK },
+  // Pale sage plastic.
+  webcam: { body: ["#F3F6F0", "#DCE7D5", "#94A78B"], accent: "#608850", lens: "#F9FBF7", ink: COCOA_INK },
+  // Peach candy shell.
+  "pocket-cam": { body: ["#FFF0EA", "#FAD2BE", "#BE8E76"], accent: "#B56344", lens: "#FFF7F3", ink: COCOA_INK },
+  // Instant film: still the white body everyone pictures.
   polaroid: {
-    body: ["#efe9df", "#b9b1a3", "#5d574d"],
-    accent: "#f2a03d",
-    lens: "#ffffff",
-    ink: DARK_INK,
+    body: ["#FFFFFF", "#F2EEE7", "#B3ABA0"],
+    accent: "#4F8AC1",
+    lens: "#FFFFFF",
+    ink: COCOA_INK,
     print: "instant",
   },
 };
