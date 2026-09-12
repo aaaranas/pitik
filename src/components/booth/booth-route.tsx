@@ -15,7 +15,7 @@ function BoothRouteInner() {
 
 export function BoothRoute() {
   return (
-    <Suspense fallback={<div className="h-full bg-ink-950" />}>
+    <Suspense fallback={<div className="min-h-full bg-cream-50" />}>
       <BoothRouteInner />
     </Suspense>
   );
