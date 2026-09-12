@@ -56,6 +56,18 @@ function pairs() {
   out.push(["sky-deep", "cream-50", UI]); // focus ring
   out.push(["blush-lamp", "cream-200", UI]); // record indicator
   out.push(["edge-strong", "cream-50", UI]); // control boundary
+
+  // Dark-ground exception. A handful of surfaces (booth-runner.tsx,
+  // clip-dialog.tsx, capture-viewer.tsx) keep a cocoa-900 backdrop on
+  // purpose — a photo/video is judged against neutral, and a countdown
+  // screen must not blind the room. The steps invert there: body text is
+  // cream-50, muted text is cocoa-400, and an accent takes its pastel
+  // `base` rather than `deep`. These are the only combinations that ship
+  // against cocoa-900 — cocoa-400 does not extend to a cocoa-800/600 fill.
+  out.push(["cream-50", "cocoa-900", TEXT]); // body text on a dark ground
+  out.push(["cocoa-400", "cocoa-900", TEXT]); // muted text on a dark ground
+  out.push(["butter-base", "cocoa-900", TEXT]); // accent text on a dark ground
+  out.push(["sky-base", "cocoa-900", TEXT]);
   return out;
 }
 

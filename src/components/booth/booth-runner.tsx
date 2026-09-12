@@ -407,7 +407,7 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
                   "rounded-pill px-3 py-1 font-mono text-xs transition",
                   interval === option
                     ? "bg-cream-50 text-cocoa-900"
-                    : "bg-cocoa-800 text-cocoa-400 hover:bg-cocoa-600",
+                    : "bg-cocoa-800 text-cream-50 hover:bg-cocoa-600",
                 )}
               >
                 {option}s
