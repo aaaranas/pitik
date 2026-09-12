@@ -30,20 +30,19 @@ describe("camera bodies", () => {
   // The unknown id exercises DEFAULT_BODY, which must pass the same bars.
   const ids = [...FILTER_PRESETS.map((preset) => preset.id), "no-such-model"];
 
-  it("prints legible ink on the lit face of every body", () => {
-    for (const id of ids) {
-      const body = getCameraBody(id);
-      // Text sits on the top two gradient stops, never the deep one.
-      expect(contrast(body.ink, body.body[0]), `${id} ink on light stop`).toBeGreaterThanOrEqual(4.5);
-      expect(contrast(body.ink, body.body[1]), `${id} ink on mid stop`).toBeGreaterThanOrEqual(4.5);
-    }
+  // it.each rather than a for loop: a plain loop's expect() throws on the
+  // first failing id and aborts, so a regression touching two models would
+  // only ever name one of them. Each id must report independently.
+  it.each(ids)("prints legible ink on the lit face of %s", (id) => {
+    const body = getCameraBody(id);
+    // Text sits on the top two gradient stops, never the deep one.
+    expect(contrast(body.ink, body.body[0]), `${id} ink on light stop`).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(body.ink, body.body[1]), `${id} ink on mid stop`).toBeGreaterThanOrEqual(4.5);
   });
 
-  it("gives every model a status lamp that reads as lit", () => {
-    for (const id of ids) {
-      const body = getCameraBody(id);
-      expect(contrast(body.accent, body.body[1]), `${id} lamp on body`).toBeGreaterThanOrEqual(3);
-    }
+  it.each(ids)("gives %s a status lamp that reads as lit", (id) => {
+    const body = getCameraBody(id);
+    expect(contrast(body.accent, body.body[1]), `${id} lamp on body`).toBeGreaterThanOrEqual(3);
   });
 
   it("keeps the instant-film body the only one that prints a border", () => {
