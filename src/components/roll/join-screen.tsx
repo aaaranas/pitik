@@ -91,23 +91,23 @@ export function JoinScreen({ code }: { code: string }) {
   }, [auth.configured, auth.loading, auth.session, code, router, setActiveRoll]);
 
   return (
-    <div className="grid h-full place-items-center px-6 text-center">
+    <div className="grid min-h-full place-items-center bg-cream-50 px-6 text-center">
       <div className="max-w-xs">
-        <PitikMark className="mx-auto size-8 text-paper" />
-        <p className="mt-5 font-mono text-2xl tracking-[0.28em] text-paper">{code}</p>
+        <PitikMark className="mx-auto size-8 text-cocoa-900" />
+        <p className="mt-5 font-mono text-2xl tracking-[0.28em] text-cocoa-900">{code}</p>
 
         {state.kind === "checking" || state.kind === "joining" ? (
-          <p className="mt-4 text-sm text-ink-400">Looking for that roll…</p>
+          <p className="mt-4 text-sm text-cocoa-600">Looking for that roll…</p>
         ) : null}
 
         {state.kind === "fetching" ? (
-          <p className="mt-4 text-sm text-ink-400">Getting the photos…</p>
+          <p className="mt-4 text-sm text-cocoa-600">Getting the photos…</p>
         ) : null}
 
         {state.kind === "invalid" ? (
           <>
-            <h1 className="mt-4 font-display text-2xl text-ink-100">That code isn&rsquo;t valid</h1>
-            <p className="mt-2 text-sm text-ink-400">
+            <h1 className="mt-4 font-display text-2xl text-cocoa-900">That code isn&rsquo;t valid</h1>
+            <p className="mt-2 text-sm text-cocoa-600">
               Codes are six letters and numbers. Check it and try again.
             </p>
           </>
@@ -115,11 +115,11 @@ export function JoinScreen({ code }: { code: string }) {
 
         {state.kind === "local" ? (
           <>
-            <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink-100">{state.title}</h1>
-            <p className="mt-2 text-sm text-ink-400">This roll is already on your device.</p>
+            <h1 className="mt-4 text-2xl font-semibold tracking-tight text-cocoa-900">{state.title}</h1>
+            <p className="mt-2 text-sm text-cocoa-600">This roll is already on your device.</p>
             <Link
               href={`/rolls/${state.rollId}`}
-              className="mt-6 inline-flex h-12 items-center justify-center rounded-xl bg-paper px-6 text-sm font-medium text-ink-900"
+              className="squish hairline mt-6 inline-flex h-12 items-center justify-center rounded-pill bg-cream-50 px-6 text-sm font-medium text-cocoa-900"
             >
               Open it
             </Link>
@@ -128,17 +128,17 @@ export function JoinScreen({ code }: { code: string }) {
 
         {state.kind === "needs-account" ? (
           <>
-            <h1 className="mt-4 font-display text-2xl text-ink-100">
+            <h1 className="mt-4 font-display text-2xl text-cocoa-900">
               You&rsquo;ll need an account for this
             </h1>
-            <p className="mt-2 text-sm leading-relaxed text-ink-400">
+            <p className="mt-2 text-sm leading-relaxed text-cocoa-600">
               Joining someone else&rsquo;s roll means photos have to travel between devices,
               and that needs somewhere to sync to. Everything else in Pitik works
               without one.
             </p>
             <Link
               href="/settings"
-              className="mt-6 inline-flex h-12 items-center justify-center rounded-xl bg-paper px-6 text-sm font-medium text-ink-900"
+              className="squish hairline mt-6 inline-flex h-12 items-center justify-center rounded-pill bg-cream-50 px-6 text-sm font-medium text-cocoa-900"
             >
               Set up an account
             </Link>
@@ -147,8 +147,8 @@ export function JoinScreen({ code }: { code: string }) {
 
         {state.kind === "error" ? (
           <>
-            <h1 className="mt-4 font-display text-2xl text-ink-100">Couldn&rsquo;t join that roll</h1>
-            <p className="mt-2 text-sm text-ink-400">{state.message}</p>
+            <h1 className="mt-4 font-display text-2xl text-cocoa-900">Couldn&rsquo;t join that roll</h1>
+            <p className="mt-2 text-sm text-cocoa-600">{state.message}</p>
             <Button variant="ghost" className="mt-5" onClick={() => router.push("/")}>
               Go home
             </Button>

@@ -76,7 +76,7 @@ export function CaptureViewer({
   return (
     <Dialog.Root open={index !== null} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-ink-950" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-cocoa-900" />
         <Dialog.Content
           className="fixed inset-0 z-50 flex flex-col outline-none"
           aria-describedby={undefined}
@@ -91,10 +91,10 @@ export function CaptureViewer({
               <img
                 src={url}
                 alt={`Frame ${index! + 1} from ${rollTitle}`}
-                className="animate-develop max-h-full max-w-full object-contain"
+                className="animate-pop max-h-full max-w-full object-contain"
               />
             ) : (
-              <div className="size-16 animate-pulse rounded-full bg-ink-800" />
+              <div className="size-16 animate-pulse rounded-pill bg-cocoa-800" />
             )}
 
             {index! > 0 ? (
@@ -106,16 +106,16 @@ export function CaptureViewer({
           </div>
 
           <header
-            className="absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-ink-950/85 to-transparent px-3 pb-8"
+            className="absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-cocoa-900/85 to-transparent px-3 pb-8"
             style={{ paddingTop: "calc(var(--safe-top) + 0.5rem)" }}
           >
             <Dialog.Close
-              className="grid size-10 place-items-center rounded-full text-ink-100 transition hover:bg-white/10"
+              className="grid size-10 place-items-center rounded-pill text-cream-50 transition hover:bg-white/10"
               aria-label="Close"
             >
               <X className="size-5" />
             </Dialog.Close>
-            <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-ink-300">
+            <p className="text-[0.6875rem] text-cocoa-400">
               {capture.authorId ? "Shared · " : ""}
               {getProfile(capture.profileId).name} · {getFilter(capture.filterId).name}
             </p>
@@ -123,7 +123,7 @@ export function CaptureViewer({
           </header>
 
           <footer
-            className="absolute inset-x-0 bottom-0 flex items-center justify-around bg-gradient-to-t from-ink-950/85 to-transparent px-4 pt-10"
+            className="absolute inset-x-0 bottom-0 flex items-center justify-around bg-gradient-to-t from-cocoa-900/85 to-transparent px-4 pt-10"
             style={{ paddingBottom: "calc(var(--safe-bottom) + 1rem)" }}
           >
             <ViewerAction
@@ -133,7 +133,7 @@ export function CaptureViewer({
               <Heart
                 className={cn(
                   "size-5",
-                  capture.favorite && "fill-safelight-500 text-safelight-500",
+                  capture.favorite && "fill-butter-base text-butter-base",
                 )}
               />
             </ViewerAction>
@@ -198,7 +198,7 @@ function NavArrow({ side, onClick }: { side: "left" | "right"; onClick: () => vo
       onClick={onClick}
       aria-label={side === "left" ? "Previous photo" : "Next photo"}
       className={cn(
-        "absolute top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-ink-950/40 text-ink-100 backdrop-blur transition hover:bg-ink-950/70",
+        "absolute top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-pill bg-cocoa-900/40 text-cream-50 backdrop-blur transition hover:bg-cocoa-900/70",
         side === "left" ? "left-2" : "right-2",
       )}
     >
@@ -221,7 +221,7 @@ function ViewerAction({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="grid size-12 place-items-center rounded-full text-ink-100 transition hover:bg-white/10"
+      className="grid size-12 place-items-center rounded-pill text-cream-50 transition hover:bg-white/10"
     >
       {children}
     </button>
