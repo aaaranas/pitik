@@ -6,12 +6,18 @@
  * light and lens tint. Kept as data next to the filters rather than as branches
  * inside the shell, so adding a model stays a one-object change.
  *
- * Keyed by filter id. Anything without an entry gets the default graphite body.
+ * Keyed by filter id. Anything without an entry gets the default warm-tan body.
  */
 export interface CameraBody {
   /** Gradient stops for the moulding, light to dark. */
   body: [string, string, string];
-  /** Status LED and accent trim. */
+  /**
+   * Status LED and accent trim.
+   *
+   * On these pale bodies a LIT lamp reads as darker than the moulding, not
+   * brighter — a light accent reads as "off". Enforced by
+   * tests/unit/camera-bodies.test.ts.
+   */
   accent: string;
   /** Ring around the screen bezel. */
   lens: string;
