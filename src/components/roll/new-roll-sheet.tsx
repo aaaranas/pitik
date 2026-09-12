@@ -148,7 +148,7 @@ export function NewRollSheet({
                   key={suggestion}
                   type="button"
                   onClick={() => setTitle(suggestion)}
-                  className="rounded-pill border border-cream-300 px-2.5 py-1 text-xs text-cocoa-600 transition hover:border-edge-strong hover:text-cocoa-900"
+                  className="rounded-pill border border-edge-strong px-2.5 py-1 text-xs text-cocoa-600 transition hover:text-cocoa-900"
                 >
                   {suggestion}
                 </button>
