@@ -29,7 +29,7 @@ function Frame({
     <button
       type="button"
       onClick={onOpen}
-      className="group relative aspect-square overflow-hidden bg-ink-900 outline-offset-2"
+      className="group relative aspect-square overflow-hidden bg-cream-50 outline-offset-2"
       aria-label={`Frame ${index + 1}${capture.favorite ? ", favourite" : ""}${
         capture.authorId ? ", added by someone else" : ""
       }`}
@@ -44,12 +44,12 @@ function Frame({
           className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         />
       ) : (
-        <span className="block size-full animate-pulse bg-ink-800" />
+        <span className="block size-full animate-pulse bg-cream-200" />
       )}
 
       <span
         aria-hidden
-        className="absolute left-1 top-1 font-mono text-[0.5625rem] text-white/70 mix-blend-difference"
+        className="absolute left-1 top-1 font-mono text-[0.5625rem] text-butter-deep mix-blend-difference"
       >
         {String(index + 1).padStart(2, "0")}
       </span>
@@ -57,7 +57,7 @@ function Frame({
       {capture.favorite ? (
         <Heart
           aria-hidden
-          className="absolute bottom-1 right-1 size-3.5 fill-safelight-500 text-safelight-500 drop-shadow"
+          className="absolute bottom-1 right-1 size-3.5 fill-butter-deep text-butter-deep drop-shadow"
         />
       ) : null}
 

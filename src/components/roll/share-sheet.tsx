@@ -45,7 +45,7 @@ export function ShareSheet({
     void QRCode.toDataURL(url, {
       width: 512,
       margin: 1,
-      color: { dark: "#0b0908", light: "#f5f0e7" },
+      color: { dark: "#2F2823", light: "#FDFBF7" },
       errorCorrectionLevel: "M",
     })
       .then((dataUrl) => !cancelled && setQr(dataUrl))
@@ -62,19 +62,19 @@ export function ShareSheet({
         description="Anyone with the code can add their photos to it."
       >
         <div className="flex flex-col items-center">
-          <div className="paper-grain grid size-48 place-items-center rounded-xl bg-paper p-3">
+          <div className="soft-grain grid size-48 place-items-center rounded-slot bg-white p-3">
             {qr ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={qr} alt={`QR code for joining ${roll.title}`} className="size-full" />
             ) : (
-              <QrCode className="size-10 text-ink-400" aria-hidden />
+              <QrCode className="size-10 text-cocoa-600" aria-hidden />
             )}
           </div>
 
-          <p className="mt-5 font-mono text-3xl tracking-[0.28em] text-paper">
+          <p className="mt-5 font-mono text-3xl tracking-[0.28em] text-cocoa-900">
             {code ?? "······"}
           </p>
-          <p className="mt-1 text-xs text-ink-400">Read it out, or scan the code above.</p>
+          <p className="mt-1 text-xs text-cocoa-600">Read it out, or scan the code above.</p>
 
           <div className="mt-6 flex w-full gap-2">
             <Button
@@ -93,7 +93,7 @@ export function ShareSheet({
             </Button>
           </div>
 
-          <p className="mt-5 text-center text-xs leading-relaxed text-ink-500">
+          <p className="mt-5 text-center text-xs leading-relaxed text-cocoa-600">
             Sharing needs an account so photos have somewhere to sync to. Until then
             the code works between your own devices.
           </p>

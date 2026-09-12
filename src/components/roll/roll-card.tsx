@@ -11,17 +11,17 @@ import { cn } from "@/lib/utils";
 /**
  * A roll, as a physical object.
  *
- * Each cover style borrows from a different piece of darkroom furniture — a
- * negative envelope, a proof sheet, a print sleeve, an instant frame. They are
- * decoration with a job: at a glance down the home screen, the shape alone
- * tells you which roll is which before you've read a single title.
+ * Each cover style is its own pastel surface — cream, a cool tinted proof, a
+ * deeper cream, a bright white instant frame — so at a glance down the home
+ * screen the shape and tone alone tell you which roll is which before you've
+ * read a single title.
  */
 
 const COVER_SURFACE: Record<CoverStyle, string> = {
-  envelope: "bg-paper text-ink-900",
-  contact: "bg-ink-900 text-ink-100",
-  sleeve: "bg-paper-dim text-ink-900",
-  polaroid: "bg-white text-ink-900",
+  envelope: "bg-cream-50 text-cocoa-900",
+  contact: "bg-sky-tint text-sky-deep",
+  sleeve: "bg-cream-200 text-cocoa-900",
+  polaroid: "bg-white text-cocoa-900",
 };
 
 export function RollCard({
@@ -49,18 +49,11 @@ export function RollCard({
     >
       <article
         className={cn(
-          "paper-grain relative overflow-hidden rounded-lg shadow-lg shadow-black/40 transition-transform duration-200",
-          "group-hover:-translate-y-0.5 group-focus-visible:ring-2 group-focus-visible:ring-safelight-400",
+          "soft-grain pillow relative overflow-hidden transition-transform duration-200",
+          "group-hover:-translate-y-0.5 group-focus-visible:ring-2 group-focus-visible:ring-sky-deep",
           COVER_SURFACE[roll.coverStyle],
         )}
       >
-        {/* Sprocket edge — the tell that this is film and not a content card. */}
-        <div
-          aria-hidden
-          className="sprockets h-3 w-full opacity-[0.18]"
-          style={{ backgroundPosition: "0 center" }}
-        />
-
         <div
           className={cn(
             "relative z-[2] aspect-[4/3] w-full overflow-hidden",
@@ -77,18 +70,14 @@ export function RollCard({
               className="size-full object-cover"
             />
           ) : (
-            <div className="grid size-full place-items-center bg-ink-800/10">
+            <div className="grid size-full place-items-center bg-cocoa-900/10">
               {undeveloped ? (
                 <div className="text-center">
                   <Lock className="mx-auto size-5 opacity-50" aria-hidden />
-                  <p className="mt-1.5 text-[0.6875rem] uppercase tracking-[0.16em] opacity-60">
-                    Developing
-                  </p>
+                  <p className="mt-1.5 text-[0.6875rem] opacity-60">Developing</p>
                 </div>
               ) : (
-                <p className="text-[0.6875rem] uppercase tracking-[0.16em] opacity-40">
-                  Empty
-                </p>
+                <p className="text-[0.6875rem] opacity-40">Empty</p>
               )}
             </div>
           )}

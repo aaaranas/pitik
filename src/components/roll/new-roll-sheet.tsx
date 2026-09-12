@@ -134,10 +134,10 @@ export function NewRollSheet({
               placeholder="Dinner with Sam"
               aria-invalid={Boolean(error)}
               aria-describedby={error ? "roll-title-error" : undefined}
-              className="w-full border-b border-ink-600 bg-transparent pb-2 text-2xl font-semibold tracking-tight text-ink-100 placeholder:text-ink-500 focus:border-safelight-500 focus:outline-none"
+              className="w-full border-b border-edge-strong bg-transparent pb-2 text-2xl font-semibold tracking-tight text-cocoa-900 placeholder:text-cocoa-600 focus:border-sky-deep focus:outline-none"
             />
             {error ? (
-              <p id="roll-title-error" className="mt-2 text-sm text-signal-bad">
+              <p id="roll-title-error" className="mt-2 text-sm text-blush-deep">
                 {error}
               </p>
             ) : null}
@@ -148,7 +148,7 @@ export function NewRollSheet({
                   key={suggestion}
                   type="button"
                   onClick={() => setTitle(suggestion)}
-                  className="rounded-full border border-ink-700 px-2.5 py-1 text-xs text-ink-300 transition hover:border-ink-500 hover:text-ink-100"
+                  className="rounded-pill border border-cream-300 px-2.5 py-1 text-xs text-cocoa-600 transition hover:border-edge-strong hover:text-cocoa-900"
                 >
                   {suggestion}
                 </button>
@@ -165,10 +165,10 @@ export function NewRollSheet({
                   aria-pressed={emoji === choice}
                   onClick={() => setEmoji(emoji === choice ? null : choice)}
                   className={cn(
-                    "grid size-10 place-items-center rounded-lg text-lg transition",
+                    "grid size-10 place-items-center rounded-slot text-lg transition",
                     emoji === choice
-                      ? "bg-safelight-500/20 ring-1 ring-safelight-500"
-                      : "bg-ink-800 hover:bg-ink-700",
+                      ? "bg-sky-tint ring-1 ring-sky-base"
+                      : "bg-cream-200 hover:bg-cream-300",
                   )}
                 >
                   {choice}
@@ -186,10 +186,10 @@ export function NewRollSheet({
                   aria-pressed={coverStyle === style}
                   onClick={() => setCoverStyle(style)}
                   className={cn(
-                    "flex-1 rounded-lg px-2 py-2 text-xs transition",
+                    "flex-1 rounded-slot px-2 py-2 text-xs transition",
                     coverStyle === style
-                      ? "bg-safelight-500/20 text-safelight-400 ring-1 ring-safelight-500"
-                      : "bg-ink-800 text-ink-300 hover:bg-ink-700",
+                      ? "bg-sky-tint text-sky-deep ring-1 ring-sky-base"
+                      : "bg-cream-200 text-cocoa-600 hover:bg-cream-300",
                   )}
                 >
                   {COVER_LABELS[style]}
@@ -198,19 +198,19 @@ export function NewRollSheet({
             </div>
           </Field>
 
-          <div className="rounded-xl border border-ink-700 p-3">
+          <div className="rounded-card border border-cream-300 p-3">
             <label className="flex cursor-pointer items-start gap-3">
               <input
                 type="checkbox"
                 checked={disposable}
                 onChange={(event) => setDisposable(event.target.checked)}
-                className="mt-0.5 size-4 shrink-0 accent-[var(--color-safelight-500)]"
+                className="mt-0.5 size-4 shrink-0 accent-[var(--color-sky-deep)]"
               />
               <span>
-                <span className="block text-sm font-medium text-ink-100">
+                <span className="block text-sm font-medium text-cocoa-900">
                   Make it a disposable
                 </span>
-                <span className="mt-0.5 block text-xs leading-relaxed text-ink-400">
+                <span className="mt-0.5 block text-xs leading-relaxed text-cocoa-600">
                   A fixed number of shots, hidden until tomorrow. You shoot without
                   checking, and see everything at once.
                 </span>
@@ -218,8 +218,8 @@ export function NewRollSheet({
             </label>
 
             {disposable ? (
-              <div className="mt-3 flex items-center gap-2 border-t border-ink-800 pt-3">
-                <span className="text-xs text-ink-400">Shots</span>
+              <div className="mt-3 flex items-center gap-2 border-t border-cream-300 pt-3">
+                <span className="text-xs text-cocoa-600">Shots</span>
                 {[12, 24, 36].map((count) => (
                   <button
                     key={count}
@@ -227,10 +227,10 @@ export function NewRollSheet({
                     aria-pressed={shotLimit === count}
                     onClick={() => setShotLimit(count)}
                     className={cn(
-                      "rounded-full px-3 py-1 font-mono text-xs transition",
+                      "rounded-pill px-3 py-1 font-mono text-xs transition",
                       shotLimit === count
-                        ? "bg-safelight-500 text-white"
-                        : "bg-ink-800 text-ink-300 hover:bg-ink-700",
+                        ? "bg-sky-base text-cocoa-900"
+                        : "bg-cream-200 text-cocoa-600 hover:bg-cream-300",
                     )}
                   >
                     {count}
@@ -248,9 +248,7 @@ export function NewRollSheet({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <fieldset>
-      <legend className="mb-2 text-[0.6875rem] uppercase tracking-[0.16em] text-ink-400">
-        {label}
-      </legend>
+      <legend className="mb-2 font-sans text-xs font-semibold text-cocoa-600">{label}</legend>
       {children}
     </fieldset>
   );

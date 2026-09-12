@@ -53,14 +53,14 @@ function StripTile({ strip, title }: { strip: Strip; title: string }) {
           src={url}
           alt={strip.caption ?? "Photo strip"}
           loading="lazy"
-          className="w-full rounded-sm shadow-lg shadow-black/40"
+          className="pillow rounded-frame w-full"
         />
       ) : (
-        <div className="aspect-[1/3] w-full animate-pulse rounded-sm bg-ink-900" />
+        <div className="pillow rounded-frame aspect-[1/3] w-full animate-pulse" />
       )}
 
       <figcaption className="mt-2 flex items-center justify-between gap-2">
-        <span className="truncate text-xs text-ink-400">
+        <span className="truncate text-xs text-cocoa-600">
           {strip.caption || relativeDay(strip.createdAt)}
         </span>
         <span className="flex gap-1">
@@ -100,7 +100,7 @@ function TileAction({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="grid size-7 place-items-center rounded-full text-ink-400 transition hover:bg-ink-800 hover:text-ink-100"
+      className="grid size-7 place-items-center rounded-pill text-cocoa-600 transition hover:bg-cream-200 hover:text-cocoa-900"
     >
       {children}
     </button>

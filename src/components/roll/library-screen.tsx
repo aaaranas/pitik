@@ -65,11 +65,11 @@ export function LibraryScreen() {
 
   return (
     <div
-      className="mx-auto w-full max-w-3xl pb-10"
+      className="mx-auto min-h-full w-full max-w-3xl bg-cream-50 pb-10"
       style={{ paddingTop: "calc(var(--safe-top) + 1.5rem)" }}
     >
       <header className="flex items-end justify-between gap-4 px-4">
-        <h1 className="font-display text-4xl leading-none text-paper">Your photos</h1>
+        <h1 className="font-display text-4xl leading-none text-cocoa-900">Your photos</h1>
         {tab === "rolls" ? (
           <Button variant="subtle" onClick={() => setNewRollOpen(true)}>
             New roll
@@ -77,7 +77,7 @@ export function LibraryScreen() {
         ) : null}
       </header>
 
-      <div role="tablist" aria-label="Library" className="mt-5 flex gap-1 border-b border-ink-850 px-4">
+      <div role="tablist" aria-label="Library" className="mt-5 flex gap-1 border-b border-cream-300 px-4">
         {TABS.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
@@ -88,8 +88,8 @@ export function LibraryScreen() {
             className={cn(
               "-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm transition-colors",
               tab === id
-                ? "border-safelight-500 text-ink-100"
-                : "border-transparent text-ink-400 hover:text-ink-200",
+                ? "border-sky-deep text-cocoa-900"
+                : "border-transparent text-cocoa-600 hover:text-cocoa-800",
             )}
           >
             <Icon className="size-4" aria-hidden />
@@ -116,7 +116,7 @@ function CameraTab() {
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
   if (loading && !captures.length) {
-    return <div className="mt-6 h-64 animate-pulse bg-ink-900/40" aria-hidden />;
+    return <div className="mt-6 h-64 animate-pulse bg-cream-200" aria-hidden />;
   }
 
   if (!captures.length) {
@@ -133,8 +133,8 @@ function CameraTab() {
     <>
       {favorites.length ? (
         <section className="mt-6 px-4">
-          <h2 className="mb-3 flex items-center gap-1.5 text-[0.6875rem] uppercase tracking-[0.18em] text-ink-400">
-            <Heart className="size-3 fill-safelight-500 text-safelight-500" aria-hidden />
+          <h2 className="mb-3 flex items-center gap-1.5 font-sans text-xs font-semibold text-cocoa-600">
+            <Heart className="size-3 fill-butter-deep text-butter-deep" aria-hidden />
             Favourites
           </h2>
           <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -145,13 +145,13 @@ function CameraTab() {
         </section>
       ) : null}
 
-      <p className="mt-6 px-4 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-ink-400">
+      <p className="mt-6 px-4 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-cocoa-600">
         {formatCount(captures.length, "photo")}
       </p>
       <ContactSheet
         captures={captures}
         onOpen={setViewerIndex}
-        className="mt-3 border-t border-ink-850 pt-px"
+        className="mt-3 border-t border-cream-300 pt-px"
       />
 
       <CaptureViewer
@@ -168,7 +168,7 @@ function CameraTab() {
 function FavoriteFrame({ capture }: { capture: Capture }) {
   const url = useObjectUrl(capture.thumb);
   return (
-    <span className="size-20 shrink-0 overflow-hidden rounded-md bg-ink-900">
+    <span className="size-20 shrink-0 overflow-hidden rounded-slot bg-cream-50">
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
@@ -184,7 +184,7 @@ function BoothTab() {
   const { data: strips, loading } = useStrips(libraryId ?? undefined);
 
   if (loading && !strips.length) {
-    return <div className="mt-6 h-64 animate-pulse bg-ink-900/40" aria-hidden />;
+    return <div className="mt-6 h-64 animate-pulse bg-cream-200" aria-hidden />;
   }
 
   if (!strips.length) {
@@ -199,7 +199,7 @@ function BoothTab() {
 
   return (
     <>
-      <p className="mt-6 px-4 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-ink-400">
+      <p className="mt-6 px-4 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-cocoa-600">
         {formatCount(strips.length, "strip")}
       </p>
       <StripGrid strips={strips} title="Photobooth" className="mt-3 px-4" />
@@ -218,7 +218,7 @@ function RollsTab({ onNewRoll }: { onNewRoll: () => void }) {
     return (
       <div className="mt-6 grid grid-cols-2 gap-3 px-4" aria-hidden>
         {[0, 1, 2, 3].map((index) => (
-          <div key={index} className="h-52 animate-pulse rounded-lg bg-ink-900" />
+          <div key={index} className="pillow h-52 animate-pulse" />
         ))}
       </div>
     );
@@ -227,8 +227,8 @@ function RollsTab({ onNewRoll }: { onNewRoll: () => void }) {
   if (!rolls.length) {
     return (
       <div className="mt-12 px-6 text-center">
-        <p className="font-display text-2xl text-ink-100">No rolls yet.</p>
-        <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-ink-400">
+        <p className="font-display text-2xl text-cocoa-900">No rolls yet.</p>
+        <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-cocoa-600">
           A roll is for one evening you want kept together. Start one and every photo
           you take goes into it instead of the camera shelf.
         </p>
@@ -266,11 +266,11 @@ function Empty({
 }) {
   return (
     <div className="mt-12 px-6 text-center">
-      <p className="font-display text-2xl text-ink-100">{title}</p>
-      <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-ink-400">{body}</p>
+      <p className="font-display text-2xl text-cocoa-900">{title}</p>
+      <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-cocoa-600">{body}</p>
       <Link
         href={action.href}
-        className="mt-6 inline-flex h-11 items-center rounded-xl bg-paper px-5 text-sm font-medium text-ink-900"
+        className="squish hairline mt-6 inline-flex h-11 items-center rounded-pill bg-cream-50 px-5 text-sm font-medium text-cocoa-900"
       >
         {action.label}
       </Link>
