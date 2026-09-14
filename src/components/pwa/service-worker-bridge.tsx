@@ -77,9 +77,9 @@ export function ServiceWorkerBridge() {
       style={{ bottom: "calc(var(--safe-bottom) + 4.5rem)" }}
       role="status"
     >
-      <div className="animate-rise flex w-full max-w-sm items-center gap-3 rounded-xl border border-ink-600 bg-ink-800/95 px-4 py-3 shadow-2xl shadow-black/50 backdrop-blur">
-        <RefreshCw className="size-4 shrink-0 text-ink-300" aria-hidden />
-        <p className="flex-1 text-sm text-ink-100">A new version of Pitik is ready.</p>
+      <div className="animate-rise pillow flex w-full max-w-sm items-center gap-3 rounded-xl border border-cream-300 bg-cream-50 px-4 py-3 text-cocoa-900 backdrop-blur">
+        <RefreshCw className="size-4 shrink-0 text-cocoa-600" aria-hidden />
+        <p className="flex-1 text-sm">A new version of Pitik is ready.</p>
         <Button
           size="sm"
           variant="primary"

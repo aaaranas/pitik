@@ -45,7 +45,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className="relative flex flex-col overflow-hidden bg-ink-950"
+      className="relative flex flex-col overflow-hidden bg-cream-50"
       style={{ height: "var(--app-height)" }}
     >
       <SyncProvider />

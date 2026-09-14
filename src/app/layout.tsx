@@ -50,9 +50,10 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "Pitik",
-    // Black-translucent lets the viewfinder run under the status bar when
-    // installed, which is what makes the standalone app feel native.
-    statusBarStyle: "black-translucent",
+    // A light app cannot use black-translucent: it forces white status-bar
+    // text, which is invisible on a pastel camera body. The cost is that
+    // installed content no longer runs under the status bar.
+    statusBarStyle: "default",
   },
   formatDetection: { telephone: false, date: false, address: false, email: false },
   openGraph: {
@@ -63,8 +64,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b0908",
-  colorScheme: "dark",
+  themeColor: "#FDFBF7",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
   // A camera app is a fixed-frame surface; pinch-zooming the chrome only ever

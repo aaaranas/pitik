@@ -19,7 +19,7 @@ export function OfflineBanner() {
   return (
     <div
       role="status"
-      className="flex shrink-0 items-center justify-center gap-2 bg-ink-800 px-4 py-1.5 text-xs text-ink-200"
+      className="tint-butter flex shrink-0 items-center justify-center gap-2 px-4 py-1.5 text-xs"
       style={{ paddingTop: "calc(var(--safe-top) + 0.375rem)" }}
     >
       <CloudOff className="size-3.5 shrink-0" aria-hidden />
