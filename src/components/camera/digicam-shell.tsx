@@ -127,8 +127,8 @@ export function DigicamShell({
             style={{ background: shell.accent, boxShadow: `0 0 6px ${shell.accent}` }}
           />
           <span
-            className="max-w-[13.5rem] truncate font-mono text-[0.5rem] uppercase tracking-[0.12em]"
-            style={{ color: shell.ink, opacity: 0.6 }}
+            className="max-w-[13.5rem] truncate font-sans text-[0.5rem]"
+            style={{ color: shell.ink }}
           >
             {model}
           </span>
@@ -149,7 +149,7 @@ export function DigicamShell({
       </div>
 
       <div className="relative z-[2] shrink-0 px-5 pt-2">
-        <div className="flex items-center justify-between rounded-sm bg-black/45 px-2.5 py-1 font-mono text-[0.5625rem] uppercase tabular-nums text-mint-base">
+        <div className="flex items-center justify-between rounded-sm bg-cocoa-900 px-2.5 py-1 font-mono text-[0.5625rem] uppercase tabular-nums text-mint-base">
           <span aria-hidden>
             {typeof shotsLeft === "number"
               ? `${String(Math.max(0, shotsLeft)).padStart(3, "0")} LEFT`
@@ -172,17 +172,20 @@ export function DigicamShell({
       {/* The dial sits on its own light strip rather than directly on the body:
           every model's body is pale now, but the hues differ, and one backdrop
           is simpler than tinting text per model. */}
-      <div className="relative z-[2] mx-5 mt-2 shrink-0 overflow-hidden rounded-full bg-cream-50/70 py-0.5">
+      <div className="relative z-[2] mx-5 mt-2 shrink-0 overflow-hidden rounded-full bg-cream-50/90 py-0.5">
         {dial}
       </div>
 
-      <div className="relative z-[2] flex shrink-0 items-center justify-center gap-1 px-3 pt-1">
+      <div
+        className="relative z-[2] flex shrink-0 items-center justify-center gap-1 px-3 pt-1"
+        style={{ color: shell.ink }}
+      >
         {tools}
       </div>
 
       <div
         className="relative z-[2] flex shrink-0 items-center justify-between px-7 pt-2"
-        style={{ paddingBottom: "calc(var(--safe-bottom) + 1rem)" }}
+        style={{ paddingBottom: "calc(var(--safe-bottom) + 1rem)", color: shell.ink }}
       >
         {deck}
       </div>

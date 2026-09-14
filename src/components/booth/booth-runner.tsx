@@ -361,6 +361,7 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
             status={camera.status === "error" ? "error" : "starting"}
             error={camera.error}
             onStart={() => void camera.start()}
+            tone="dark"
           />
         )}
       </div>

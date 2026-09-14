@@ -68,6 +68,9 @@ function pairs() {
   out.push(["cocoa-400", "cocoa-900", TEXT]); // muted text on a dark ground
   out.push(["butter-base", "cocoa-900", TEXT]); // accent text on a dark ground
   out.push(["sky-base", "cocoa-900", TEXT]);
+  // The digicam-shell shot-counter readout is a solid cocoa-900 LCD window
+  // on every camera body, pastel or not — mint-base is its lit-digit colour.
+  out.push(["mint-base", "cocoa-900", TEXT]);
   return out;
 }
 

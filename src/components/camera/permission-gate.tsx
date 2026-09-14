@@ -3,6 +3,7 @@
 import { Camera, ImageDown, RefreshCw } from "lucide-react";
 import type { CameraError } from "@/lib/camera/errors";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 /**
  * What stands in for the viewfinder before the camera is live.
@@ -11,22 +12,35 @@ import { Button } from "@/components/ui/button";
  * lasts a moment. Its real job is the failure case: a refusal, a camera already
  * in use, or a browser that cannot open one at all — each stated plainly with
  * the one thing the user can try.
+ *
+ * `tone` lets a dark host (the booth's deliberately dark sequence) keep its
+ * ground instead of flashing a light panel over it. "light" is the default —
+ * every camera-mode call site keeps it — "dark" follows the ratified
+ * dark-ground rule: cream-50 body text, cocoa-400 muted, cocoa-900 ground.
  */
 export function PermissionGate({
   status,
   error,
   onStart,
   onImport,
+  tone = "light",
 }: {
   status: "idle" | "starting" | "error";
   error: CameraError | null;
   onStart: () => void;
   onImport?: () => void;
+  tone?: "light" | "dark";
 }) {
+  const dark = tone === "dark";
+
   if (status === "starting") {
     return (
-      <div className="grid size-full place-items-center bg-cream-50">
-        <div className="flex flex-col items-center gap-3 text-cocoa-600">
+      <div
+        className={cn("grid size-full place-items-center", dark ? "bg-cocoa-900" : "bg-cream-50")}
+      >
+        <div
+          className={cn("flex flex-col items-center gap-3", dark ? "text-cocoa-400" : "text-cocoa-600")}
+        >
           <RefreshCw className="size-5 animate-spin" aria-hidden />
           <p className="text-sm">Opening the camera…</p>
         </div>
@@ -37,11 +51,25 @@ export function PermissionGate({
   if (status === "error" && error) {
     const recoverable = error.code !== "not-found" && error.code !== "unsupported";
     return (
-      <div className="grid size-full place-items-center bg-cream-50 p-6">
+      <div
+        className={cn(
+          "grid size-full place-items-center p-6",
+          dark ? "bg-cocoa-900" : "bg-cream-50",
+        )}
+      >
         <div className="max-w-xs text-center">
-          <h2 className="font-display text-2xl text-cocoa-900">{error.message}</h2>
+          <h2 className={cn("font-display text-2xl", dark ? "text-cream-50" : "text-cocoa-900")}>
+            {error.message}
+          </h2>
           {error.remedy ? (
-            <p className="mt-2 text-sm leading-relaxed text-cocoa-600">{error.remedy}</p>
+            <p
+              className={cn(
+                "mt-2 text-sm leading-relaxed",
+                dark ? "text-cocoa-400" : "text-cocoa-600",
+              )}
+            >
+              {error.remedy}
+            </p>
           ) : null}
           <div className="mt-6 flex flex-col gap-2">
             {recoverable ? (
@@ -62,13 +90,27 @@ export function PermissionGate({
   }
 
   return (
-    <div className="grid size-full place-items-center bg-cream-50 p-6">
+    <div
+      className={cn("grid size-full place-items-center p-6", dark ? "bg-cocoa-900" : "bg-cream-50")}
+    >
       <div className="max-w-xs text-center">
-        <div className="mx-auto grid size-14 place-items-center rounded-full border border-cream-300 text-cocoa-800">
+        <div
+          className={cn(
+            "mx-auto grid size-14 place-items-center rounded-full border",
+            dark ? "border-cocoa-800 text-cocoa-400" : "border-cream-300 text-cocoa-800",
+          )}
+        >
           <Camera className="size-6" aria-hidden />
         </div>
-        <h2 className="mt-5 font-display text-2xl text-cocoa-900">Ready when you are</h2>
-        <p className="mt-2 text-sm leading-relaxed text-cocoa-600">
+        <h2 className={cn("mt-5 font-display text-2xl", dark ? "text-cream-50" : "text-cocoa-900")}>
+          Ready when you are
+        </h2>
+        <p
+          className={cn(
+            "mt-2 text-sm leading-relaxed",
+            dark ? "text-cocoa-400" : "text-cocoa-600",
+          )}
+        >
           Pitik needs your camera to shoot. Photos stay on this device unless you
           choose to share them.
         </p>
