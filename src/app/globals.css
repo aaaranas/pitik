@@ -3,11 +3,18 @@
 /* ------------------------------------------------------------------
    Pitik design tokens
 
-   The identity is "darkroom + paper". Chrome is a warm near-black
-   (never pure grey — every neutral carries a red/amber bias, the way
-   film base does). Photographic artifacts — strips, envelopes, frames
-   — are rendered on cream paper so they read as physical objects
-   sitting on top of the chrome.
+   The identity is "soft plastic + thick paper". The ground is milk and
+   cream; ink is a soft brown rather than black, because black on cream
+   reads as a printed form rather than as something friendly.
+
+   Five pastels carry the variety — one per camera model, one per booth
+   template, one per surface tint — with sky as the single accent that
+   means "this is the action".
+
+   Every pastel has three steps and they are not interchangeable: `tint`
+   is a surface, `base` is a fill, and `deep` is the only step that may
+   be small text. scripts/check-contrast.mjs reads these very lines and
+   fails the build if that stops being true.
    ------------------------------------------------------------------ */
 
 @theme {
@@ -66,38 +73,6 @@
   --radius-card: 1.5rem;
   --radius-slot: 1rem;
 
-  /* Chrome: warm neutrals, darkest to lightest */
-  --color-ink-950: #0b0908;
-  --color-ink-900: #121010;
-  --color-ink-850: #181514;
-  --color-ink-800: #1f1b19;
-  --color-ink-700: #2a2523;
-  --color-ink-600: #3a3230;
-  --color-ink-500: #564b47;
-  --color-ink-400: #7c6e69;
-  --color-ink-300: #a2938d;
-  --color-ink-200: #c9bcb5;
-  --color-ink-100: #e5dcd6;
-
-  /* Paper: the surface photographs live on */
-  --color-paper: #f5f0e7;
-  --color-paper-dim: #e7dfd1;
-  --color-paper-deep: #d6ccbb;
-
-  /* Safelight — the single accent. Used sparingly: record state,
-     primary action, active selection. Never for decoration. */
-  --color-safelight-400: #ff7358;
-  --color-safelight-500: #ea4f34;
-  --color-safelight-600: #c73c25;
-
-  /* Amber — favorites, timestamps, secondary emphasis */
-  --color-amber-warm: #d9a441;
-
-  /* Feedback */
-  --color-signal-ok: #6bbf9a;
-  --color-signal-warn: #e0b155;
-  --color-signal-bad: #e3654f;
-
   /*
    * next/font hashes its family names, so it publishes them as
    * `--font-*-face` on <html> and the theme keys point at those. Naming the
@@ -115,7 +90,6 @@
 
   --animate-shutter-flash: shutter-flash 320ms var(--ease-shutter);
   --animate-rise: rise 420ms var(--ease-shutter) both;
-  --animate-develop: develop 1400ms ease-out both;
   --animate-pop: pop 260ms var(--ease-squish) both;
 
   @keyframes shutter-flash {
@@ -138,17 +112,6 @@
     to {
       opacity: 1;
       transform: none;
-    }
-  }
-
-  @keyframes develop {
-    from {
-      opacity: 0;
-      filter: contrast(0.3) brightness(1.5) saturate(0.2);
-    }
-    to {
-      opacity: 1;
-      filter: none;
     }
   }
 
@@ -211,34 +174,6 @@
 }
 
 @layer components {
-  /* Fine paper tooth, applied to cream surfaces so they don't read as
-     flat CSS rectangles. */
-  .paper-grain {
-    position: relative;
-    isolation: isolate;
-  }
-  .paper-grain::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.35;
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='0.5'/></svg>");
-  }
-
-  /* Sprocket-hole edge used on roll cards and strip previews. */
-  .sprockets {
-    background-image: radial-gradient(
-      circle at center,
-      var(--color-ink-950) 0 2.5px,
-      transparent 2.5px
-    );
-    background-size: 12px 12px;
-    background-repeat: repeat-x;
-  }
-
   .hairline {
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-cocoa-900) 8%, transparent);
   }
@@ -251,80 +186,6 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-}
-
-/* ------------------------------------------------------------------
-   Vintage print furniture
-
-   The app is about photographic objects, so the interface borrows from
-   what those objects were printed on: film cartons, envelopes, lab
-   tickets. These are the reusable pieces of that vocabulary.
-   ------------------------------------------------------------------ */
-
-@layer components {
-  /* Double rule, as on the top and bottom of a film-carton masthead. */
-  .rule-double {
-    border-top: 3px solid currentColor;
-    border-bottom: 1px solid currentColor;
-    height: 5px;
-  }
-
-  /* The torn edge of a lab ticket. Notches are punched out of the paper
-     with radial gradients rather than drawn on top of it, so whatever is
-     behind the element shows through the holes. */
-  .perforated-y {
-    -webkit-mask-image:
-      radial-gradient(circle at 5px 50%, transparent 5px, black 5.5px),
-      radial-gradient(circle at calc(100% - 5px) 50%, transparent 5px, black 5.5px);
-    -webkit-mask-composite: source-in;
-    mask-image:
-      radial-gradient(circle at 5px 50%, transparent 5px, black 5.5px),
-      radial-gradient(circle at calc(100% - 5px) 50%, transparent 5px, black 5.5px);
-    mask-composite: intersect;
-  }
-
-  /* Offset-printed halftone. Sits above a surface at low opacity so flat
-     colour reads as ink on paper rather than as a CSS rectangle. */
-  .halftone::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.14;
-    background-image: radial-gradient(currentColor 0.5px, transparent 0.6px);
-    background-size: 4px 4px;
-  }
-
-  /* Rubber-stamped label: slightly rotated, ink-bled edges. */
-  .stamp {
-    border: 2px solid currentColor;
-    border-radius: 2px;
-    letter-spacing: 0.18em;
-    opacity: 0.75;
-  }
-
-  /* Sprocket holes down both long edges of a film strip. */
-  .film-edge::before,
-  .film-edge::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 9px;
-    background-image: radial-gradient(
-      circle at center,
-      var(--color-ink-950) 0 2px,
-      transparent 2.2px
-    );
-    background-size: 11px 9px;
-    background-repeat: repeat-x;
-  }
-  .film-edge::before {
-    top: 0;
-  }
-  .film-edge::after {
-    bottom: 0;
   }
 }
 
