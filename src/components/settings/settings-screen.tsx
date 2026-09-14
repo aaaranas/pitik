@@ -235,7 +235,7 @@ function Toggle({
         <span
           aria-hidden
           className={cn(
-            "hairline absolute top-0.5 size-5 rounded-full bg-cream-50 transition-transform",
+            "absolute top-0.5 size-5 rounded-full border border-cocoa-800 bg-cream-50 transition-transform",
             checked ? "translate-x-[1.375rem]" : "translate-x-0.5",
           )}
         />
