@@ -165,7 +165,7 @@
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   /* Viewport unit that accounts for mobile browser chrome. Updated by
      the app shell on resize for browsers without dvh support. */
   --app-height: 100dvh;
@@ -184,8 +184,8 @@
   }
 
   body {
-    background: var(--color-ink-950);
-    color: var(--color-ink-100);
+    background: var(--color-cream-50);
+    color: var(--color-cocoa-800);
     font-family: var(--font-sans);
     /* Photography app: never rubber-band the shell, the camera needs
        the whole viewport to stay put. */
@@ -195,12 +195,12 @@
   }
 
   ::selection {
-    background: var(--color-safelight-500);
-    color: white;
+    background: var(--color-sky-base);
+    color: var(--color-cocoa-900);
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-safelight-400);
+    outline: 2px solid var(--color-sky-deep);
     outline-offset: 2px;
   }
 

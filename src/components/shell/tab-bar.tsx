@@ -27,7 +27,7 @@ export function TabBar() {
   return (
     <nav
       aria-label="Main"
-      className="shrink-0 border-t-2 border-ink-800 bg-ink-950/95 backdrop-blur"
+      className="shrink-0 border-t border-cream-300 bg-cream-50/95 backdrop-blur"
       style={{ paddingBottom: "var(--safe-bottom)" }}
     >
       <ul className="mx-auto flex max-w-md items-stretch">
@@ -45,11 +45,11 @@ export function TabBar() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex h-14 flex-col items-center justify-center gap-1 transition-colors",
-                  active ? "text-safelight-400" : "text-ink-400 hover:text-ink-200",
+                  active ? "text-sky-deep" : "text-cocoa-600 hover:text-cocoa-900",
                 )}
               >
                 <Icon className="size-5" aria-hidden strokeWidth={active ? 2.2 : 1.8} />
-                <span className="font-mono text-[0.5625rem] uppercase tracking-[0.2em]">{tab.label}</span>
+                <span className="font-sans text-[0.625rem] font-semibold">{tab.label}</span>
               </Link>
             </li>
           );
