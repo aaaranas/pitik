@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { findUltraWide, listCameras } from "@/lib/camera/service";
+import { cn } from "@/lib/utils";
 
 /**
  * What this device actually reports about its cameras.
@@ -36,24 +37,29 @@ export function CameraReport() {
 
   return (
     <div className="px-4 py-3.5">
-      <p className="text-sm text-ink-100">Cameras on this device</p>
-      <p className="mt-1 text-xs leading-relaxed text-ink-400">
+      <p className="text-sm text-cocoa-900">Cameras on this device</p>
+      <p
+        className={cn(
+          "mt-2 rounded-slot border px-3 py-2 text-xs leading-relaxed",
+          ultraWide ? "tint-mint" : "tint-blush",
+        )}
+      >
         {ultraWide
           ? `Ultra-wide found: ${ultraWide}. The 0.5x control is available.`
           : "No ultra-wide lens was found, so the 0.5x control is hidden."}
       </p>
 
       {labels === null ? (
-        <p className="mt-2 font-mono text-[0.6875rem] text-ink-600">Checking…</p>
+        <p className="mt-2 font-mono text-[0.6875rem] text-cocoa-600">Checking…</p>
       ) : labels.length === 0 ? (
-        <p className="mt-2 font-mono text-[0.6875rem] text-ink-600">
+        <p className="mt-2 font-mono text-[0.6875rem] text-cocoa-600">
           None reported. Open the camera once, then come back — labels stay blank
           until permission is granted.
         </p>
       ) : (
         <ul className="mt-2 space-y-0.5">
           {labels.map((label, index) => (
-            <li key={`${label}-${index}`} className="font-mono text-[0.6875rem] text-ink-500">
+            <li key={`${label}-${index}`} className="font-mono text-[0.6875rem] text-cocoa-600">
               {label}
             </li>
           ))}
