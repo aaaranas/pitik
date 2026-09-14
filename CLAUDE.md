@@ -50,16 +50,18 @@ a dependency that phones home, that test will fail and it is right.
 
 ## Typography
 
-The app is dressed as film packaging, not as a product page. Three faces, all
-self-hosted through `next/font`, all declared once in `layout.tsx`:
+The app is dressed as soft moulded plastic, not as a product page. Three
+faces, all self-hosted through `next/font`, all declared once in `layout.tsx`:
 
-- `font-display` (Bebas Neue) is **caps-only**. It is for our words —
-  headings, labels, the wordmark. Never put a user's text in it: a roll named
-  "Dinner with Sam" would be shouted back at them as DINNER WITH SAM.
-- `font-sans` (Archivo) carries body copy **and everything the user typed**.
-  Roll titles, captions, names.
-- `font-mono` (Courier Prime) is the typewritten furniture — spec lines, dates,
-  frame numbers, counters. Tracked out wide and uppercase.
+- `font-display` (Fredoka) is for our words — headings, labels, the wordmark.
+  **Mixed case.** It is rounded enough to read as friendly and structured
+  enough to survive at label sizes.
+- `font-sans` (Plus Jakarta Sans) carries body copy **and everything the user
+  typed**. Roll titles, captions, names. Keep user text here: Fredoka's
+  character coverage is narrower, so an emoji or CJK roll title would fall
+  back mid-string and break the line.
+- `font-mono` (DM Mono) is for machine facts — frame numbers, counters,
+  timers, timestamps. Only where digits must align; it is not decoration.
 
 next/font hashes its family names, so it publishes them as `--font-*-face` and
 the Tailwind theme keys point at those. Keep the two names distinct — a
@@ -67,9 +69,39 @@ self-referential custom property silently resolves to nothing. Canvas cannot
 read a CSS variable at all, so `compositor.ts` resolves the stack off the
 document and falls back to generics in workers and tests.
 
-Vintage print utilities (`rule-double`, `perforated-y`, `halftone`, `stamp`,
-`film-edge`) live in `globals.css`. Reach for those before inventing a new
-rounded card.
+Soft utilities (`pillow`, `chip`, `tint-*`, `soft-grain`, `squish`) live in
+`globals.css`. Reach for those before inventing a new card.
+
+## Colour
+
+Five pastels plus a cream ground and a cocoa ink. Every pastel has three steps
+and they are **not** interchangeable: `tint` is a surface, `base` is a fill,
+and `deep` is the only step that may be small text. Text on a `base` fill is
+always `cocoa-900`. `cocoa-400` is decorative and disabled-state only — it
+does not clear 4.5:1 on any ground here.
+
+The values are solved, not chosen. `scripts/check-contrast.mjs` reads them out
+of `globals.css` and runs inside `pnpm check`; a hand-picked draft of this
+palette failed 10 of its 29 pairs. If you change a hex, that gate is what tells
+you whether you got away with it. It covers dark-ground pairs too, not just
+the cream ground below.
+
+A lit indicator on a pale body has to be **darker** than its surroundings, not
+brighter. This is the opposite of the instinct and every accent in `bodies.ts`
+obeys it, enforced by `tests/unit/camera-bodies.test.ts`.
+
+Two surfaces are deliberately dark: the photo viewer (a photograph is judged
+against neutral, not cream) and the running booth (a bright screen during a
+countdown blinds the room). On those, the steps invert: body text is
+`cream-50`, muted is `cocoa-400`, and accents take a pastel `base`, not
+`deep`. The cream-ground mapping is illegible there — `cocoa-900` on itself is
+1:1. Never put `cocoa-400` on a `cocoa-800` or `cocoa-600` fill; use
+`cream-50`. This applies in `capture-viewer.tsx`, `booth-runner.tsx`,
+`clip-dialog.tsx`, and `PermissionGate` with `tone="dark"`.
+
+A boundary that is a control's only affordance — it has no fill or label to
+carry it otherwise — uses `edge-strong`, not `cream-300`: `cream-300` is a
+decorative divider and does not clear 3:1.
 
 ## Filters
 
@@ -91,6 +123,10 @@ rounded card.
 
 - The screen is a camera body, edge to edge. Controls live inside the moulding
   as slots; nothing floats underneath it.
+- Every body on the dial is its own pastel (`bodies.ts`), not a shared shell
+  with a colour swapped in — body, accent lamp, lens ring and ink are all
+  per-model. The lamp obeys the Colour section's rule: lit is *darker* than
+  the moulding, never brighter.
 - **The model dial is the only look control.** Do not reintroduce a filter tray
   here — two controls for one property will disagree, and a camera is not a
   filter stacked on another filter.
@@ -213,7 +249,7 @@ human one exists — "That frame didn't save", not "Capture pipeline error".
 ## Quality gates
 
 ```bash
-pnpm lint && pnpm typecheck && pnpm test && pnpm build
+pnpm lint && pnpm typecheck && pnpm check:contrast && pnpm test && pnpm build
 # or
 pnpm check
 ```

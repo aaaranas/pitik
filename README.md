@@ -57,7 +57,8 @@ create — Pitik works completely without one. See
 | `pnpm test` | Unit tests (Vitest) |
 | `pnpm test:e2e` | End-to-end tests (Playwright, real capture) |
 | `pnpm icons` | Regenerate app icons from `scripts/generate-icons.mjs` |
-| `pnpm check` | lint + typecheck + test + build |
+| `pnpm check:contrast` | WCAG gate on the palette in `globals.css` |
+| `pnpm check` | lint + typecheck + check:contrast + test + build |
 
 ---
 
@@ -446,9 +447,9 @@ makes **no third-party requests at all**.
 pnpm check
 ```
 
-Runs lint, typecheck, unit tests and a production build. All four must pass.
-TypeScript is `strict`; ESLint includes the React Compiler rules, which are
-treated as correctness requirements rather than suggestions.
+Runs lint, typecheck, the contrast gate, unit tests and a production build. All
+five must pass. TypeScript is `strict`; ESLint includes the React Compiler
+rules, which are treated as correctness requirements rather than suggestions.
 
 ---
 
