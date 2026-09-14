@@ -93,38 +93,38 @@ export function RenderCheck() {
   }, []);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8">
-      <h1 className="font-display text-3xl text-paper">Render check</h1>
-      <p className="mt-2 max-w-2xl text-sm text-ink-400">
+    <div className="mx-auto min-h-full w-full max-w-6xl bg-cream-50 px-4 py-8">
+      <h1 className="font-display text-3xl text-cocoa-900">Render check</h1>
+      <p className="mt-2 max-w-2xl text-sm text-cocoa-600">
         Every filter through the export renderer (left of each pair) and the live
         preview approximation (right). They should read as the same look. Development
         only.
       </p>
 
       {error ? (
-        <p className="mt-6 rounded-lg bg-signal-bad/15 p-4 text-sm text-signal-bad">
+        <p className="tint-blush mt-6 rounded-slot border p-4 text-sm">
           Pipeline failed: {error}
         </p>
       ) : null}
 
       {source ? (
         <section className="mt-8">
-          <h2 className="text-[0.6875rem] uppercase tracking-[0.18em] text-ink-400">
+          <h2 className="text-[0.6875rem] uppercase tracking-[0.18em] text-cocoa-600">
             Reference image
           </h2>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={source} alt="Reference" className="mt-2 w-72 rounded" />
+          <img src={source} alt="Reference" className="mt-2 w-72 rounded border border-cream-300" />
         </section>
       ) : null}
 
       <section className="mt-10">
-        <h2 className="text-[0.6875rem] uppercase tracking-[0.18em] text-ink-400">
+        <h2 className="text-[0.6875rem] uppercase tracking-[0.18em] text-cocoa-600">
           Filters ({filters.length})
         </h2>
         <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {filters.map((filter) => (
             <figure key={filter.id} data-testid="filter-sample">
-              <div className="grid grid-cols-2 gap-px overflow-hidden rounded bg-ink-800">
+              <div className="grid grid-cols-2 gap-px overflow-hidden rounded bg-cream-300">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={filter.exported} alt={`${filter.name}, exported`} />
                 <span className="relative block">
@@ -148,9 +148,9 @@ export function RenderCheck() {
                   ))}
                 </span>
               </div>
-              <figcaption className="mt-1.5 text-xs text-ink-200">
+              <figcaption className="mt-1.5 text-xs text-cocoa-800">
                 {filter.name}
-                <span className="ml-1 text-ink-500">{filter.category}</span>
+                <span className="ml-1 text-cocoa-600">{filter.category}</span>
               </figcaption>
             </figure>
           ))}
@@ -158,7 +158,7 @@ export function RenderCheck() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-[0.6875rem] uppercase tracking-[0.18em] text-ink-400">
+        <h2 className="text-[0.6875rem] uppercase tracking-[0.18em] text-cocoa-600">
           Booth templates ({strips.length})
         </h2>
         <div className="mt-3 flex flex-wrap items-start gap-6">
@@ -166,7 +166,7 @@ export function RenderCheck() {
             <figure key={strip.name} data-testid="strip-sample">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={strip.url} alt={strip.name} className="max-h-80 w-auto" />
-              <figcaption className="mt-1.5 text-xs text-ink-200">{strip.name}</figcaption>
+              <figcaption className="mt-1.5 text-xs text-cocoa-800">{strip.name}</figcaption>
             </figure>
           ))}
         </div>

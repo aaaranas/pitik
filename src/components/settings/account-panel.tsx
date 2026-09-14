@@ -35,13 +35,13 @@ export function AccountPanel() {
 
   if (!auth.configured) {
     return (
-      <section className="mt-4 rounded-2xl border border-ink-850 bg-ink-900 p-5">
-        <h2 className="font-display text-xl text-ink-100">Backup isn&rsquo;t set up</h2>
-        <p className="mt-2 text-sm leading-relaxed text-ink-400">
+      <section className="mt-4 pillow p-5">
+        <h2 className="font-display text-xl text-cocoa-900">Backup isn&rsquo;t set up</h2>
+        <p className="mt-2 text-sm leading-relaxed text-cocoa-600">
           This install has no Supabase project connected, so accounts and shared rolls
           are unavailable. Everything else works — your photos live on this device.
         </p>
-        <p className="mt-3 font-mono text-[0.6875rem] text-ink-600">
+        <p className="mt-3 font-mono text-[0.6875rem] text-cocoa-600">
           Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable it.
         </p>
       </section>
@@ -75,11 +75,11 @@ export function AccountPanel() {
     };
 
     return (
-      <section className="mt-4 rounded-2xl border border-ink-850 bg-ink-900 p-5">
-        <p className="text-[0.6875rem] uppercase tracking-[0.16em] text-ink-400">Signed in</p>
-        <p className="mt-1 truncate text-sm text-ink-100">{auth.session.user.email}</p>
+      <section className="mt-4 pillow p-5">
+        <p className="text-[0.6875rem] uppercase tracking-[0.16em] text-cocoa-600">Signed in</p>
+        <p className="mt-1 truncate text-sm text-cocoa-900">{auth.session.user.email}</p>
 
-        <label className="mt-4 flex cursor-pointer items-start gap-3 border-t border-ink-850 pt-4">
+        <label className="mt-4 flex cursor-pointer items-start gap-3 border-t border-cream-300 pt-4">
           <input
             type="checkbox"
             checked={settings?.syncEnabled ?? false}
@@ -87,11 +87,11 @@ export function AccountPanel() {
               await update({ syncEnabled: event.target.checked });
               if (event.target.checked) await reconcile();
             }}
-            className="mt-0.5 size-4 shrink-0 accent-[var(--color-safelight-500)]"
+            className="mt-0.5 size-4 shrink-0 accent-[var(--color-sky-deep)]"
           />
           <span>
-            <span className="block text-sm text-ink-100">Back up and sync my rolls</span>
-            <span className="mt-0.5 block text-xs leading-relaxed text-ink-400">
+            <span className="block text-sm text-cocoa-900">Back up and sync my rolls</span>
+            <span className="mt-0.5 block text-xs leading-relaxed text-cocoa-600">
               Uploads photos to your private storage so they survive losing this
               device, and brings in photos other people added to rolls you share.
               Off by default.
@@ -132,16 +132,16 @@ export function AccountPanel() {
   };
 
   return (
-    <section className="mt-4 rounded-2xl border border-ink-850 bg-ink-900 p-5">
-      <h2 className="font-display text-xl text-ink-100">Back up your rolls</h2>
-      <p className="mt-2 text-sm leading-relaxed text-ink-400">
+    <section className="mt-4 pillow p-5">
+      <h2 className="font-display text-xl text-cocoa-900">Back up your rolls</h2>
+      <p className="mt-2 text-sm leading-relaxed text-cocoa-600">
         Optional. Sign in to keep a private copy of your photos, and to share rolls
         with the people you were with. The camera works either way.
       </p>
 
       {sent ? (
-        <p className="mt-4 flex items-start gap-2 rounded-lg bg-ink-850 p-3 text-sm text-ink-200">
-          <Mail className="mt-0.5 size-4 shrink-0 text-signal-ok" aria-hidden />
+        <p className="tint-mint mt-4 flex items-start gap-2 rounded-slot border p-3 text-sm">
+          <Mail className="mt-0.5 size-4 shrink-0" aria-hidden />
           Check {email} for a sign-in link.
         </p>
       ) : (
@@ -163,13 +163,13 @@ export function AccountPanel() {
               onKeyDown={(event) => event.key === "Enter" && void submit()}
               placeholder="you@example.com"
               aria-invalid={Boolean(error)}
-              className="min-w-0 flex-1 rounded-lg border border-ink-700 bg-ink-950 px-3 py-2.5 text-sm text-ink-100 placeholder:text-ink-500 focus:border-safelight-500 focus:outline-none"
+              className="min-w-0 flex-1 rounded-slot border border-cream-300 bg-cream-200 px-3 py-2.5 text-sm text-cocoa-900 placeholder:text-cocoa-600 focus:border-sky-deep focus:outline-none"
             />
             <Button variant="subtle" onClick={() => void submit()} disabled={sending || !online}>
               {sending ? "Sending…" : "Send link"}
             </Button>
           </div>
-          {error ? <p className="mt-2 text-sm text-signal-bad">{error}</p> : null}
+          {error ? <p className="mt-2 text-sm text-blush-deep">{error}</p> : null}
         </div>
       )}
     </section>

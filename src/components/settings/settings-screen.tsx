@@ -34,18 +34,18 @@ export function SettingsScreen() {
 
   return (
     <div
-      className="mx-auto w-full max-w-xl px-4 pb-12"
+      className="mx-auto min-h-full w-full max-w-xl bg-cream-50 px-4 pb-12"
       style={{ paddingTop: "calc(var(--safe-top) + 0.5rem)" }}
     >
       <header className="flex items-center gap-1 pb-4">
         <Link
           href="/"
-          className="grid size-10 place-items-center rounded-full text-ink-200 transition hover:bg-ink-800"
+          className="grid size-10 place-items-center rounded-pill text-cocoa-800 transition hover:bg-cream-200"
           aria-label="Back"
         >
           <ChevronLeft className="size-5" />
         </Link>
-        <h1 className="font-display text-2xl text-paper">Settings</h1>
+        <h1 className="font-display text-2xl text-cocoa-900">Settings</h1>
       </header>
 
       <AccountPanel />
@@ -105,8 +105,8 @@ export function SettingsScreen() {
       <Group title="On this device">
         <CameraReport />
         <div className="px-4 py-3.5">
-          <p className="text-sm text-ink-100">Storage</p>
-          <p className="mt-1 text-xs leading-relaxed text-ink-400">
+          <p className="text-sm text-cocoa-900">Storage</p>
+          <p className="mt-1 text-xs leading-relaxed text-cocoa-600">
             {report
               ? `${formatCount(report.rolls, "roll")}, ${formatCount(report.captures, "photo")}, ${formatCount(report.strips, "strip")} — about ${formatBytes(report.usage)}${
                   report.quota ? ` of ${formatBytes(report.quota)} available` : ""
@@ -121,10 +121,10 @@ export function SettingsScreen() {
         </div>
       </Group>
 
-      <section className="mt-8 rounded-2xl border border-ink-800 p-5">
-        <ShieldCheck className="size-5 text-signal-ok" aria-hidden />
-        <h2 className="mt-3 font-display text-xl text-ink-100">Where your photos go</h2>
-        <ul className="mt-3 space-y-2.5 text-sm leading-relaxed text-ink-300">
+      <section className="mt-8 pillow p-5">
+        <ShieldCheck className="size-5 text-mint-deep" aria-hidden />
+        <h2 className="mt-3 font-display text-xl text-cocoa-900">Where your photos go</h2>
+        <ul className="mt-3 space-y-2.5 text-sm leading-relaxed text-cocoa-600">
           <li>
             Photos are written to this device&rsquo;s storage the moment you take them, and
             they stay there.
@@ -145,7 +145,7 @@ export function SettingsScreen() {
         </ul>
       </section>
 
-      <footer className="mt-10 flex items-center justify-center gap-2 text-ink-600">
+      <footer className="mt-10 flex items-center justify-center gap-2 text-cocoa-600">
         <PitikMark className="size-4" />
         <span className="font-mono text-[0.625rem] uppercase tracking-[0.2em]">
           Made for moments together
@@ -184,12 +184,8 @@ export function SettingsScreen() {
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-8">
-      <h2 className="mb-2 px-1 text-[0.6875rem] uppercase tracking-[0.18em] text-ink-400">
-        {title}
-      </h2>
-      <div className="divide-y divide-ink-850 overflow-hidden rounded-xl border border-ink-850 bg-ink-900">
-        {children}
-      </div>
+      <h2 className="mb-2 px-1 font-display text-xl text-cocoa-800">{title}</h2>
+      <div className="pillow divide-y divide-cream-200 overflow-hidden">{children}</div>
     </section>
   );
 }
@@ -221,8 +217,8 @@ function Toggle({
   return (
     <label className="flex cursor-pointer items-center gap-4 px-4 py-3.5">
       <span className="min-w-0 flex-1">
-        <span className="block text-sm text-ink-100">{label}</span>
-        <span className="mt-0.5 block text-xs leading-relaxed text-ink-400">{hint}</span>
+        <span className="block text-sm text-cocoa-900">{label}</span>
+        <span className="mt-0.5 block text-xs leading-relaxed text-cocoa-600">{hint}</span>
       </span>
       <button
         type="button"
@@ -232,14 +228,14 @@ function Toggle({
         disabled={!settings}
         onClick={() => void onChange({ [field]: !checked } as Partial<Settings>)}
         className={cn(
-          "relative h-6 w-11 shrink-0 rounded-full transition-colors",
-          checked ? "bg-safelight-500" : "bg-ink-700",
+          "relative h-6 w-11 shrink-0 rounded-pill border transition-colors",
+          checked ? "border-sky-base bg-sky-base" : "border-edge-strong bg-cream-300",
         )}
       >
         <span
           aria-hidden
           className={cn(
-            "absolute top-0.5 size-5 rounded-full bg-paper transition-transform",
+            "hairline absolute top-0.5 size-5 rounded-full bg-cream-50 transition-transform",
             checked ? "translate-x-[1.375rem]" : "translate-x-0.5",
           )}
         />
