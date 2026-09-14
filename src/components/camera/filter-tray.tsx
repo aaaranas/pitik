@@ -70,9 +70,9 @@ function FilterChip({ filter, selected, referenceFrame, onSelect }: FilterChipPr
     >
       <span
         className={cn(
-          "relative block size-16 overflow-hidden rounded-xl bg-ink-800 transition",
+          "relative block size-16 overflow-hidden rounded-xl bg-black/40 transition",
           selected
-            ? "ring-2 ring-safelight-500 ring-offset-2 ring-offset-ink-950"
+            ? "ring-2 ring-white ring-offset-2 ring-offset-black/60"
             : "ring-1 ring-white/10",
         )}
       >
@@ -118,8 +118,8 @@ function FilterChip({ filter, selected, referenceFrame, onSelect }: FilterChipPr
         {filter.maker ? (
           <span
             className={cn(
-              "max-w-full truncate font-mono text-[0.5rem] uppercase leading-none tracking-[0.14em] transition-colors",
-              selected ? "text-safelight-400/80" : "text-ink-500 group-hover:text-ink-400",
+              "max-w-full truncate font-mono text-[0.5rem] uppercase leading-none tracking-[0.14em] drop-shadow transition-colors",
+              selected ? "text-white/90" : "text-white/50 group-hover:text-white/70",
             )}
           >
             {filter.maker}
@@ -127,8 +127,8 @@ function FilterChip({ filter, selected, referenceFrame, onSelect }: FilterChipPr
         ) : null}
         <span
           className={cn(
-            "w-full text-balance text-center text-[0.625rem] leading-tight transition-colors",
-            selected ? "text-safelight-400" : "text-ink-300 group-hover:text-ink-100",
+            "w-full text-balance text-center text-[0.625rem] leading-tight drop-shadow transition-colors",
+            selected ? "text-white" : "text-white/70 group-hover:text-white/90",
           )}
         >
           {filter.name}

@@ -149,7 +149,7 @@ export function DigicamShell({
       </div>
 
       <div className="relative z-[2] shrink-0 px-5 pt-2">
-        <div className="flex items-center justify-between rounded-sm bg-black/45 px-2.5 py-1 font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[#9fe6b8]">
+        <div className="flex items-center justify-between rounded-sm bg-black/45 px-2.5 py-1 font-mono text-[0.5625rem] uppercase tabular-nums text-mint-base">
           <span aria-hidden>
             {typeof shotsLeft === "number"
               ? `${String(Math.max(0, shotsLeft)).padStart(3, "0")} LEFT`
@@ -169,11 +169,10 @@ export function DigicamShell({
         </div>
       </div>
 
-      {/* The dial sits on its own dark strip rather than directly on the body:
-          model names have to stay legible on a cream instant-film shell as well
-          as on black plastic, and one backdrop is simpler than tinting text per
-          model. */}
-      <div className="relative z-[2] mx-5 mt-2 shrink-0 overflow-hidden rounded-full bg-black/35 py-0.5">
+      {/* The dial sits on its own light strip rather than directly on the body:
+          every model's body is pale now, but the hues differ, and one backdrop
+          is simpler than tinting text per model. */}
+      <div className="relative z-[2] mx-5 mt-2 shrink-0 overflow-hidden rounded-full bg-cream-50/70 py-0.5">
         {dial}
       </div>
 

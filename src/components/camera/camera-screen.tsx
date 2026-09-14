@@ -363,7 +363,7 @@ export function CameraScreen({
         }
         className={cn(
           "grid size-10 place-items-center rounded-full transition disabled:opacity-25",
-          flashOn ? "text-amber-warm" : "hover:bg-black/10",
+          flashOn ? "text-butter-deep" : "hover:bg-black/10",
         )}
       >
         {flashOn ? <Zap className="size-5" /> : <ZapOff className="size-5" />}
@@ -445,8 +445,8 @@ export function CameraScreen({
             className={cn(
               "h-7 rounded-full px-3 font-mono text-[0.6875rem] tabular-nums transition",
               camera.lens === "ultra"
-                ? "bg-amber-warm text-ink-950"
-                : "bg-black/30 text-white/80 hover:bg-black/40",
+                ? "bg-butter-base text-cocoa-900"
+                : "bg-white/40 text-cocoa-800 hover:bg-white/60",
             )}
           >
             {camera.lens === "ultra" ? "0.5x" : "1x"}
@@ -475,7 +475,7 @@ export function CameraScreen({
 
   if (!live) {
     return (
-      <div className="flex h-full flex-col bg-ink-950 text-ink-100">
+      <div className="flex h-full flex-col bg-cream-50 text-cocoa-900">
         {/* The header stays before the camera starts: which roll you are about
             to shoot into is exactly the thing you want to check first. */}
         <div
@@ -597,8 +597,8 @@ function ToolButton({
       className={cn(
         "flex h-9 items-center gap-1.5 rounded-full px-3 text-xs transition",
         active
-          ? "bg-black/35 text-white"
-          : "bg-black/15 text-white/70 hover:bg-black/25 hover:text-white",
+          ? "bg-white/80 text-cocoa-900 shadow-sm"
+          : "bg-white/35 text-cocoa-600 hover:bg-white/55 hover:text-cocoa-900",
       )}
     >
       {children}

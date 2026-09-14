@@ -38,7 +38,7 @@ export function LevelIndicator({ roll }: { roll: number | null }) {
       <div
         className={cn(
           "h-px w-24 origin-center transition-colors duration-200",
-          level ? "bg-safelight-400" : "bg-white/40",
+          level ? "bg-white shadow-[0_0_6px_rgba(0,0,0,0.5)]" : "bg-white/40",
         )}
         style={{ transform: `rotate(${-roll}deg)` }}
       />

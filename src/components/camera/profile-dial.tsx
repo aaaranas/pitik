@@ -75,22 +75,22 @@ export function ProfileDial({
               onClick={() => onSelect(item.id)}
               className={cn(
                 "flex shrink-0 snap-center flex-col items-center gap-0.5 whitespace-nowrap rounded-full px-3 py-1 transition-colors",
-                selected ? "text-safelight-400" : "text-ink-400 hover:text-ink-200",
+                selected
+                  ? "ring-2 ring-sky-deep text-cocoa-900"
+                  : "text-cocoa-600 hover:text-cocoa-900",
               )}
             >
               {item.maker ? (
                 <span
                   className={cn(
-                    "font-mono text-[0.5rem] uppercase leading-none tracking-[0.2em]",
+                    "font-sans text-[0.5rem] leading-none",
                     selected ? "opacity-80" : "opacity-55",
                   )}
                 >
                   {item.maker}
                 </span>
               ) : null}
-              <span className="text-[0.6875rem] uppercase leading-none tracking-[0.12em]">
-                {item.name}
-              </span>
+              <span className="font-sans text-[0.6875rem] leading-none">{item.name}</span>
             </button>
           );
         })}
@@ -104,7 +104,7 @@ export function ProfileDial({
           aria-hidden
           className="pointer-events-none absolute inset-x-0 -bottom-0.5 flex justify-center"
         >
-          <div className="h-px w-8 bg-safelight-500" />
+          <div className="h-px w-8 bg-sky-deep" />
         </div>
       ) : null}
     </div>
