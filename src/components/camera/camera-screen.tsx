@@ -363,7 +363,7 @@ export function CameraScreen({
         }
         className={cn(
           "grid size-10 place-items-center rounded-full transition disabled:opacity-25",
-          flashOn ? "text-butter-deep" : "hover:bg-black/10",
+          flashOn ? "bg-cocoa-900 text-cream-50" : "hover:bg-black/10",
         )}
       >
         {flashOn ? <Zap className="size-5" /> : <ZapOff className="size-5" />}
@@ -381,7 +381,7 @@ export function CameraScreen({
         active={dateStamp}
       >
         <CalendarClock className="size-4" aria-hidden />
-        <span className="text-[0.625rem] uppercase tracking-[0.12em]">Date</span>
+        <span className="font-sans text-[0.625rem]">Date</span>
       </ToolButton>
 
       <ToolButton
@@ -597,8 +597,8 @@ function ToolButton({
       className={cn(
         "flex h-9 items-center gap-1.5 rounded-full px-3 text-xs transition",
         active
-          ? "bg-white/80 text-cocoa-900 shadow-sm"
-          : "bg-white/35 text-cocoa-600 hover:bg-white/55 hover:text-cocoa-900",
+          ? "bg-cocoa-900 text-cream-50"
+          : "bg-cream-50/70 text-cocoa-900 hover:bg-cream-50",
       )}
     >
       {children}

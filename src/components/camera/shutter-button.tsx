@@ -47,7 +47,7 @@ export function ShutterButton({
         aria-hidden
         className={cn(
           "absolute inset-0 rounded-full border-[3px] transition-colors duration-200",
-          counting ? "border-blush-lamp" : "border-cocoa-900/25",
+          counting ? "border-blush-lamp" : "border-cocoa-900",
         )}
       />
       {/* Inner disc — collapses under the thumb. */}
