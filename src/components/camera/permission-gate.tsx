@@ -25,8 +25,8 @@ export function PermissionGate({
 }) {
   if (status === "starting") {
     return (
-      <div className="grid size-full place-items-center">
-        <div className="flex flex-col items-center gap-3 text-ink-400">
+      <div className="grid size-full place-items-center bg-cream-50">
+        <div className="flex flex-col items-center gap-3 text-cocoa-600">
           <RefreshCw className="size-5 animate-spin" aria-hidden />
           <p className="text-sm">Opening the camera…</p>
         </div>
@@ -37,11 +37,11 @@ export function PermissionGate({
   if (status === "error" && error) {
     const recoverable = error.code !== "not-found" && error.code !== "unsupported";
     return (
-      <div className="grid size-full place-items-center p-6">
+      <div className="grid size-full place-items-center bg-cream-50 p-6">
         <div className="max-w-xs text-center">
-          <h2 className="font-display text-2xl text-ink-100">{error.message}</h2>
+          <h2 className="font-display text-2xl text-cocoa-900">{error.message}</h2>
           {error.remedy ? (
-            <p className="mt-2 text-sm leading-relaxed text-ink-300">{error.remedy}</p>
+            <p className="mt-2 text-sm leading-relaxed text-cocoa-600">{error.remedy}</p>
           ) : null}
           <div className="mt-6 flex flex-col gap-2">
             {recoverable ? (
@@ -62,13 +62,13 @@ export function PermissionGate({
   }
 
   return (
-    <div className="grid size-full place-items-center p-6">
+    <div className="grid size-full place-items-center bg-cream-50 p-6">
       <div className="max-w-xs text-center">
-        <div className="mx-auto grid size-14 place-items-center rounded-full border border-ink-600 text-ink-200">
+        <div className="mx-auto grid size-14 place-items-center rounded-full border border-cream-300 text-cocoa-800">
           <Camera className="size-6" aria-hidden />
         </div>
-        <h2 className="mt-5 font-display text-2xl text-ink-100">Ready when you are</h2>
-        <p className="mt-2 text-sm leading-relaxed text-ink-300">
+        <h2 className="mt-5 font-display text-2xl text-cocoa-900">Ready when you are</h2>
+        <p className="mt-2 text-sm leading-relaxed text-cocoa-600">
           Pitik needs your camera to shoot. Photos stay on this device unless you
           choose to share them.
         </p>

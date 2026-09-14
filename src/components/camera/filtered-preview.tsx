@@ -66,7 +66,7 @@ export function FilteredPreview({
   return (
     <div ref={containerRef} className={cn("grid size-full place-items-center", className)}>
       <div
-        className="relative isolate overflow-hidden rounded-2xl bg-ink-950"
+        className="relative isolate overflow-hidden rounded-2xl bg-black"
         style={{ width: frame.width || "100%", height: frame.height || "100%" }}
       >
         <video

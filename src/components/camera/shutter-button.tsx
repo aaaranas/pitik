@@ -47,21 +47,21 @@ export function ShutterButton({
         aria-hidden
         className={cn(
           "absolute inset-0 rounded-full border-[3px] transition-colors duration-200",
-          counting ? "border-safelight-500" : "border-paper/90",
+          counting ? "border-blush-lamp" : "border-cocoa-900/25",
         )}
       />
       {/* Inner disc — collapses under the thumb. */}
       <span
         aria-hidden
         className={cn(
-          "size-[3.75rem] rounded-full bg-paper transition-transform duration-100 ease-out",
+          "size-[3.75rem] rounded-full bg-cream-50 shadow-[0_2px_6px_color-mix(in_srgb,var(--color-cocoa-900)_20%,transparent)] transition-transform duration-100 ease-out",
           "group-active:scale-[0.86]",
           busy && "animate-pulse",
-          counting && "scale-[0.7] bg-safelight-500",
+          counting && "scale-[0.7] bg-blush-lamp",
         )}
       />
       {counting ? (
-        <span className="absolute font-display text-3xl text-white tabular-nums">
+        <span className="absolute font-display text-3xl font-semibold text-cream-50 tabular-nums">
           {countdown}
         </span>
       ) : null}

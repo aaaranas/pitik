@@ -23,11 +23,11 @@ export function FocusReticle({ point }: { point: FocusPoint | null }) {
       className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-1/2"
       style={{ left: `${point.x * 100}%`, top: `${point.y * 100}%` }}
     >
-      <div className="size-16 animate-[rise_320ms_var(--ease-shutter)] rounded-lg border border-amber-warm/90 shadow-[0_0_12px_rgba(0,0,0,0.4)]">
-        <div className="absolute inset-x-1/2 top-0 h-2 w-px -translate-x-1/2 bg-amber-warm/90" />
-        <div className="absolute inset-x-1/2 bottom-0 h-2 w-px -translate-x-1/2 bg-amber-warm/90" />
-        <div className="absolute inset-y-1/2 left-0 h-px w-2 -translate-y-1/2 bg-amber-warm/90" />
-        <div className="absolute inset-y-1/2 right-0 h-px w-2 -translate-y-1/2 bg-amber-warm/90" />
+      <div className="size-16 animate-[rise_320ms_var(--ease-shutter)] rounded-lg border border-white/90 shadow-[0_0_12px_rgba(0,0,0,0.4)]">
+        <div className="absolute inset-x-1/2 top-0 h-2 w-px -translate-x-1/2 bg-white/90" />
+        <div className="absolute inset-x-1/2 bottom-0 h-2 w-px -translate-x-1/2 bg-white/90" />
+        <div className="absolute inset-y-1/2 left-0 h-px w-2 -translate-y-1/2 bg-white/90" />
+        <div className="absolute inset-y-1/2 right-0 h-px w-2 -translate-y-1/2 bg-white/90" />
       </div>
     </div>
   );

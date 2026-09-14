@@ -63,7 +63,7 @@ export function CameraRoute() {
   return (
     // `useSearchParams` needs a Suspense boundary to keep the rest of the route
     // statically renderable.
-    <Suspense fallback={<div className="h-full bg-ink-950" />}>
+    <Suspense fallback={<div className="h-full bg-cream-50" />}>
       <CameraRouteInner />
     </Suspense>
   );
