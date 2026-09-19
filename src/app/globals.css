@@ -87,6 +87,13 @@
   --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-face), ui-monospace, "SF Mono", monospace;
 
+  /* Caption-only faces for the booth strip. Each falls back to the generic
+     of its own class, so a strip still reads correctly in a worker or a test
+     where no document exists to resolve the variable. */
+  --font-serif: var(--font-serif-face), ui-serif, Georgia, serif;
+  --font-hand: var(--font-hand-face), cursive;
+  --font-script: var(--font-script-face), cursive;
+
   --radius-frame: 0.25rem;
 
   --ease-shutter: cubic-bezier(0.16, 1, 0.3, 1);
