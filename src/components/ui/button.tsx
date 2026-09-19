@@ -13,27 +13,25 @@ import { cn } from "@/lib/utils";
  * are for dense, secondary rows, not a screen's primary action.
  */
 const buttonVariants = cva(
-  "squish inline-flex items-center justify-center gap-2 whitespace-nowrap font-semibold disabled:pointer-events-none disabled:opacity-40",
+  "squish inline-flex items-center justify-center gap-2 whitespace-nowrap border-2 border-cocoa-900 font-display font-semibold tracking-[-0.01em] disabled:pointer-events-none disabled:opacity-40",
   {
     variants: {
       variant: {
-        // A pastel fill demands dark ink — white on sky is 1.7:1.
-        primary:
-          "bg-sky-base text-cocoa-900 hover:bg-sky-base/85 shadow-[0_2px_8px_color-mix(in_srgb,var(--color-sky-deep)_22%,transparent)]",
-        soft: "bg-cream-50 text-cocoa-900 hover:bg-white hairline",
-        subtle: "bg-cream-200 text-cocoa-800 hover:bg-cream-300",
-        outline: "border border-edge-strong text-cocoa-800 hover:bg-cream-100",
-        ghost: "text-cocoa-600 hover:bg-cream-200 hover:text-cocoa-900",
-        // A lightened hover fails contrast at every translucent step tried;
-        // inverting to a solid deep fill also matches the lit-is-darker rule.
+        // Ink fill, cream text: 14.03:1, and the loudest thing on the screen.
+        primary: "bg-cocoa-900 text-cream-50 shadow-[4px_4px_0_var(--color-sky-base)] hover:bg-cocoa-800",
+        soft: "bg-cream-50 text-cocoa-900 shadow-[4px_4px_0_var(--color-cocoa-900)] hover:bg-white",
+        subtle: "bg-cream-200 text-cocoa-900 hover:bg-cream-300",
+        outline: "bg-transparent text-cocoa-900 hover:bg-cream-100",
+        // Ghost is the one variant with no ink border — it is not a slab.
+        ghost: "border-transparent text-cocoa-600 hover:bg-cream-200 hover:text-cocoa-900",
         danger: "bg-blush-tint text-blush-deep hover:bg-blush-deep hover:text-cream-50",
       },
       size: {
-        sm: "h-9 rounded-pill px-3.5 text-[0.8125rem]",
-        md: "h-11 rounded-pill px-5 text-sm",
-        lg: "h-14 rounded-pill px-7 text-base",
-        icon: "size-11 rounded-pill",
-        "icon-sm": "size-9 rounded-pill",
+        sm: "h-9 rounded-slab px-3.5 text-[0.8125rem]",
+        md: "h-11 rounded-slab px-5 text-sm",
+        lg: "h-14 rounded-slab px-7 text-base",
+        icon: "size-11 rounded-slab",
+        "icon-sm": "size-9 rounded-slab",
       },
     },
     defaultVariants: { variant: "subtle", size: "md" },
