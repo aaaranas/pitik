@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { fontStack } from "@/lib/booth/compositor";
+import { captionScale, fontStack } from "@/lib/booth/compositor";
 import {
   BOOTH_TEMPLATES,
   getTemplate,
   listTemplateCategories,
   templateAspect,
 } from "@/lib/booth/templates";
+import { CAPTION_FONT_IDS } from "@/lib/booth/types";
 import { PAPERS, PAPER_IDS } from "@/lib/booth/types";
 
 /**
@@ -125,5 +126,41 @@ describe("compositor font fallbacks", () => {
 
   it("keeps a real monospace stack for machine text", () => {
     expect(fontStack("mono")).toContain("monospace");
+  });
+});
+
+/**
+ * The strip caption can be set in six faces. Two things are easy to get wrong
+ * and invisible until someone exports a strip: a face with no fallback (canvas
+ * silently draws a generic), and a face whose optical size was never corrected
+ * (Cormorant and Dancing Script set far smaller than Archivo at the same px).
+ */
+describe("strip caption faces", () => {
+  it("offers six faces", () => {
+    expect(CAPTION_FONT_IDS).toHaveLength(6);
+  });
+
+  it("gives every face a fallback ending in a real generic", () => {
+    for (const id of CAPTION_FONT_IDS) {
+      expect(fontStack(id), id).toMatch(/serif|sans-serif|monospace|cursive/);
+    }
+  });
+
+  it("falls back within the right family class", () => {
+    expect(fontStack("serif")).toContain("serif");
+    expect(fontStack("serif")).not.toContain("sans-serif");
+    expect(fontStack("hand")).toContain("cursive");
+    expect(fontStack("script")).toContain("cursive");
+    expect(fontStack("mono")).toContain("monospace");
+  });
+
+  it("corrects optical size for the faces that set small", () => {
+    for (const id of CAPTION_FONT_IDS) {
+      expect(captionScale(id), id).toBeGreaterThan(0);
+    }
+    // Left uncorrected, picking one of these would visibly shrink the caption.
+    expect(captionScale("serif")).toBeGreaterThan(captionScale("display"));
+    expect(captionScale("hand")).toBeGreaterThan(captionScale("display"));
+    expect(captionScale("script")).toBeGreaterThan(captionScale("display"));
   });
 });

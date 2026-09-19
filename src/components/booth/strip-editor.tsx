@@ -10,6 +10,7 @@ import { useToast } from "@/components/providers/toast-provider";
 import { exportStrip } from "@/lib/booth/compositor";
 import {
   type BoothTemplate,
+  type CaptionFontId,
   DEFAULT_STRIP_STYLE,
   PAPERS,
   paperBackgroundCss,
@@ -22,6 +23,20 @@ import { CLIP_SPEED, speedUpClip } from "@/lib/camera/motion-speed";
 import { addStrip } from "@/lib/db/repo";
 import { extensionFor, downloadBlob, shareFile } from "@/lib/share";
 import { cn, slugify } from "@/lib/utils";
+
+/**
+ * Rendering each label in its own face is both the fix for lazy loading — it
+ * puts every face in the DOM, which is what actually triggers the browser to
+ * fetch it — and better UX, because you see what you are choosing.
+ */
+const CAPTION_FACES: { id: CaptionFontId; label: string; className: string }[] = [
+  { id: "display", label: "Bold", className: "font-display font-extrabold" },
+  { id: "sans", label: "Sans", className: "font-sans" },
+  { id: "mono", label: "Mono", className: "font-mono" },
+  { id: "serif", label: "Serif", className: "font-serif" },
+  { id: "hand", label: "Hand", className: "font-hand text-base" },
+  { id: "script", label: "Script", className: "font-script text-base" },
+];
 
 /**
  * Finish and keep the strip.
@@ -249,23 +264,24 @@ export function StripEditor({
                   }
                   className="w-full rounded-slot border border-edge-strong bg-cream-200 px-3 py-2.5 text-sm text-cocoa-900 placeholder:text-cocoa-600 focus:border-sky-deep focus:outline-none"
                 />
-                <div className="mt-2 flex gap-1.5">
-                  {(["display", "sans", "mono"] as const).map((font) => (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {CAPTION_FACES.map((face) => (
                     <button
-                      key={font}
+                      key={face.id}
                       type="button"
-                      aria-pressed={style.captionFont === font}
-                      onClick={() => setStyle((current) => ({ ...current, captionFont: font }))}
+                      aria-pressed={style.captionFont === face.id}
+                      onClick={() =>
+                        setStyle((current) => ({ ...current, captionFont: face.id }))
+                      }
                       className={cn(
-                        "flex-1 rounded-slot py-1.5 text-xs capitalize transition",
-                        font === "display" && "font-display text-base",
-                        font === "mono" && "font-mono",
-                        style.captionFont === font
-                          ? "bg-sky-tint text-sky-deep ring-1 ring-sky-base"
-                          : "bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
+                        "rounded-slab border-2 px-2.5 py-1.5 text-sm transition",
+                        face.className,
+                        style.captionFont === face.id
+                          ? "border-cocoa-900 bg-cocoa-900 text-cream-50"
+                          : "border-cocoa-900 bg-cream-50 text-cocoa-900 hover:bg-cream-200",
                       )}
                     >
-                      {font === "display" ? "Serif" : font === "sans" ? "Sans" : "Mono"}
+                      {face.label}
                     </button>
                   ))}
                 </div>
