@@ -35,13 +35,29 @@ export interface BoothSlot {
   radius?: number;
 }
 
+/**
+ * The faces a strip caption can be set in. Exported as data so the picker and
+ * the unit suite iterate the same list — a face added here and forgotten in
+ * the compositor fails to compile, because FONT_FALLBACKS is a Record over it.
+ */
+export const CAPTION_FONT_IDS = [
+  "display",
+  "sans",
+  "mono",
+  "serif",
+  "hand",
+  "script",
+] as const;
+
+export type CaptionFontId = (typeof CAPTION_FONT_IDS)[number];
+
 export interface BoothCaption {
   x: number;
   y: number;
   align: CanvasTextAlign;
   /** Font size in canvas pixels. */
   size: number;
-  font: "display" | "sans" | "mono";
+  font: CaptionFontId;
   placeholder: string;
   maxLength: number;
 }

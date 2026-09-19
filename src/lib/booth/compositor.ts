@@ -32,7 +32,32 @@ const FONT_FALLBACKS: Record<StripStyle["captionFont"], string> = {
   display: "ui-rounded, ui-sans-serif, system-ui, sans-serif",
   sans: "ui-sans-serif, system-ui, sans-serif",
   mono: 'ui-monospace, "SF Mono", Menlo, monospace',
+  serif: "ui-serif, Georgia, serif",
+  hand: "cursive",
+  script: "cursive",
 };
+
+/**
+ * Optical size correction.
+ *
+ * These faces set at very different x-heights. Cormorant and Dancing Script
+ * are far smaller than Archivo at the same pixel size, so a caption would
+ * visibly shrink just by choosing them. The multiplier keeps a caption the
+ * same visual weight whichever face is picked; BoothCaption.size keeps
+ * meaning what it always meant.
+ */
+const FONT_SCALE: Record<StripStyle["captionFont"], number> = {
+  display: 1,
+  sans: 1,
+  mono: 0.95,
+  serif: 1.18,
+  hand: 1.22,
+  script: 1.2,
+};
+
+export function captionScale(kind: StripStyle["captionFont"]): number {
+  return FONT_SCALE[kind];
+}
 
 /** Exported for the unit suite: the no-document path is the one that bites. */
 export function fontStack(kind: StripStyle["captionFont"]): string {
@@ -221,7 +246,7 @@ export function composeStrip(options: ComposeOptions): AnyCanvas {
   if (caption && style.caption.trim()) {
     const text = style.caption.trim().slice(0, caption.maxLength);
     ctx.save();
-    ctx.font = `${caption.size * scale}px ${fontStack(style.captionFont)}`;
+    ctx.font = `${caption.size * scale * captionScale(style.captionFont)}px ${fontStack(style.captionFont)}`;
     ctx.fillStyle = paper.ink;
     ctx.textAlign = caption.align;
     ctx.textBaseline = "alphabetic";
@@ -254,10 +279,33 @@ export interface ComposedStrip {
   height: number;
 }
 
+/**
+ * Canvas draws with a generic when the chosen face has not loaded yet, and
+ * says nothing about it. The interface never uses the caption-only faces, so
+ * they download lazily — without this, the first strip composed after picking
+ * Serif, Handwritten or Script would render in the wrong font silently.
+ */
+async function ensureCaptionFont(kind: StripStyle["captionFont"], px: number): Promise<void> {
+  if (typeof document === "undefined" || !document.fonts) return;
+  // document.fonts.load wants a single family, not a stack.
+  const family = fontStack(kind).split(",")[0]?.trim();
+  if (!family) return;
+  try {
+    await document.fonts.load(`${Math.max(1, Math.round(px))}px ${family}`);
+  } catch {
+    // A face that refuses to load is not a reason to fail an export —
+    // the fallback stack still draws a readable caption.
+  }
+}
+
 /** Composes and encodes. PNG keeps the rounded corners' transparency intact. */
 export async function exportStrip(
   options: ComposeOptions & { format?: "png" | "jpeg" },
 ): Promise<ComposedStrip> {
+  await ensureCaptionFont(
+    options.style.captionFont,
+    (options.template.caption?.size ?? 16) * (options.scale ?? 1),
+  );
   const canvas = composeStrip(options);
   const format = options.format ?? "png";
   const blob = await canvasToBlob(
