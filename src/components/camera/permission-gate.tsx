@@ -28,6 +28,10 @@ export function PermissionGate({
   status: "idle" | "starting" | "error";
   error: CameraError | null;
   onStart: () => void;
+  /** Renders an "Import instead" fallback when provided. Its ghost-variant
+   * text is cocoa-600 on cocoa-900 (2.62:1) with `tone="dark"` — unreachable
+   * today because the only dark caller passes no `onImport`, but the next
+   * caller that pairs the two needs a dark-aware text colour first. */
   onImport?: () => void;
   tone?: "light" | "dark";
 }) {
@@ -36,7 +40,10 @@ export function PermissionGate({
   if (status === "starting") {
     return (
       <div
-        className={cn("grid size-full place-items-center", dark ? "bg-cocoa-900" : "bg-cream-50")}
+        className={cn(
+          "grid size-full place-items-center",
+          dark ? "on-dark bg-cocoa-900" : "bg-cream-50",
+        )}
       >
         <div
           className={cn("flex flex-col items-center gap-3", dark ? "text-cocoa-400" : "text-cocoa-600")}
@@ -54,7 +61,7 @@ export function PermissionGate({
       <div
         className={cn(
           "grid size-full place-items-center p-6",
-          dark ? "bg-cocoa-900" : "bg-cream-50",
+          dark ? "on-dark bg-cocoa-900" : "bg-cream-50",
         )}
       >
         <div className="max-w-xs text-center">
@@ -91,7 +98,10 @@ export function PermissionGate({
 
   return (
     <div
-      className={cn("grid size-full place-items-center p-6", dark ? "bg-cocoa-900" : "bg-cream-50")}
+      className={cn(
+        "grid size-full place-items-center p-6",
+        dark ? "on-dark bg-cocoa-900" : "bg-cream-50",
+      )}
     >
       <div className="max-w-xs text-center">
         <div

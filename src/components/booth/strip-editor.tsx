@@ -247,7 +247,7 @@ export function StripEditor({
                   onChange={(event) =>
                     setStyle((current) => ({ ...current, caption: event.target.value }))
                   }
-                  className="w-full rounded-slot border border-cream-300 bg-cream-200 px-3 py-2.5 text-sm text-cocoa-900 placeholder:text-cocoa-600 focus:border-sky-deep focus:outline-none"
+                  className="w-full rounded-slot border border-edge-strong bg-cream-200 px-3 py-2.5 text-sm text-cocoa-900 placeholder:text-cocoa-600 focus:border-sky-deep focus:outline-none"
                 />
                 <div className="mt-2 flex gap-1.5">
                   {(["display", "sans", "mono"] as const).map((font) => (
@@ -262,7 +262,7 @@ export function StripEditor({
                         font === "mono" && "font-mono",
                         style.captionFont === font
                           ? "bg-sky-tint text-sky-deep ring-1 ring-sky-base"
-                          : "bg-cream-200 text-cocoa-600 hover:bg-cream-300",
+                          : "bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
                       )}
                     >
                       {font === "display" ? "Serif" : font === "sans" ? "Sans" : "Mono"}
@@ -400,7 +400,7 @@ function Toggle({
         "flex-1 rounded-slot py-2 text-xs transition",
         pressed
           ? "bg-sky-tint text-sky-deep ring-1 ring-sky-base"
-          : "bg-cream-200 text-cocoa-600 hover:bg-cream-300",
+          : "bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
       )}
     >
       {label}

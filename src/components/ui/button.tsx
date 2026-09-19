@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 /**
  * Buttons.
  *
- * Sized around thumbs first — the smallest variant still clears the 44px
- * touch target once padding is counted, because every one of these can end up
- * on a camera screen being tapped one-handed in the dark.
+ * Sized around thumbs first: `md`, `lg`, and `icon` clear the 44px touch
+ * target, for anything that can end up tapped one-handed on a camera screen
+ * in the dark. `sm` (h-9) and `icon-sm` (size-9) are 36px on purpose — they
+ * are for dense, secondary rows, not a screen's primary action.
  */
 const buttonVariants = cva(
   "squish inline-flex items-center justify-center gap-2 whitespace-nowrap font-semibold disabled:pointer-events-none disabled:opacity-40",
@@ -23,7 +24,9 @@ const buttonVariants = cva(
         subtle: "bg-cream-200 text-cocoa-800 hover:bg-cream-300",
         outline: "border border-edge-strong text-cocoa-800 hover:bg-cream-100",
         ghost: "text-cocoa-600 hover:bg-cream-200 hover:text-cocoa-900",
-        danger: "bg-blush-tint text-blush-deep hover:bg-blush-base/60",
+        // A lightened hover fails contrast at every translucent step tried;
+        // inverting to a solid deep fill also matches the lit-is-darker rule.
+        danger: "bg-blush-tint text-blush-deep hover:bg-blush-deep hover:text-cream-50",
       },
       size: {
         sm: "h-9 rounded-pill px-3.5 text-[0.8125rem]",
