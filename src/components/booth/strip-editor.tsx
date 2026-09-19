@@ -10,6 +10,7 @@ import { useToast } from "@/components/providers/toast-provider";
 import { exportStrip } from "@/lib/booth/compositor";
 import {
   type BoothTemplate,
+  CAPTION_FONT_IDS,
   type CaptionFontId,
   DEFAULT_STRIP_STYLE,
   PAPERS,
@@ -28,15 +29,24 @@ import { cn, slugify } from "@/lib/utils";
  * Rendering each label in its own face is both the fix for lazy loading — it
  * puts every face in the DOM, which is what actually triggers the browser to
  * fetch it — and better UX, because you see what you are choosing.
+ *
+ * Keyed as a `Record` over `CaptionFontId`, the same device already
+ * protecting `FONT_FALLBACKS` and `FONT_SCALE` in the compositor: it makes
+ * the union's coverage a compile error, not just a compile error on each
+ * listed id. A face added to `CAPTION_FONT_IDS` and forgotten here fails
+ * `pnpm typecheck` instead of silently never appearing in the picker.
  */
-const CAPTION_FACES: { id: CaptionFontId; label: string; className: string }[] = [
-  { id: "display", label: "Bold", className: "font-display font-extrabold" },
-  { id: "sans", label: "Sans", className: "font-sans" },
-  { id: "mono", label: "Mono", className: "font-mono" },
-  { id: "serif", label: "Serif", className: "font-serif" },
-  { id: "hand", label: "Hand", className: "font-hand text-base" },
-  { id: "script", label: "Script", className: "font-script text-base" },
-];
+const CAPTION_FACE_META: Record<CaptionFontId, { label: string; className: string }> = {
+  display: { label: "Bold", className: "font-display font-extrabold" },
+  sans: { label: "Sans", className: "font-sans" },
+  mono: { label: "Mono", className: "font-mono" },
+  serif: { label: "Serif", className: "font-serif" },
+  hand: { label: "Hand", className: "font-hand text-base" },
+  script: { label: "Script", className: "font-script text-base" },
+};
+
+/** Order comes from the canonical list, not from object key order. */
+const CAPTION_FACES = CAPTION_FONT_IDS.map((id) => ({ id, ...CAPTION_FACE_META[id] }));
 
 /**
  * Finish and keep the strip.
