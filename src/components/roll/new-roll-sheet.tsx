@@ -189,7 +189,7 @@ export function NewRollSheet({
                     "flex-1 rounded-slot px-2 py-2 text-xs transition",
                     coverStyle === style
                       ? "bg-sky-tint text-sky-deep ring-1 ring-sky-base"
-                      : "bg-cream-200 text-cocoa-600 hover:bg-cream-300",
+                      : "bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
                   )}
                 >
                   {COVER_LABELS[style]}
@@ -229,8 +229,8 @@ export function NewRollSheet({
                     className={cn(
                       "rounded-pill px-3 py-1 font-mono text-xs transition",
                       shotLimit === count
-                        ? "bg-sky-base text-cocoa-900"
-                        : "bg-cream-200 text-cocoa-600 hover:bg-cream-300",
+                        ? "bg-sky-tint text-sky-deep ring-1 ring-sky-base"
+                        : "bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
                     )}
                   >
                     {count}

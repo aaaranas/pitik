@@ -445,7 +445,7 @@ export function CameraScreen({
             className={cn(
               "h-7 rounded-full px-3 font-mono text-[0.6875rem] tabular-nums transition",
               camera.lens === "ultra"
-                ? "bg-butter-base text-cocoa-900"
+                ? "bg-cocoa-900 text-cream-50"
                 : "bg-white/40 text-cocoa-800 hover:bg-white/60",
             )}
           >

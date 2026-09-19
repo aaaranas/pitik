@@ -24,6 +24,15 @@ const COVER_SURFACE: Record<CoverStyle, string> = {
   polaroid: "bg-white text-cocoa-900",
 };
 
+/** Muted text on each cover: full-strength, never dimmed with opacity — an
+ * opacity modifier on top of these fills falls well short of 4.5:1. */
+const COVER_MUTED: Record<CoverStyle, string> = {
+  envelope: "text-cocoa-600",
+  contact: "text-sky-deep",
+  sleeve: "text-cocoa-600",
+  polaroid: "text-cocoa-600",
+};
+
 export function RollCard({
   roll,
   count,
@@ -72,12 +81,12 @@ export function RollCard({
           ) : (
             <div className="grid size-full place-items-center bg-cocoa-900/10">
               {undeveloped ? (
-                <div className="text-center">
-                  <Lock className="mx-auto size-5 opacity-50" aria-hidden />
-                  <p className="mt-1.5 text-[0.6875rem] opacity-60">Developing</p>
+                <div className={cn("text-center", COVER_MUTED[roll.coverStyle])}>
+                  <Lock className="mx-auto size-5" aria-hidden />
+                  <p className="mt-1.5 text-[0.6875rem]">Developing</p>
                 </div>
               ) : (
-                <p className="text-[0.6875rem] opacity-40">Empty</p>
+                <p className={cn("text-[0.6875rem]", COVER_MUTED[roll.coverStyle])}>Empty</p>
               )}
             </div>
           )}
@@ -88,7 +97,12 @@ export function RollCard({
             {roll.emoji ? <span className="mr-1.5">{roll.emoji}</span> : null}
             {roll.title}
           </h3>
-          <p className="mt-0.5 font-mono text-[0.6875rem] uppercase tracking-[0.1em] opacity-55">
+          <p
+            className={cn(
+              "mt-0.5 font-mono text-[0.6875rem] uppercase tracking-[0.1em]",
+              COVER_MUTED[roll.coverStyle],
+            )}
+          >
             {undeveloped && roll.revealAt
               ? `Ready ${formatTimeUntil(roll.revealAt, now)}`
               : `${formatCount(count, "photo")} · ${relativeDay(roll.updatedAt, now || undefined)}`}

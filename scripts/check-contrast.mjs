@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
  *
  * The palette is read out of globals.css rather than duplicated here: a copy
  * would drift, and the point is to check what the app actually ships. An
- * earlier hand-picked draft of this palette failed 10 of these 24 pairs, which
+ * earlier hand-picked draft of this palette failed 10 of these 29 pairs, which
  * is why the check exists at all.
  *
  * Run: pnpm check:contrast

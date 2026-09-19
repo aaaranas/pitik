@@ -302,7 +302,7 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
   const shotsTaken = frames.length;
 
   return (
-    <div className="flex h-full flex-col bg-cocoa-900">
+    <div className="on-dark flex h-full flex-col bg-cocoa-900">
       <header
         className="flex shrink-0 items-center gap-1 px-2 pb-2"
         style={{ paddingTop: "calc(var(--safe-top) + 0.5rem)" }}

@@ -53,7 +53,7 @@ export function BoothPicker() {
               "shrink-0 rounded-pill px-3 py-1.5 text-xs transition",
               category === name
                 ? "bg-sky-tint text-sky-deep ring-1 ring-sky-base"
-                : "bg-cream-200 text-cocoa-600 hover:bg-cream-300",
+                : "bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
             )}
           >
             {name}

@@ -78,7 +78,7 @@ export function CaptureViewer({
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-cocoa-900" />
         <Dialog.Content
-          className="fixed inset-0 z-50 flex flex-col outline-none"
+          className="on-dark fixed inset-0 z-50 flex flex-col outline-none"
           aria-describedby={undefined}
         >
           <Dialog.Title className="sr-only">

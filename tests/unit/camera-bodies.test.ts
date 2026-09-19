@@ -43,6 +43,15 @@ describe("camera bodies", () => {
   it.each(ids)("gives %s a status lamp that reads as lit", (id) => {
     const body = getCameraBody(id);
     expect(contrast(body.accent, body.body[1]), `${id} lamp on body`).toBeGreaterThanOrEqual(3);
+    // Contrast alone is a magnitude, not a direction: a lamp that was 3:1
+    // *lighter* than the body would still pass the assertion above. The
+    // project's rule is that a lit indicator on a pale body reads darker,
+    // never brighter, so confirm the accent's luminance is actually the
+    // lower of the two.
+    expect(
+      luminance(body.accent),
+      `${id} lamp must be darker than the body, not just 3:1 apart from it`,
+    ).toBeLessThan(luminance(body.body[1]));
   });
 
   it("keeps the instant-film body the only one that prints a border", () => {
