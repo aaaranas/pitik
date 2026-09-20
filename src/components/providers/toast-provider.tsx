@@ -28,9 +28,9 @@ interface ToastValue {
 const ToastContext = createContext<ToastValue | null>(null);
 
 const TONE_STYLES: Record<ToastTone, string> = {
-  neutral: "border-cream-300 bg-cream-50 text-cocoa-900",
-  success: "tint-mint border",
-  error: "tint-blush border",
+  neutral: "bg-cream-50 text-cocoa-900",
+  success: "tint-mint",
+  error: "tint-blush",
 };
 
 let nextId = 0;
@@ -66,7 +66,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           <div
             key={item.id}
             className={cn(
-              "animate-rise pillow pointer-events-auto w-full max-w-sm rounded-xl border px-4 py-3 backdrop-blur",
+              "animate-rise slab pointer-events-auto w-full max-w-sm border-2 border-cocoa-900 px-4 py-3",
               TONE_STYLES[item.tone],
             )}
           >
