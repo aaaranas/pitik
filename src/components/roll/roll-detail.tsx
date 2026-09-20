@@ -8,7 +8,7 @@ import { CaptureViewer } from "./capture-viewer";
 import { ContactSheet } from "./contact-sheet";
 import { StripGrid } from "./strip-grid";
 import { ShareSheet } from "./share-sheet";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Modal, SheetRoot } from "@/components/ui/sheet";
 import { useToast } from "@/components/providers/toast-provider";
 import { useMinute } from "@/hooks/use-now";
@@ -46,7 +46,7 @@ export function RollDetail({ rollId }: { rollId: string }) {
     return (
       <div className="grid h-full place-items-center bg-cream-50 px-6 text-center">
         <div>
-          <h1 className="font-display text-2xl text-cocoa-900">This roll is gone</h1>
+          <h1 className="font-display text-2xl tracking-[-0.04em] text-cocoa-900">This roll is gone</h1>
           <p className="mt-2 text-sm text-cocoa-600">
             It may have been deleted, or it lives on another device.
           </p>
@@ -82,7 +82,7 @@ export function RollDetail({ rollId }: { rollId: string }) {
       >
         <Link
           href="/rolls"
-          className="grid size-10 place-items-center rounded-pill text-cocoa-800 transition hover:bg-cream-200"
+          className={buttonVariants({ variant: "ghost", size: "icon" })}
           aria-label="Back to rolls"
         >
           <ChevronLeft className="size-5" />
@@ -91,7 +91,7 @@ export function RollDetail({ rollId }: { rollId: string }) {
         <button
           type="button"
           onClick={() => setShareOpen(true)}
-          className="grid size-10 place-items-center rounded-pill text-cocoa-800 transition hover:bg-cream-200"
+          className={buttonVariants({ variant: "ghost", size: "icon" })}
           aria-label="Share this roll"
         >
           <Share2 className="size-5" />
@@ -99,7 +99,7 @@ export function RollDetail({ rollId }: { rollId: string }) {
         <button
           type="button"
           onClick={() => setConfirmDelete(true)}
-          className="grid size-10 place-items-center rounded-pill text-cocoa-800 transition hover:bg-cream-200"
+          className={buttonVariants({ variant: "ghost", size: "icon" })}
           aria-label="Delete this roll"
         >
           <Trash2 className="size-5" />
@@ -118,7 +118,7 @@ export function RollDetail({ rollId }: { rollId: string }) {
               if (event.key === "Escape") setRenaming(false);
             }}
             aria-label="Roll name"
-            className="w-full border-b border-sky-deep bg-transparent pb-1 text-3xl font-semibold tracking-tight text-cocoa-900 focus:outline-none"
+            className="w-full border-b-2 border-sky-deep bg-transparent pb-1 text-3xl font-semibold tracking-tight text-cocoa-900 focus:outline-none"
           />
         ) : (
           <button
@@ -135,7 +135,7 @@ export function RollDetail({ rollId }: { rollId: string }) {
           </button>
         )}
 
-        <p className="mt-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-cocoa-600">
+        <p className="counter mt-1.5">
           {formatCount(captures.length, "photo")}
           {strips.length ? ` · ${formatCount(strips.length, "strip")}` : ""} ·{" "}
           {relativeDay(roll.createdAt)}
@@ -147,15 +147,12 @@ export function RollDetail({ rollId }: { rollId: string }) {
         <div className="mt-4 flex gap-2">
           <Link
             href={`/camera?roll=${roll.id}`}
-            className="squish hairline flex h-11 flex-1 items-center justify-center gap-2 rounded-pill bg-cream-50 text-sm font-medium text-cocoa-900 transition hover:bg-white"
+            className={cn(buttonVariants({ variant: "soft", size: "lg" }), "flex-1")}
           >
             <Camera className="size-4" aria-hidden />
             Keep shooting
           </Link>
-          <Link
-            href="/booth"
-            className="squish flex h-11 items-center justify-center gap-2 rounded-pill bg-cream-200 px-4 text-sm text-cocoa-900 transition hover:bg-cream-300"
-          >
+          <Link href="/booth" className={buttonVariants({ variant: "subtle", size: "lg" })}>
             <LayoutGrid className="size-4" aria-hidden />
             Booth
           </Link>
@@ -186,7 +183,7 @@ export function RollDetail({ rollId }: { rollId: string }) {
                   aria-selected={tab === value}
                   onClick={() => setTab(value)}
                   className={cn(
-                    "-mb-px border-b-2 px-3 py-2 text-sm capitalize transition-colors",
+                    "-mb-px border-b-[3px] px-3 py-2 font-mono text-[0.6875rem] uppercase tracking-[0.14em] transition-colors",
                     tab === value
                       ? "border-sky-deep text-cocoa-900"
                       : "border-transparent text-cocoa-600 hover:text-cocoa-800",
@@ -266,9 +263,9 @@ function DevelopingState({
 }) {
   return (
     <section className="mt-8 px-4">
-      <div className="rounded-card border-2 border-dashed border-cream-300 px-6 py-10 text-center">
+      <div className="rounded-frame border-2 border-dashed border-cocoa-900 px-6 py-10 text-center">
         <Lock className="mx-auto size-6 text-cocoa-600" aria-hidden />
-        <h2 className="mt-4 font-display text-2xl text-cocoa-900">Still developing</h2>
+        <h2 className="mt-4 font-display text-2xl tracking-[-0.04em] text-cocoa-900">Still developing</h2>
         <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-cocoa-600">
           {shotsTaken > 0
             ? `${formatCount(shotsTaken, "shot")} on the roll${shotLimit ? ` of ${shotLimit}` : ""}. `
@@ -287,13 +284,15 @@ function DevelopingState({
 function EmptyRoll({ rollId }: { rollId: string }) {
   return (
     <div className="mt-10 px-6 text-center">
-      <p className="font-display text-2xl text-cocoa-900">This roll is still blank.</p>
+      <p className="font-display text-2xl tracking-[-0.04em] text-cocoa-900">
+        This roll is still blank.
+      </p>
       <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-cocoa-600">
         Open the camera and take the first one. Nobody ever regrets the first photo.
       </p>
       <Link
         href={`/camera?roll=${rollId}`}
-        className="squish hairline mt-5 inline-flex h-11 items-center gap-2 rounded-pill bg-cream-50 px-5 text-sm font-medium text-cocoa-900"
+        className={cn(buttonVariants({ variant: "soft" }), "mt-5")}
       >
         <Camera className="size-4" aria-hidden />
         Start shooting

@@ -9,7 +9,7 @@ import { ContactSheet } from "./contact-sheet";
 import { NewRollSheet } from "./new-roll-sheet";
 import { RollCard } from "./roll-card";
 import { StripGrid } from "./strip-grid";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useObjectUrl } from "@/hooks/use-object-url";
 import {
   useCaptures,
@@ -69,7 +69,9 @@ export function LibraryScreen() {
       style={{ paddingTop: "calc(var(--safe-top) + 1.5rem)" }}
     >
       <header className="flex items-end justify-between gap-4 px-4">
-        <h1 className="font-display text-4xl leading-none text-cocoa-900">Your photos</h1>
+        <h1 className="font-display text-4xl leading-none tracking-[-0.04em] text-cocoa-900">
+          Your photos
+        </h1>
         {tab === "rolls" ? (
           <Button variant="subtle" onClick={() => setNewRollOpen(true)}>
             New roll
@@ -86,14 +88,14 @@ export function LibraryScreen() {
             aria-selected={tab === id}
             onClick={() => selectTab(id)}
             className={cn(
-              "-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm transition-colors",
+              "-mb-px flex items-center gap-1.5 border-b-[3px] px-3 py-2 transition-colors",
               tab === id
                 ? "border-sky-deep text-cocoa-900"
                 : "border-transparent text-cocoa-600 hover:text-cocoa-800",
             )}
           >
             <Icon className="size-4" aria-hidden />
-            {label}
+            <span className="font-mono text-[0.6875rem] uppercase tracking-[0.14em]">{label}</span>
           </button>
         ))}
       </div>
@@ -133,7 +135,7 @@ function CameraTab() {
     <>
       {favorites.length ? (
         <section className="mt-6 px-4">
-          <h2 className="mb-3 flex items-center gap-1.5 font-sans text-xs font-semibold text-cocoa-600">
+          <h2 className="counter mb-3 flex items-center gap-1.5">
             <Heart className="size-3 fill-butter-deep text-butter-deep" aria-hidden />
             Favourites
           </h2>
@@ -145,9 +147,7 @@ function CameraTab() {
         </section>
       ) : null}
 
-      <p className="mt-6 px-4 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-cocoa-600">
-        {formatCount(captures.length, "photo")}
-      </p>
+      <p className="counter mt-6 px-4">{formatCount(captures.length, "photo")}</p>
       <ContactSheet
         captures={captures}
         onOpen={setViewerIndex}
@@ -168,7 +168,7 @@ function CameraTab() {
 function FavoriteFrame({ capture }: { capture: Capture }) {
   const url = useObjectUrl(capture.thumb);
   return (
-    <span className="size-20 shrink-0 overflow-hidden rounded-slot bg-cream-50">
+    <span className="size-20 shrink-0 overflow-hidden rounded-frame border-2 border-cocoa-900 bg-cream-50">
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
@@ -199,9 +199,7 @@ function BoothTab() {
 
   return (
     <>
-      <p className="mt-6 px-4 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-cocoa-600">
-        {formatCount(strips.length, "strip")}
-      </p>
+      <p className="counter mt-6 px-4">{formatCount(strips.length, "strip")}</p>
       <StripGrid strips={strips} title="Photobooth" className="mt-3 px-4" />
     </>
   );
@@ -218,7 +216,7 @@ function RollsTab({ onNewRoll }: { onNewRoll: () => void }) {
     return (
       <div className="mt-6 grid grid-cols-2 gap-3 px-4" aria-hidden>
         {[0, 1, 2, 3].map((index) => (
-          <div key={index} className="pillow h-52 animate-pulse" />
+          <div key={index} className="slab h-52 animate-pulse" />
         ))}
       </div>
     );
@@ -227,7 +225,7 @@ function RollsTab({ onNewRoll }: { onNewRoll: () => void }) {
   if (!rolls.length) {
     return (
       <div className="mt-12 px-6 text-center">
-        <p className="font-display text-2xl text-cocoa-900">No rolls yet.</p>
+        <p className="font-display text-2xl tracking-[-0.04em] text-cocoa-900">No rolls yet.</p>
         <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-cocoa-600">
           A roll is for one evening you want kept together. Start one and every photo
           you take goes into it instead of the camera shelf.
@@ -266,12 +264,9 @@ function Empty({
 }) {
   return (
     <div className="mt-12 px-6 text-center">
-      <p className="font-display text-2xl text-cocoa-900">{title}</p>
+      <p className="font-display text-2xl tracking-[-0.04em] text-cocoa-900">{title}</p>
       <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-cocoa-600">{body}</p>
-      <Link
-        href={action.href}
-        className="squish hairline mt-6 inline-flex h-11 items-center rounded-pill bg-cream-50 px-5 text-sm font-medium text-cocoa-900"
-      >
+      <Link href={action.href} className={cn(buttonVariants({ variant: "soft" }), "mt-6")}>
         {action.label}
       </Link>
     </div>

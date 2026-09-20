@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { PitikMark } from "@/components/shell/wordmark";
 import { useSession } from "@/components/providers/session-provider";
 import { useAuth } from "@/hooks/use-auth";
@@ -11,6 +11,7 @@ import { getRollByShareCode, updateSettings } from "@/lib/db/repo";
 import { isShareCode } from "@/lib/ids";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import { pullRemote } from "@/lib/sync/pull";
+import { cn } from "@/lib/utils";
 
 type State =
   | { kind: "checking" }
@@ -106,7 +107,9 @@ export function JoinScreen({ code }: { code: string }) {
 
         {state.kind === "invalid" ? (
           <>
-            <h1 className="mt-4 font-display text-2xl text-cocoa-900">That code isn&rsquo;t valid</h1>
+            <h1 className="mt-4 font-display text-2xl tracking-[-0.04em] text-cocoa-900">
+              That code isn&rsquo;t valid
+            </h1>
             <p className="mt-2 text-sm text-cocoa-600">
               Codes are six letters and numbers. Check it and try again.
             </p>
@@ -119,7 +122,7 @@ export function JoinScreen({ code }: { code: string }) {
             <p className="mt-2 text-sm text-cocoa-600">This roll is already on your device.</p>
             <Link
               href={`/rolls/${state.rollId}`}
-              className="squish hairline mt-6 inline-flex h-12 items-center justify-center rounded-pill bg-cream-50 px-6 text-sm font-medium text-cocoa-900"
+              className={cn(buttonVariants({ variant: "soft", size: "lg" }), "mt-6")}
             >
               Open it
             </Link>
@@ -128,7 +131,7 @@ export function JoinScreen({ code }: { code: string }) {
 
         {state.kind === "needs-account" ? (
           <>
-            <h1 className="mt-4 font-display text-2xl text-cocoa-900">
+            <h1 className="mt-4 font-display text-2xl tracking-[-0.04em] text-cocoa-900">
               You&rsquo;ll need an account for this
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-cocoa-600">
@@ -138,7 +141,7 @@ export function JoinScreen({ code }: { code: string }) {
             </p>
             <Link
               href="/settings"
-              className="squish hairline mt-6 inline-flex h-12 items-center justify-center rounded-pill bg-cream-50 px-6 text-sm font-medium text-cocoa-900"
+              className={cn(buttonVariants({ variant: "soft", size: "lg" }), "mt-6")}
             >
               Set up an account
             </Link>
@@ -147,7 +150,9 @@ export function JoinScreen({ code }: { code: string }) {
 
         {state.kind === "error" ? (
           <>
-            <h1 className="mt-4 font-display text-2xl text-cocoa-900">Couldn&rsquo;t join that roll</h1>
+            <h1 className="mt-4 font-display text-2xl tracking-[-0.04em] text-cocoa-900">
+              Couldn&rsquo;t join that roll
+            </h1>
             <p className="mt-2 text-sm text-cocoa-600">{state.message}</p>
             <Button variant="ghost" className="mt-5" onClick={() => router.push("/")}>
               Go home

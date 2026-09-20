@@ -53,10 +53,10 @@ function StripTile({ strip, title }: { strip: Strip; title: string }) {
           src={url}
           alt={strip.caption ?? "Photo strip"}
           loading="lazy"
-          className="pillow rounded-frame w-full"
+          className="slab rounded-frame w-full"
         />
       ) : (
-        <div className="pillow rounded-frame aspect-[1/3] w-full animate-pulse" />
+        <div className="slab rounded-frame aspect-[1/3] w-full animate-pulse" />
       )}
 
       <figcaption className="mt-2 flex items-center justify-between gap-2">
@@ -100,7 +100,7 @@ function TileAction({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="grid size-7 place-items-center rounded-pill text-cocoa-600 transition hover:bg-cream-200 hover:text-cocoa-900"
+      className="grid size-7 place-items-center rounded-slab text-cocoa-600 transition hover:bg-cream-200 hover:text-cocoa-900"
     >
       {children}
     </button>

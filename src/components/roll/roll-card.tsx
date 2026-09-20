@@ -14,7 +14,12 @@ import { cn } from "@/lib/utils";
  * Each cover style is its own pastel surface — cream, a cool tinted proof, a
  * deeper cream, a bright white instant frame — so at a glance down the home
  * screen the shape and tone alone tell you which roll is which before you've
- * read a single title.
+ * read a single title. Each also carries its own `.slab-<hue>` shadow, so a
+ * library of rolls reads as a pile of different objects rather than a
+ * uniform grid: sky is reserved for "contact" (its bare `.slab` default,
+ * kept for the sheet that already reads as cool and proof-like), blush is
+ * left alone entirely because it already means "danger" on the delete
+ * button and the disposable-roll countdown.
  */
 
 const COVER_SURFACE: Record<CoverStyle, string> = {
@@ -22,6 +27,15 @@ const COVER_SURFACE: Record<CoverStyle, string> = {
   contact: "bg-sky-tint text-sky-deep",
   sleeve: "bg-cream-200 text-cocoa-900",
   polaroid: "bg-white text-cocoa-900",
+};
+
+/** The shadow modifier per cover, on top of the shared `.slab` border. Empty
+ * string keeps `.slab`'s own default (sky) shadow. */
+const COVER_SLAB: Record<CoverStyle, string> = {
+  envelope: "slab-butter",
+  contact: "",
+  sleeve: "slab-mint",
+  polaroid: "slab-lilac",
 };
 
 /** Muted text on each cover: full-strength, never dimmed with opacity — an
@@ -58,8 +72,9 @@ export function RollCard({
     >
       <article
         className={cn(
-          "soft-grain pillow relative overflow-hidden transition-transform duration-200",
+          "soft-grain slab relative overflow-hidden transition-transform duration-200",
           "group-hover:-translate-y-0.5 group-focus-visible:ring-2 group-focus-visible:ring-sky-deep",
+          COVER_SLAB[roll.coverStyle],
           COVER_SURFACE[roll.coverStyle],
         )}
       >
@@ -97,12 +112,7 @@ export function RollCard({
             {roll.emoji ? <span className="mr-1.5">{roll.emoji}</span> : null}
             {roll.title}
           </h3>
-          <p
-            className={cn(
-              "mt-0.5 font-mono text-[0.6875rem] uppercase tracking-[0.1em]",
-              COVER_MUTED[roll.coverStyle],
-            )}
-          >
+          <p className={cn("counter mt-0.5", COVER_MUTED[roll.coverStyle])}>
             {undeveloped && roll.revealAt
               ? `Ready ${formatTimeUntil(roll.revealAt, now)}`
               : `${formatCount(count, "photo")} · ${relativeDay(roll.updatedAt, now || undefined)}`}

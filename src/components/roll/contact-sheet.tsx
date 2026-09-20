@@ -49,7 +49,7 @@ function Frame({
 
       <span
         aria-hidden
-        className="absolute left-1 top-1 font-mono text-[0.5625rem] text-butter-deep mix-blend-difference"
+        className="absolute left-1 top-1 font-mono text-[0.5625rem] tracking-[0.04em] tabular-nums text-butter-deep mix-blend-difference"
       >
         {String(index + 1).padStart(2, "0")}
       </span>
