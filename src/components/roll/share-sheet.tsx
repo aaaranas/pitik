@@ -62,7 +62,7 @@ export function ShareSheet({
         description="Anyone with the code can add their photos to it."
       >
         <div className="flex flex-col items-center">
-          <div className="soft-grain grid size-48 place-items-center rounded-slot bg-white p-3">
+          <div className="soft-grain slab grid size-48 place-items-center bg-white p-3">
             {qr ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={qr} alt={`QR code for joining ${roll.title}`} className="size-full" />

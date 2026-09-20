@@ -115,7 +115,7 @@ export function CaptureViewer({
             >
               <X className="size-5" />
             </Dialog.Close>
-            <p className="text-[0.6875rem] text-cocoa-400">
+            <p className="font-mono text-[0.625rem] uppercase tracking-[0.14em] text-cocoa-400">
               {capture.authorId ? "Shared · " : ""}
               {getProfile(capture.profileId).name} · {getFilter(capture.filterId).name}
             </p>

@@ -134,7 +134,7 @@ export function NewRollSheet({
               placeholder="Dinner with Sam"
               aria-invalid={Boolean(error)}
               aria-describedby={error ? "roll-title-error" : undefined}
-              className="w-full border-b border-edge-strong bg-transparent pb-2 text-2xl font-semibold tracking-tight text-cocoa-900 placeholder:text-cocoa-600 focus:border-sky-deep focus:outline-none"
+              className="w-full border-b-2 border-edge-strong bg-transparent pb-2 text-2xl font-semibold tracking-tight text-cocoa-900 placeholder:text-cocoa-600 focus:border-sky-deep focus:outline-none"
             />
             {error ? (
               <p id="roll-title-error" className="mt-2 text-sm text-blush-deep">
@@ -148,7 +148,7 @@ export function NewRollSheet({
                   key={suggestion}
                   type="button"
                   onClick={() => setTitle(suggestion)}
-                  className="rounded-pill border border-edge-strong px-2.5 py-1 text-xs text-cocoa-600 transition hover:text-cocoa-900"
+                  className="rounded-slab border-2 border-edge-strong px-2.5 py-1 text-xs text-cocoa-600 transition hover:border-cocoa-900 hover:text-cocoa-900"
                 >
                   {suggestion}
                 </button>
@@ -165,10 +165,10 @@ export function NewRollSheet({
                   aria-pressed={emoji === choice}
                   onClick={() => setEmoji(emoji === choice ? null : choice)}
                   className={cn(
-                    "grid size-10 place-items-center rounded-slot text-lg transition",
+                    "grid size-10 place-items-center rounded-slab border-2 text-lg transition",
                     emoji === choice
-                      ? "bg-sky-tint ring-1 ring-sky-base"
-                      : "bg-cream-200 hover:bg-cream-300",
+                      ? "border-cocoa-900 bg-sky-tint"
+                      : "border-transparent bg-cream-200 hover:bg-cream-300",
                   )}
                 >
                   {choice}
@@ -186,10 +186,10 @@ export function NewRollSheet({
                   aria-pressed={coverStyle === style}
                   onClick={() => setCoverStyle(style)}
                   className={cn(
-                    "flex-1 rounded-slot px-2 py-2 text-xs transition",
+                    "flex-1 rounded-slab border-2 px-2 py-2 text-xs transition",
                     coverStyle === style
-                      ? "bg-sky-tint text-sky-deep ring-1 ring-sky-base"
-                      : "bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
+                      ? "border-cocoa-900 bg-sky-tint text-sky-deep"
+                      : "border-transparent bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
                   )}
                 >
                   {COVER_LABELS[style]}
@@ -198,7 +198,7 @@ export function NewRollSheet({
             </div>
           </Field>
 
-          <div className="rounded-card border border-cream-300 p-3">
+          <div className="rounded-frame border-2 border-cocoa-900 p-3">
             <label className="flex cursor-pointer items-start gap-3">
               <input
                 type="checkbox"
@@ -219,7 +219,7 @@ export function NewRollSheet({
 
             {disposable ? (
               <div className="mt-3 flex items-center gap-2 border-t border-cream-300 pt-3">
-                <span className="text-xs text-cocoa-600">Shots</span>
+                <span className="counter">Shots</span>
                 {[12, 24, 36].map((count) => (
                   <button
                     key={count}
@@ -227,10 +227,10 @@ export function NewRollSheet({
                     aria-pressed={shotLimit === count}
                     onClick={() => setShotLimit(count)}
                     className={cn(
-                      "rounded-pill px-3 py-1 font-mono text-xs transition",
+                      "rounded-slab border-2 px-3 py-1 font-mono text-xs transition",
                       shotLimit === count
-                        ? "bg-sky-tint text-sky-deep ring-1 ring-sky-base"
-                        : "bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
+                        ? "border-cocoa-900 bg-sky-tint text-sky-deep"
+                        : "border-transparent bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
                     )}
                   >
                     {count}
@@ -248,7 +248,7 @@ export function NewRollSheet({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <fieldset>
-      <legend className="mb-2 font-sans text-xs font-semibold text-cocoa-600">{label}</legend>
+      <legend className="counter mb-2">{label}</legend>
       {children}
     </fieldset>
   );
