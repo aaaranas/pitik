@@ -57,6 +57,13 @@ function pairs() {
   out.push(["blush-lamp", "cream-200", UI]); // record indicator
   out.push(["edge-strong", "cream-50", UI]); // control boundary
 
+  // The toast detail line (text-cocoa-600) sits on a tinted slab for the
+  // success/error tones — toast-provider.tsx's TONE_STYLES puts bg-mint-tint
+  // and bg-blush-tint under it, so those two grounds need their own pair
+  // rather than relying on the cream-50/cream-200 checks above.
+  out.push(["cocoa-600", "mint-tint", TEXT]);
+  out.push(["cocoa-600", "blush-tint", TEXT]);
+
   // Dark-ground exception. A handful of surfaces (booth-runner.tsx,
   // clip-dialog.tsx, capture-viewer.tsx) keep a cocoa-900 backdrop on
   // purpose — a photo/video is judged against neutral, and a countdown
