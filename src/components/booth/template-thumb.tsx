@@ -25,7 +25,7 @@ export function TemplateThumb({
 
   return (
     <div
-      className={cn("relative overflow-hidden pillow rounded-frame", className)}
+      className={cn("relative overflow-hidden rounded-frame", className)}
       style={{
         // Two constraints, both expressed in CSS so no measurement is needed:
         // the drawing fills its column, and `maxWidth` is set to exactly the

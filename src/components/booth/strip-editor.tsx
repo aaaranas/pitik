@@ -234,7 +234,9 @@ export function StripEditor({
       />
       <div className="min-h-0 flex-1 overflow-y-auto px-4" style={{ paddingTop: "calc(var(--safe-top) + 1rem)" }}>
         <div className="mx-auto w-full max-w-md">
-          <h1 className="text-center font-display text-3xl text-cocoa-900">Your strip</h1>
+          <h1 className="text-center font-display text-3xl tracking-[-0.03em] text-cocoa-900">
+            Your strip
+          </h1>
           <p className="mt-1 text-center text-sm text-cocoa-600">
             {frames.length === template.shots
               ? "All frames in. Finish it however you like."
@@ -248,20 +250,17 @@ export function StripEditor({
               <img
                 src={previewUrl}
                 alt="Your finished photo strip"
-                className="animate-pop pillow rounded-frame max-h-[52svh] w-auto"
+                className="animate-pop slab rounded-frame max-h-[52svh] w-auto"
               />
             ) : (
-              <div className="h-[52svh] w-40 animate-pulse rounded-frame bg-cream-200" />
+              <div className="slab h-[52svh] w-40 animate-pulse rounded-frame" />
             )}
           </div>
 
           <div className="mt-6 space-y-5 pb-6">
             {caption ? (
               <div>
-                <label
-                  htmlFor="strip-caption"
-                  className="mb-2 block text-[0.6875rem] uppercase tracking-[0.16em] text-cocoa-600"
-                >
+                <label htmlFor="strip-caption" className="counter mb-2 block">
                   Caption
                 </label>
                 <input
@@ -299,9 +298,7 @@ export function StripEditor({
             ) : null}
 
             <div>
-              <span className="mb-2 block text-[0.6875rem] uppercase tracking-[0.16em] text-cocoa-600">
-                Paper
-              </span>
+              <span className="counter mb-2 block">Paper</span>
               {/* Wraps rather than scrolls: sixteen papers in a row would hide
                   most of the choice behind a swipe people don't know to make. */}
               <div className="flex flex-wrap gap-2">
@@ -398,10 +395,10 @@ function PaperSwatch({
       aria-label={`${paper.name} paper`}
       title={paper.name}
       className={cn(
-        "size-9 rounded-pill transition",
+        "size-9 rounded-pill border-2 transition",
         selected
-          ? "ring-2 ring-sky-deep ring-offset-2 ring-offset-cream-50"
-          : "ring-1 ring-white/15 hover:ring-white/40",
+          ? "border-cocoa-900 ring-2 ring-sky-deep ring-offset-2 ring-offset-cream-50"
+          : "border-edge-strong hover:border-cocoa-900",
       )}
       style={{ background: paperBackgroundCss(paper) }}
     />
@@ -423,10 +420,10 @@ function Toggle({
       aria-pressed={pressed}
       onClick={() => onPressedChange(!pressed)}
       className={cn(
-        "flex-1 rounded-slot py-2 text-xs transition",
+        "flex-1 rounded-slab border-2 py-2 text-xs transition",
         pressed
-          ? "bg-sky-tint text-sky-deep ring-1 ring-sky-base"
-          : "bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
+          ? "border-cocoa-900 bg-sky-tint text-sky-deep"
+          : "border-transparent bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
       )}
     >
       {label}
