@@ -29,8 +29,8 @@ const ToastContext = createContext<ToastValue | null>(null);
 
 const TONE_STYLES: Record<ToastTone, string> = {
   neutral: "bg-cream-50 text-cocoa-900",
-  success: "tint-mint",
-  error: "tint-blush",
+  success: "bg-mint-tint text-mint-deep",
+  error: "bg-blush-tint text-blush-deep",
 };
 
 let nextId = 0;
