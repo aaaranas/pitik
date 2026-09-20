@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
  * Styled as an ink-bordered track with an oversized invisible hit area — the
  * thumb and the padding around it are what your finger actually needs to
  * find. The thumb keeps a real `cocoa-900` boundary against both the empty
- * track (7.59:1) and the filled range (5.90:1); a previous cream-on-sky knob
+ * track (14.03:1) and the filled range (8.48:1); a previous cream-on-sky knob
  * measured 1.29:1 and was effectively invisible.
  */
 export const Slider = React.forwardRef<
