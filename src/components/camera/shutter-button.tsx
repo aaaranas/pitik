@@ -61,7 +61,8 @@ export function ShutterButton({
         )}
       />
       {counting ? (
-        <span className="absolute font-display text-3xl font-semibold text-cream-50 tabular-nums">
+        // A timer value, not a word — machine text takes the mono face.
+        <span className="absolute font-mono text-3xl font-medium text-cream-50 tabular-nums">
           {countdown}
         </span>
       ) : null}

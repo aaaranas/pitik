@@ -115,10 +115,14 @@ function FilterChip({ filter, selected, referenceFrame, onSelect }: FilterChipPr
           long — "Handycam DCR-TRV350" — so this wraps rather than truncating a
           camera down to something you cannot identify. */}
       <span className="flex w-full flex-col items-center gap-0.5">
+        {/* Overlays draw on the photo, not the body, so colour stays exempt
+            from the palette — white marks are what survive a dark subject.
+            Only the type family follows the maker's-mark convention used
+            everywhere else a camera badge is printed. */}
         {filter.maker ? (
           <span
             className={cn(
-              "max-w-full truncate font-sans text-[0.5rem] leading-none drop-shadow transition-colors",
+              "max-w-full truncate font-mono text-[0.5rem] uppercase leading-none tracking-[0.14em] drop-shadow transition-colors",
               selected ? "text-white/90" : "text-white/50 group-hover:text-white/70",
             )}
           >

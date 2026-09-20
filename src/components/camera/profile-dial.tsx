@@ -74,14 +74,19 @@ export function ProfileDial({
               data-selected={selected}
               onClick={() => onSelect(item.id)}
               className={cn(
-                "flex shrink-0 snap-center flex-col items-center gap-0.5 whitespace-nowrap rounded-full px-3 py-1 transition-colors",
+                "flex shrink-0 snap-center flex-col items-center gap-0.5 whitespace-nowrap rounded-pill px-3 py-1 transition-colors",
                 selected
                   ? "ring-2 ring-inset ring-sky-deep text-cocoa-900"
                   : "text-cocoa-600 hover:text-cocoa-900",
               )}
             >
+              {/* Badged like a maker's mark on a real body: mono tracked
+                  caps. The model name underneath stays legible sans — this
+                  is a list to scan, not a plate to read once. */}
               {item.maker ? (
-                <span className="font-sans text-[0.5rem] leading-none">{item.maker}</span>
+                <span className="font-mono text-[0.5rem] uppercase leading-none tracking-[0.14em]">
+                  {item.maker}
+                </span>
               ) : null}
               <span className="font-sans text-[0.6875rem] leading-none">{item.name}</span>
             </button>

@@ -123,11 +123,13 @@ export function DigicamShell({
         <span className="flex items-center gap-1.5">
           <span
             aria-hidden
-            className="size-1.5 rounded-full"
+            className="size-1.5 rounded-pill"
             style={{ background: shell.accent, boxShadow: `0 0 6px ${shell.accent}` }}
           />
+          {/* Printed like a badge moulded into the body: machine text, not a
+              sentence, so it takes the mono tracked-caps treatment. */}
           <span
-            className="max-w-[13.5rem] truncate font-sans text-[0.5rem]"
+            className="max-w-[13.5rem] truncate font-mono text-[0.5rem] uppercase tracking-[0.18em]"
             style={{ color: shell.ink }}
           >
             {model}
@@ -149,7 +151,7 @@ export function DigicamShell({
       </div>
 
       <div className="relative z-[2] shrink-0 px-5 pt-2">
-        <div className="flex items-center justify-between rounded-sm bg-cocoa-900 px-2.5 py-1 font-mono text-[0.5625rem] uppercase tabular-nums text-mint-base">
+        <div className="flex items-center justify-between rounded-frame bg-cocoa-900 px-2.5 py-1 font-mono text-[0.5625rem] uppercase tracking-[0.18em] tabular-nums text-mint-base">
           <span aria-hidden>
             {typeof shotsLeft === "number"
               ? `${String(Math.max(0, shotsLeft)).padStart(3, "0")} LEFT`
@@ -172,7 +174,7 @@ export function DigicamShell({
       {/* The dial sits on its own light strip rather than directly on the body:
           every model's body is pale now, but the hues differ, and one backdrop
           is simpler than tinting text per model. */}
-      <div className="relative z-[2] mx-5 mt-2 shrink-0 overflow-hidden rounded-full bg-cream-50/90 py-0.5">
+      <div className="relative z-[2] mx-5 mt-2 shrink-0 overflow-hidden rounded-pill bg-cream-50/90 py-0.5">
         {dial}
       </div>
 
