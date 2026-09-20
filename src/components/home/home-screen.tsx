@@ -122,13 +122,11 @@ export function HomeScreen() {
         </div>
       ) : activeRoll ? (
         <Section label="Still shooting">
-          <div className="slab p-3">
-            <RollCard
-              roll={activeRoll}
-              count={counts[activeRoll.id] ?? 0}
-              cover={covers[activeRoll.id]}
-            />
-          </div>
+          <RollCard
+            roll={activeRoll}
+            count={counts[activeRoll.id] ?? 0}
+            cover={covers[activeRoll.id]}
+          />
         </Section>
       ) : rolls.length === 0 && recent.length === 0 ? (
         <EmptyState onStart={() => setNewRollOpen(true)} />
