@@ -311,7 +311,7 @@ export function CameraScreen({
     <>
       <Link
         href={shootingIntoRoll && rollId ? `/rolls/${rollId}` : "/rolls?tab=camera"}
-        className="grid size-10 place-items-center rounded-full transition hover:bg-black/10"
+        className="grid size-10 place-items-center rounded-pill transition hover:bg-black/10"
         aria-label="Leave the camera"
       >
         <ChevronLeft className="size-5" />
@@ -331,7 +331,7 @@ export function CameraScreen({
                 type="button"
                 onClick={() => setActiveRoll(null)}
                 aria-label="Stop shooting into this roll"
-                className="grid size-5 shrink-0 place-items-center rounded-full opacity-60 transition hover:bg-black/10 hover:opacity-100"
+                className="grid size-5 shrink-0 place-items-center rounded-pill opacity-60 transition hover:bg-black/10 hover:opacity-100"
               >
                 <X className="size-3" />
               </button>
@@ -362,7 +362,7 @@ export function CameraScreen({
               : "Turn on the screen flash"
         }
         className={cn(
-          "grid size-10 place-items-center rounded-full transition disabled:opacity-25",
+          "grid size-10 place-items-center rounded-pill transition disabled:opacity-25",
           flashOn ? "bg-cocoa-900 text-cream-50" : "hover:bg-black/10",
         )}
       >
@@ -381,7 +381,9 @@ export function CameraScreen({
         active={dateStamp}
       >
         <CalendarClock className="size-4" aria-hidden />
-        <span className="font-sans text-[0.625rem]">Date</span>
+        <span className="font-display text-[0.625rem] font-semibold tracking-[-0.01em]">
+          Date
+        </span>
       </ToolButton>
 
       <ToolButton
@@ -390,7 +392,9 @@ export function CameraScreen({
         active={timer > 0}
       >
         <Timer className="size-4" aria-hidden />
-        {timer > 0 ? <span className="text-[0.625rem] tabular-nums">{timer}s</span> : null}
+        {timer > 0 ? (
+          <span className="font-mono text-[0.625rem] tabular-nums">{timer}s</span>
+        ) : null}
       </ToolButton>
 
       <ToolButton
@@ -443,7 +447,7 @@ export function CameraScreen({
                 : "Switch to the ultra-wide lens"
             }
             className={cn(
-              "h-7 rounded-full px-3 font-mono text-[0.6875rem] tabular-nums transition",
+              "h-7 rounded-pill px-3 font-mono text-[0.6875rem] tabular-nums transition",
               camera.lens === "ultra"
                 ? "bg-cocoa-900 text-cream-50"
                 : "bg-white/40 text-cocoa-800 hover:bg-white/60",
@@ -465,7 +469,7 @@ export function CameraScreen({
         type="button"
         onClick={() => void camera.flip()}
         disabled={!camera.capabilities?.multipleCameras}
-        className="grid size-12 shrink-0 place-items-center rounded-full transition hover:bg-black/10 disabled:opacity-25"
+        className="grid size-12 shrink-0 place-items-center rounded-pill transition hover:bg-black/10 disabled:opacity-25"
         aria-label="Switch camera"
       >
         <RefreshCcw className="size-5" />
@@ -595,7 +599,7 @@ function ToolButton({
       aria-label={label}
       aria-pressed={active}
       className={cn(
-        "flex h-9 items-center gap-1.5 rounded-full px-3 text-xs transition",
+        "flex h-9 items-center gap-1.5 rounded-pill px-3 text-xs transition",
         active
           ? "bg-cocoa-900 text-cream-50"
           : "bg-cream-50/70 text-cocoa-900 hover:bg-cream-50",

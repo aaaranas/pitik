@@ -106,7 +106,7 @@ export function PermissionGate({
       <div className="max-w-xs text-center">
         <div
           className={cn(
-            "mx-auto grid size-14 place-items-center rounded-full border",
+            "mx-auto grid size-14 place-items-center rounded-pill border",
             dark ? "border-cocoa-800 text-cocoa-400" : "border-cream-300 text-cocoa-800",
           )}
         >
