@@ -450,8 +450,12 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
             >
               <RefreshCcw className="size-5" />
             </Button>
+            {/* Primary CTAs on a light ground are a solid ink block; on this
+                dark ground that fill would vanish into bg-cocoa-900, so this
+                follows the PermissionGate precedent and uses "soft" — a
+                cream block with an ink border reads on either ground. */}
             <Button
-              variant="primary"
+              variant="soft"
               size="lg"
               className="flex-1"
               onClick={() => void start()}
