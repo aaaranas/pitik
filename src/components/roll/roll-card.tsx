@@ -94,15 +94,27 @@ export function RollCard({
               className="size-full object-cover"
             />
           ) : (
-            <div className="grid size-full place-items-center bg-cocoa-900/10">
-              {undeveloped ? (
-                <div className={cn("text-center", COVER_MUTED[roll.coverStyle])}>
-                  <Lock className="mx-auto size-5" aria-hidden />
-                  <p className="mt-1.5 text-[0.6875rem]">Developing</p>
-                </div>
-              ) : (
-                <p className={cn("text-[0.6875rem]", COVER_MUTED[roll.coverStyle])}>Empty</p>
-              )}
+            <div className="grid size-full place-items-center p-3">
+              {/* An empty dashed ink well, not a dark scrim — a `bg-cocoa-900/10`
+                  fill under this text used to composite well under 4.5:1 for
+                  three of the four covers. No fill means no compositing to get
+                  wrong; the border alone marks this as an empty slot, the same
+                  "still developing" language `roll-detail.tsx` already uses. */}
+              <div
+                className={cn(
+                  "grid size-full place-items-center rounded-frame border-2 border-dashed border-cocoa-900",
+                  COVER_MUTED[roll.coverStyle],
+                )}
+              >
+                {undeveloped ? (
+                  <div className="text-center">
+                    <Lock className="mx-auto size-5" aria-hidden />
+                    <p className="mt-1.5 text-[0.6875rem]">Developing</p>
+                  </div>
+                ) : (
+                  <p className="text-[0.6875rem]">Empty</p>
+                )}
+              </div>
             </div>
           )}
         </div>
