@@ -24,7 +24,7 @@ export default function Error({
   return (
     <div className="grid min-h-full place-items-center bg-cream-50 px-6 text-center">
       <div className="max-w-xs">
-        <h1 className="font-display text-3xl text-cocoa-900">Something jammed</h1>
+        <h1 className="font-display text-3xl tracking-[-0.04em] text-cocoa-900">Something jammed</h1>
         <p className="mt-3 text-sm leading-relaxed text-cocoa-600">
           Pitik hit a problem on this screen. Your photos are safe on this device —
           nothing here can delete them.
