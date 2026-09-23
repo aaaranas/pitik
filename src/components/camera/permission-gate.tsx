@@ -65,7 +65,7 @@ export function PermissionGate({
         )}
       >
         <div className="max-w-xs text-center">
-          <h2 className={cn("font-display text-2xl", dark ? "text-cream-50" : "text-cocoa-900")}>
+          <h2 className={cn("font-display text-2xl font-extrabold", dark ? "text-cream-50" : "text-cocoa-900")}>
             {error.message}
           </h2>
           {error.remedy ? (
@@ -112,7 +112,7 @@ export function PermissionGate({
         >
           <Camera className="size-6" aria-hidden />
         </div>
-        <h2 className={cn("mt-5 font-display text-2xl", dark ? "text-cream-50" : "text-cocoa-900")}>
+        <h2 className={cn("mt-5 font-display text-2xl font-extrabold", dark ? "text-cream-50" : "text-cocoa-900")}>
           Ready when you are
         </h2>
         <p

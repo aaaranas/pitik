@@ -43,9 +43,13 @@ export function HomeScreen() {
       {/* ------------------------------------------------------- masthead */}
       <header className="text-cocoa-900">
         <div className="flex items-center justify-between">
-          <span className="blk">Rec ●</span>
+          <span className="blk" aria-hidden>
+            Rec ●
+          </span>
           <div className="flex items-center gap-3">
-            <span className="counter">36 EXP · MMXXVI</span>
+            <span className="counter" aria-hidden>
+              35MM · MMXXVI
+            </span>
             <Link
               href="/settings"
               className="rounded-slab border-2 border-cocoa-900 p-1.5 text-cocoa-900 transition hover:bg-cream-200"
@@ -58,7 +62,9 @@ export function HomeScreen() {
 
         <h1 className="mt-4 flex items-start gap-1 font-display text-[3.75rem] font-extrabold leading-[0.86] tracking-[-0.05em] text-cocoa-900">
           Pitik
-          <span className="counter mt-2 !text-[0.5rem]">©</span>
+          <span className="counter mt-2 !text-[0.5rem]" aria-hidden>
+            ©
+          </span>
         </h1>
 
         <div className="rule-ink mt-2" aria-hidden />
@@ -72,7 +78,9 @@ export function HomeScreen() {
         onClick={() => setNewRollOpen(true)}
         className="squish relative mt-5 block w-full border-2 border-cocoa-900 bg-cocoa-900 px-5 pb-5 pt-4 text-left shadow-[6px_6px_0_var(--color-sky-base)]"
       >
-        <span className="sticker absolute -right-2 -top-3">New!</span>
+        <span className="sticker absolute -right-2 -top-3" aria-hidden>
+          New!
+        </span>
 
         <span className="block font-display text-[2.25rem] font-extrabold uppercase leading-[0.9] tracking-[-0.04em] text-cream-50">
           Start
@@ -133,7 +141,9 @@ export function HomeScreen() {
       ) : null}
 
       <footer className="mt-12 text-center">
-        <p className="counter">Keep away from heat · Process before expiry</p>
+        <p className="counter" aria-hidden>
+          Keep away from heat · Process before expiry
+        </p>
       </footer>
 
       <NewRollSheet open={newRollOpen} onOpenChange={setNewRollOpen} />
@@ -239,7 +249,7 @@ function EmptyState({ onStart }: { onStart: () => void }) {
   return (
     <section className="slab mt-10 px-6 py-9 text-center">
       <span className="chip tint-lilac">Unexposed</span>
-      <p className="mt-4 font-display text-3xl leading-tight tracking-[-0.04em] text-cocoa-900">
+      <p className="mt-4 font-display text-3xl font-extrabold leading-tight tracking-[-0.04em] text-cocoa-900">
         Nothing here yet — which
         <br />
         is the best time to start

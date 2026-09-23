@@ -30,9 +30,11 @@ export function BoothPicker() {
       style={{ paddingTop: "calc(var(--safe-top) + 1.5rem)" }}
     >
       <header>
-        <h1 className="font-display text-4xl leading-none tracking-[-0.04em] text-cocoa-900">
+        <span className="blk">Booth</span>
+        <h1 className="mt-3 font-display text-4xl font-extrabold leading-none tracking-[-0.04em] text-cocoa-900">
           Choose a booth
         </h1>
+        <div className="rule-ink mt-2" aria-hidden />
         <p className="mt-2 max-w-sm text-sm leading-relaxed text-cocoa-600">
           Pick a layout, line everyone up, and let it count you in. The strip prints
           itself when the last shot lands.
@@ -52,12 +54,11 @@ export function BoothPicker() {
             aria-selected={category === name}
             onClick={() => setCategory(name)}
             className={cn(
-              "shrink-0 rounded-pill px-3 py-1.5 text-xs transition",
-              // Inset, because an outward ring gets clipped by this row's
-              // horizontal scroller — already a defect here once.
+              "shrink-0 rounded-slab border-2 border-cocoa-900 px-3 py-1.5 text-xs font-medium transition",
+              // A lit control reads darker on a pale ground, never brighter.
               category === name
-                ? "bg-sky-tint text-sky-deep ring-2 ring-inset ring-sky-deep"
-                : "bg-cream-200 text-cocoa-600 hover:bg-cream-300 hover:text-cocoa-800",
+                ? "bg-cocoa-900 text-cream-50"
+                : "bg-cream-50 text-cocoa-900 hover:bg-cream-200",
             )}
           >
             {name}

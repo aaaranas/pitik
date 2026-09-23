@@ -46,7 +46,7 @@ export function RollDetail({ rollId }: { rollId: string }) {
     return (
       <div className="grid h-full place-items-center bg-cream-50 px-6 text-center">
         <div>
-          <h1 className="font-display text-2xl tracking-[-0.04em] text-cocoa-900">This roll is gone</h1>
+          <h1 className="font-display text-2xl font-extrabold tracking-[-0.04em] text-cocoa-900">This roll is gone</h1>
           <p className="mt-2 text-sm text-cocoa-600">
             It may have been deleted, or it lives on another device.
           </p>
@@ -265,7 +265,7 @@ function DevelopingState({
     <section className="mt-8 px-4">
       <div className="rounded-frame border-2 border-dashed border-cocoa-900 px-6 py-10 text-center">
         <Lock className="mx-auto size-6 text-cocoa-600" aria-hidden />
-        <h2 className="mt-4 font-display text-2xl tracking-[-0.04em] text-cocoa-900">Still developing</h2>
+        <h2 className="mt-4 font-display text-2xl font-extrabold tracking-[-0.04em] text-cocoa-900">Still developing</h2>
         <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-cocoa-600">
           {shotsTaken > 0
             ? `${formatCount(shotsTaken, "shot")} on the roll${shotLimit ? ` of ${shotLimit}` : ""}. `
@@ -284,7 +284,7 @@ function DevelopingState({
 function EmptyRoll({ rollId }: { rollId: string }) {
   return (
     <div className="mt-10 px-6 text-center">
-      <p className="font-display text-2xl tracking-[-0.04em] text-cocoa-900">
+      <p className="font-display text-2xl font-extrabold tracking-[-0.04em] text-cocoa-900">
         This roll is still blank.
       </p>
       <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-cocoa-600">

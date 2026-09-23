@@ -69,7 +69,7 @@ export function LibraryScreen() {
       style={{ paddingTop: "calc(var(--safe-top) + 1.5rem)" }}
     >
       <header className="flex items-end justify-between gap-4 px-4">
-        <h1 className="font-display text-4xl leading-none tracking-[-0.04em] text-cocoa-900">
+        <h1 className="font-display text-4xl font-extrabold leading-none tracking-[-0.04em] text-cocoa-900">
           Your photos
         </h1>
         {tab === "rolls" ? (
@@ -135,11 +135,12 @@ function CameraTab() {
     <>
       {favorites.length ? (
         <section className="mt-6 px-4">
-          <h2 className="counter mb-3 flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5">
+            <h2 className="blk">Favourites</h2>
             <Heart className="size-3 fill-butter-deep text-butter-deep" aria-hidden />
-            Favourites
-          </h2>
-          <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          </div>
+          <div className="rule-ink mt-2" aria-hidden />
+          <div className="-mx-4 mt-3 flex gap-1.5 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {favorites.map((capture) => (
               <FavoriteFrame key={capture.id} capture={capture} />
             ))}
@@ -147,12 +148,11 @@ function CameraTab() {
         </section>
       ) : null}
 
-      <p className="counter mt-6 px-4">{formatCount(captures.length, "photo")}</p>
-      <ContactSheet
-        captures={captures}
-        onOpen={setViewerIndex}
-        className="mt-3 border-t border-cream-300 pt-px"
-      />
+      <div className="mt-6 px-4">
+        <span className="blk">{formatCount(captures.length, "photo")}</span>
+        <div className="rule-ink mt-2" aria-hidden />
+      </div>
+      <ContactSheet captures={captures} onOpen={setViewerIndex} className="mt-3" />
 
       <CaptureViewer
         captures={captures}
@@ -199,7 +199,10 @@ function BoothTab() {
 
   return (
     <>
-      <p className="counter mt-6 px-4">{formatCount(strips.length, "strip")}</p>
+      <div className="mt-6 px-4">
+        <span className="blk">{formatCount(strips.length, "strip")}</span>
+        <div className="rule-ink mt-2" aria-hidden />
+      </div>
       <StripGrid strips={strips} title="Photobooth" className="mt-3 px-4" />
     </>
   );
@@ -225,7 +228,7 @@ function RollsTab({ onNewRoll }: { onNewRoll: () => void }) {
   if (!rolls.length) {
     return (
       <div className="mt-12 px-6 text-center">
-        <p className="font-display text-2xl tracking-[-0.04em] text-cocoa-900">No rolls yet.</p>
+        <p className="font-display text-2xl font-extrabold tracking-[-0.04em] text-cocoa-900">No rolls yet.</p>
         <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-cocoa-600">
           A roll is for one evening you want kept together. Start one and every photo
           you take goes into it instead of the camera shelf.
@@ -264,7 +267,7 @@ function Empty({
 }) {
   return (
     <div className="mt-12 px-6 text-center">
-      <p className="font-display text-2xl tracking-[-0.04em] text-cocoa-900">{title}</p>
+      <p className="font-display text-2xl font-extrabold tracking-[-0.04em] text-cocoa-900">{title}</p>
       <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-cocoa-600">{body}</p>
       <Link href={action.href} className={cn(buttonVariants({ variant: "soft" }), "mt-6")}>
         {action.label}

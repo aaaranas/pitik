@@ -29,7 +29,7 @@ function Frame({
     <button
       type="button"
       onClick={onOpen}
-      className="group relative aspect-square overflow-hidden bg-cream-50 outline-offset-2"
+      className="group relative aspect-square overflow-hidden rounded-frame border-2 border-cocoa-900 bg-cream-50 outline-offset-2"
       aria-label={`Frame ${index + 1}${capture.favorite ? ", favourite" : ""}${
         capture.authorId ? ", added by someone else" : ""
       }`}

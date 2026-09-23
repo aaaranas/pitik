@@ -36,7 +36,7 @@ export function AccountPanel() {
   if (!auth.configured) {
     return (
       <section className="mt-4 slab p-5">
-        <h2 className="font-display text-xl tracking-[-0.03em] text-cocoa-900">
+        <h2 className="font-display text-xl font-extrabold tracking-[-0.03em] text-cocoa-900">
           Backup isn&rsquo;t set up
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-cocoa-600">
@@ -137,7 +137,7 @@ export function AccountPanel() {
 
   return (
     <section className="mt-4 slab p-5">
-      <h2 className="font-display text-xl tracking-[-0.03em] text-cocoa-900">
+      <h2 className="font-display text-xl font-extrabold tracking-[-0.03em] text-cocoa-900">
         Back up your rolls
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-cocoa-600">
@@ -169,7 +169,7 @@ export function AccountPanel() {
               onKeyDown={(event) => event.key === "Enter" && void submit()}
               placeholder="you@example.com"
               aria-invalid={Boolean(error)}
-              className="min-w-0 flex-1 rounded-slot border border-edge-strong bg-cream-200 px-3 py-2.5 text-sm text-cocoa-900 placeholder:text-cocoa-600 focus:border-sky-deep focus:outline-none"
+              className="min-w-0 flex-1 rounded-slab border-2 border-cocoa-900 bg-cream-50 px-3 py-2.5 text-sm text-cocoa-900 placeholder:text-cocoa-600 focus:border-sky-deep focus:outline-none"
             />
             <Button variant="subtle" onClick={() => void submit()} disabled={sending || !online}>
               {sending ? "Sending…" : "Send link"}

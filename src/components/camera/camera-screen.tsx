@@ -412,7 +412,7 @@ export function CameraScreen({
       {lastCapture && lastThumbUrl ? (
         <Link
           href={shootingIntoRoll && rollId ? `/rolls/${rollId}` : "/rolls?tab=camera"}
-          className="size-12 shrink-0 overflow-hidden rounded-lg ring-1 ring-black/25 transition hover:ring-black/50"
+          className="size-12 shrink-0 overflow-hidden rounded-lg border-2 border-cocoa-900"
           aria-label={shootingIntoRoll ? "Open this roll" : "Open your camera photos"}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -234,7 +234,7 @@ export function StripEditor({
       />
       <div className="min-h-0 flex-1 overflow-y-auto px-4" style={{ paddingTop: "calc(var(--safe-top) + 1rem)" }}>
         <div className="mx-auto w-full max-w-md">
-          <h1 className="text-center font-display text-3xl tracking-[-0.03em] text-cocoa-900">
+          <h1 className="text-center font-display text-3xl font-extrabold tracking-[-0.03em] text-cocoa-900">
             Your strip
           </h1>
           <p className="mt-1 text-center text-sm text-cocoa-600">
@@ -260,9 +260,10 @@ export function StripEditor({
           <div className="mt-6 space-y-5 pb-6">
             {caption ? (
               <div>
-                <label htmlFor="strip-caption" className="counter mb-2 block">
+                <label htmlFor="strip-caption" className="blk">
                   Caption
                 </label>
+                <div className="rule-ink mb-3 mt-2" aria-hidden />
                 <input
                   id="strip-caption"
                   value={style.caption}
@@ -271,7 +272,7 @@ export function StripEditor({
                   onChange={(event) =>
                     setStyle((current) => ({ ...current, caption: event.target.value }))
                   }
-                  className="w-full rounded-slot border border-edge-strong bg-cream-200 px-3 py-2.5 text-sm text-cocoa-900 placeholder:text-cocoa-600 focus:border-sky-deep focus:outline-none"
+                  className="w-full rounded-slab border-2 border-cocoa-900 bg-cream-50 px-3 py-2.5 text-sm text-cocoa-900 placeholder:text-cocoa-600 focus:border-sky-deep focus:outline-none"
                 />
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {CAPTION_FACES.map((face) => (
@@ -298,7 +299,8 @@ export function StripEditor({
             ) : null}
 
             <div>
-              <span className="counter mb-2 block">Paper</span>
+              <span className="blk">Paper</span>
+              <div className="rule-ink mb-3 mt-2" aria-hidden />
               {/* Wraps rather than scrolls: sixteen papers in a row would hide
                   most of the choice behind a swipe people don't know to make. */}
               <div className="flex flex-wrap gap-2">
