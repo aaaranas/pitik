@@ -120,8 +120,15 @@ a date stamp into the corner. They compose with any filter.
 Ten data-driven layouts across Classic, Minimal, Cute, Y2K, Film, Friends,
 Party, and Date Night. Pick one, choose an interval, press start, and the booth
 takes over: it counts you in and fires on its own schedule until the strip is
-full. Then you finish it — paper, caption, typeface, date, corners, keyline —
-and export a PNG with no watermark. Sixteen papers, five of them gradients.
+full. Then you finish it — paper, caption, date, corners, keyline — and export
+a PNG with no watermark. Sixteen papers, five of them gradients.
+
+The caption sets in one of **six faces**: Bold (Archivo), Sans (Plus Jakarta
+Sans) and Mono (DM Mono) match the interface; Serif (Cormorant Garamond), Hand
+(Caveat) and Script (Dancing Script) exist only here. All six render in the
+picker itself so the browser is forced to fetch each one — a face that has
+never appeared in the DOM stays unloaded, and canvas would silently fall back
+to a generic rather than report the miss.
 
 The whole shoot is also **recorded as a short clip, with sound** — countdowns,
 flinches and all — so a session produces both a printable strip and something
