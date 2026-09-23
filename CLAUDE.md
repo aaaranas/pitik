@@ -50,18 +50,26 @@ a dependency that phones home, that test will fail and it is right.
 
 ## Typography
 
-The app is dressed as soft moulded plastic, not as a product page. Three
-faces, all self-hosted through `next/font`, all declared once in `layout.tsx`:
+The app is dressed as a Y2K zine, not as a product page. Three faces for the
+interface, all self-hosted through `next/font`, all declared once in `layout.tsx`:
 
-- `font-display` (Fredoka) is for our words — headings, labels, the wordmark.
-  **Mixed case.** It is rounded enough to read as friendly and structured
-  enough to survive at label sizes.
+- `font-display` (Archivo 800) is for our words — headings, the wordmark, ink
+  blocks. Set it tight: at 2rem and above it takes `tracking-[-0.04em]`, because
+  the tracking is what makes it read as a masthead rather than a big paragraph.
 - `font-sans` (Plus Jakarta Sans) carries body copy **and everything the user
-  typed**. Roll titles, captions, names. Keep user text here: Fredoka's
-  character coverage is narrower, so an emoji or CJK roll title would fall
-  back mid-string and break the line.
-- `font-mono` (DM Mono) is for machine facts — frame numbers, counters,
-  timers, timestamps. Only where digits must align; it is not decoration.
+  typed**. Roll titles, captions, names. Keep user text here: Archivo's character
+  coverage is narrower, so an emoji or CJK roll title would fall back mid-string.
+- `font-mono` (DM Mono) carries machine text **and the zine's micro-labels** —
+  counters, timestamps, and the tracked-caps furniture (`REC ●`, `36 EXP`,
+  `01` / `02`). Here it is deliberately decorative as well as functional.
+
+Three further faces — Cormorant Garamond, Caveat and Dancing Script — exist only
+for the booth strip caption and are never used by the interface. That is exactly
+why `exportStrip` forces the chosen face to load before drawing: canvas falls
+back to a generic for an unloaded face and reports nothing, and a caption-only
+face downloads lazily. Each also carries a size multiplier, because these faces
+set at very different x-heights and a caption would otherwise shrink just by
+being restyled.
 
 next/font hashes its family names, so it publishes them as `--font-*-face` and
 the Tailwind theme keys point at those. Keep the two names distinct — a
@@ -69,8 +77,27 @@ self-referential custom property silently resolves to nothing. Canvas cannot
 read a CSS variable at all, so `compositor.ts` resolves the stack off the
 document and falls back to generics in workers and tests.
 
-Soft utilities (`pillow`, `chip`, `tint-*`, `soft-grain`, `squish`) live in
-`globals.css`. Reach for those before inventing a new card.
+## Ornament
+
+Ink is a **material**, not just a text colour. That is the difference between this
+design and a default soft app: rules, solid label blocks and outlines are what a
+pastel palette needs to read as designed.
+
+Reach for these before inventing anything: `.slab` (the card — ink border, hard
+offset shadow, never a blur), `.blk` (solid ink label), `.rule-ink` (3px
+structural rule), `.rule-dot`, `.sticker` (rotated badge), `.counter` (machine
+text), `.polaroid` and `.tape` (a photograph as an object), `.chip` (square tag).
+`.hairline`, `.soft-grain`, `.squish` and the `tint-*` set survive from the
+previous system.
+
+**`.slab` must never carry a `.tint-*` class.** Both declare `background`;
+`.slab` is defined later in `globals.css` and silently wins, killing the tint
+with no error — this shipped as a real bug in the toasts. To tint a slab, use
+the Tailwind utility form `bg-<hue>-tint text-<hue>-deep`, which lives in the
+utilities layer and unconditionally beats any component class. `.slab-<hue>`
+modifiers set only `box-shadow` and are safe to combine.
+
+A blurred shadow anywhere on a card is a regression, not a variation.
 
 ## Colour
 
@@ -79,6 +106,10 @@ and they are **not** interchangeable: `tint` is a surface, `base` is a fill,
 and `deep` is the only step that may be small text. Text on a `base` fill is
 always `cocoa-900`. `cocoa-400` is decorative and disabled-state only — it
 does not clear 4.5:1 on any ground here.
+
+Ink (`cocoa-900`) is structural as well as textual: 3px rules, solid blocks with
+`cream-50` text (14.03:1), and 2px outlines. Pastel without ink reads washy — that
+is the failure the first pastel build shipped with.
 
 The values are solved, not chosen. `scripts/check-contrast.mjs` reads them out
 of `globals.css` and runs inside `pnpm check`; a hand-picked draft of this
@@ -98,6 +129,10 @@ countdown blinds the room). On those, the steps invert: body text is
 1:1. Never put `cocoa-400` on a `cocoa-800` or `cocoa-600` fill; use
 `cream-50`. This applies in `capture-viewer.tsx`, `booth-runner.tsx`,
 `clip-dialog.tsx`, and `PermissionGate` with `tone="dark"`.
+
+**`variant="primary"` is `bg-cocoa-900` and is invisible on a dark ground** —
+use `variant="soft"` there instead. This shipped as an invisible "Start the
+booth" button.
 
 A boundary that is a control's only affordance — it has no fill or label to
 carry it otherwise — uses `edge-strong`, not `cream-300`: `cream-300` is a

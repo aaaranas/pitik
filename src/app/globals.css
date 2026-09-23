@@ -3,9 +3,12 @@
 /* ------------------------------------------------------------------
    Pitik design tokens
 
-   The identity is "soft plastic + thick paper". The ground is milk and
-   cream; ink is a soft brown rather than black, because black on cream
-   reads as a printed form rather than as something friendly.
+   The identity is a Y2K zine. Ink is a material, not just a text
+   colour: rules, solid label blocks and hard-offset shadows are what
+   let a pastel palette read as designed rather than as a default soft
+   app — see the zine kit near the bottom of this file (`.slab`, `.blk`,
+   `.rule-ink`, `.sticker`, `.polaroid`, `.chip`). A blurred shadow
+   anywhere is a regression, not a variation.
 
    Five pastels carry the variety — one per camera model, one per booth
    template, one per surface tint — with sky as the single accent that
@@ -208,26 +211,16 @@
 }
 
 /* ------------------------------------------------------------------
-   Soft furniture
+   Shared surface helpers
 
-   The app is a pastel toy camera, so the interface borrows from moulded
-   plastic and thick paper: rounded everything, shadows that read as a
-   cushion rather than a drop, and flat colour broken up by the faintest
-   tooth. These are the reusable pieces of that vocabulary.
+   Tint pairs a fill, border and text as one set so a tinted region
+   can't be assembled out of mismatched steps; soft-grain is the
+   faintest tooth so a large milk surface doesn't read as flat CSS;
+   squish is the press feedback every tappable surface uses. The card
+   itself is `.slab`, in the zine kit below.
    ------------------------------------------------------------------ */
 
 @layer components {
-  /* The standard raised surface. Two layers: a tight contact shadow so the
-     edge reads, and a wide soft one so the card floats. Both in cocoa —
-     a grey shadow on cream looks like dirt. */
-  .pillow {
-    background: var(--color-cream-50);
-    border-radius: var(--radius-card);
-    box-shadow:
-      0 1px 2px color-mix(in srgb, var(--color-cocoa-900) 4%, transparent),
-      0 8px 24px color-mix(in srgb, var(--color-cocoa-900) 8%, transparent);
-  }
-
   /* Surface, border and text as one set, so a tinted region cannot be
      assembled out of mismatched steps. */
   .tint-sky {
