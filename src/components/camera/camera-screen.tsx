@@ -381,9 +381,7 @@ export function CameraScreen({
         active={dateStamp}
       >
         <CalendarClock className="size-4" aria-hidden />
-        <span className="font-display text-[0.625rem] font-semibold tracking-[-0.01em]">
-          Date
-        </span>
+        <span>Date</span>
       </ToolButton>
 
       <ToolButton
@@ -392,9 +390,7 @@ export function CameraScreen({
         active={timer > 0}
       >
         <Timer className="size-4" aria-hidden />
-        {timer > 0 ? (
-          <span className="font-mono text-[0.625rem] tabular-nums">{timer}s</span>
-        ) : null}
+        {timer > 0 ? <span className="tabular-nums">{timer}s</span> : null}
       </ToolButton>
 
       <ToolButton
@@ -426,7 +422,7 @@ export function CameraScreen({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="grid size-12 shrink-0 place-items-center rounded-lg border border-dashed border-black/30 opacity-70 transition hover:opacity-100"
+          className="grid size-12 shrink-0 place-items-center rounded-lg border-2 border-dashed border-cocoa-900 text-cocoa-600 transition hover:text-cocoa-900"
           aria-label="Import photos from your gallery"
         >
           <ImageDown className="size-5" />
@@ -447,7 +443,7 @@ export function CameraScreen({
                 : "Switch to the ultra-wide lens"
             }
             className={cn(
-              "h-7 rounded-pill px-3 font-mono text-[0.6875rem] tabular-nums transition",
+              "h-7 rounded-slab border-2 border-cocoa-900 px-3 font-mono text-[0.6875rem] uppercase tracking-[0.14em] tabular-nums transition",
               camera.lens === "ultra"
                 ? "bg-cocoa-900 text-cream-50"
                 : "bg-white/40 text-cocoa-800 hover:bg-white/60",
@@ -599,7 +595,9 @@ function ToolButton({
       aria-label={label}
       aria-pressed={active}
       className={cn(
-        "flex h-9 items-center gap-1.5 rounded-pill px-3 text-xs transition",
+        // Square ink tag, in the .chip idiom: a 2px border that's always
+        // there, mono tracked caps for the label, solid ink when armed.
+        "flex h-9 items-center gap-1.5 rounded-slab border-2 border-cocoa-900 px-3 font-mono text-[0.625rem] uppercase tracking-[0.14em] transition",
         active
           ? "bg-cocoa-900 text-cream-50"
           : "bg-cream-50/70 text-cocoa-900 hover:bg-cream-50",

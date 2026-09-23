@@ -74,7 +74,7 @@ export function ProfileDial({
               data-selected={selected}
               onClick={() => onSelect(item.id)}
               className={cn(
-                "flex shrink-0 snap-center flex-col items-center gap-0.5 whitespace-nowrap rounded-pill px-3 py-1 transition-colors",
+                "flex shrink-0 snap-center flex-col items-center gap-0.5 whitespace-nowrap rounded-slab px-3 py-1 transition-colors",
                 selected
                   ? "ring-2 ring-inset ring-sky-deep text-cocoa-900"
                   : "text-cocoa-600 hover:text-cocoa-900",
