@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AccountPanel } from "./account-panel";
 import { CameraReport } from "./camera-report";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Modal, SheetRoot } from "@/components/ui/sheet";
 import { useToast } from "@/components/providers/toast-provider";
 import { useSettings } from "@/hooks/use-store";
@@ -38,14 +38,10 @@ export function SettingsScreen() {
       style={{ paddingTop: "calc(var(--safe-top) + 0.5rem)" }}
     >
       <header className="flex items-center gap-1 pb-4">
-        <Link
-          href="/"
-          className="grid size-10 place-items-center rounded-pill text-cocoa-800 transition hover:bg-cream-200"
-          aria-label="Back"
-        >
+        <Link href="/" className={buttonVariants({ variant: "ghost", size: "icon" })} aria-label="Back">
           <ChevronLeft className="size-5" />
         </Link>
-        <h1 className="font-display text-2xl text-cocoa-900">Settings</h1>
+        <h1 className="font-display text-2xl tracking-[-0.04em] text-cocoa-900">Settings</h1>
       </header>
 
       <AccountPanel />
@@ -121,9 +117,11 @@ export function SettingsScreen() {
         </div>
       </Group>
 
-      <section className="mt-8 pillow p-5">
+      <section className="mt-8 slab p-5">
         <ShieldCheck className="size-5 text-mint-deep" aria-hidden />
-        <h2 className="mt-3 font-display text-xl text-cocoa-900">Where your photos go</h2>
+        <h2 className="mt-3 font-display text-xl tracking-[-0.03em] text-cocoa-900">
+          Where your photos go
+        </h2>
         <ul className="mt-3 space-y-2.5 text-sm leading-relaxed text-cocoa-600">
           <li>
             Photos are written to this device&rsquo;s storage the moment you take them, and
@@ -184,8 +182,8 @@ export function SettingsScreen() {
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-8">
-      <h2 className="mb-2 px-1 font-display text-xl text-cocoa-800">{title}</h2>
-      <div className="pillow divide-y divide-cream-200 overflow-hidden">{children}</div>
+      <h2 className="mb-2 px-1 font-display tracking-[-0.03em] text-xl text-cocoa-800">{title}</h2>
+      <div className="slab divide-y divide-cream-200 overflow-hidden">{children}</div>
     </section>
   );
 }

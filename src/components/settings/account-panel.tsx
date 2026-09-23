@@ -35,8 +35,10 @@ export function AccountPanel() {
 
   if (!auth.configured) {
     return (
-      <section className="mt-4 pillow p-5">
-        <h2 className="font-display text-xl text-cocoa-900">Backup isn&rsquo;t set up</h2>
+      <section className="mt-4 slab p-5">
+        <h2 className="font-display text-xl tracking-[-0.03em] text-cocoa-900">
+          Backup isn&rsquo;t set up
+        </h2>
         <p className="mt-2 text-sm leading-relaxed text-cocoa-600">
           This install has no Supabase project connected, so accounts and shared rolls
           are unavailable. Everything else works — your photos live on this device.
@@ -75,8 +77,10 @@ export function AccountPanel() {
     };
 
     return (
-      <section className="mt-4 pillow p-5">
-        <p className="text-[0.6875rem] uppercase tracking-[0.16em] text-cocoa-600">Signed in</p>
+      <section className="mt-4 slab p-5">
+        <p className="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-cocoa-600">
+          Signed in
+        </p>
         <p className="mt-1 truncate text-sm text-cocoa-900">{auth.session.user.email}</p>
 
         <label className="mt-4 flex cursor-pointer items-start gap-3 border-t border-cream-300 pt-4">
@@ -132,15 +136,17 @@ export function AccountPanel() {
   };
 
   return (
-    <section className="mt-4 pillow p-5">
-      <h2 className="font-display text-xl text-cocoa-900">Back up your rolls</h2>
+    <section className="mt-4 slab p-5">
+      <h2 className="font-display text-xl tracking-[-0.03em] text-cocoa-900">
+        Back up your rolls
+      </h2>
       <p className="mt-2 text-sm leading-relaxed text-cocoa-600">
         Optional. Sign in to keep a private copy of your photos, and to share rolls
         with the people you were with. The camera works either way.
       </p>
 
       {sent ? (
-        <p className="tint-mint mt-4 flex items-start gap-2 rounded-slot border p-3 text-sm">
+        <p className="mt-4 flex items-start gap-2 rounded-slab border-2 border-cocoa-900 bg-mint-tint p-3 text-sm text-mint-deep">
           <Mail className="mt-0.5 size-4 shrink-0" aria-hidden />
           Check {email} for a sign-in link.
         </p>

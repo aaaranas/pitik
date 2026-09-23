@@ -40,8 +40,8 @@ export function CameraReport() {
       <p className="text-sm text-cocoa-900">Cameras on this device</p>
       <p
         className={cn(
-          "mt-2 rounded-slot border px-3 py-2 text-xs leading-relaxed",
-          ultraWide ? "tint-mint" : "tint-blush",
+          "mt-2 rounded-slab border-2 border-cocoa-900 px-3 py-2 text-xs leading-relaxed",
+          ultraWide ? "bg-mint-tint text-mint-deep" : "bg-blush-tint text-blush-deep",
         )}
       >
         {ultraWide
