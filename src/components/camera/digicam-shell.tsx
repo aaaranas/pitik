@@ -127,11 +127,10 @@ export function DigicamShell({
             style={{ background: shell.accent, boxShadow: `0 0 6px ${shell.accent}` }}
           />
           {/* Printed like a badge moulded into the body: machine text, not a
-              sentence, so it takes the mono tracked-caps treatment. */}
-          <span
-            className="max-w-[13.5rem] truncate font-mono text-[0.5rem] uppercase tracking-[0.18em]"
-            style={{ color: shell.ink }}
-          >
+              sentence, so it takes the mono tracked-caps treatment. The
+              inline colour wins over `.counter`'s own — inline style beats
+              any stylesheet rule — so the class is safe to use as-is. */}
+          <span className="counter max-w-[13.5rem] truncate" style={{ color: shell.ink }}>
             {model}
           </span>
         </span>
@@ -151,7 +150,10 @@ export function DigicamShell({
       </div>
 
       <div className="relative z-[2] shrink-0 px-5 pt-2">
-        <div className="flex items-center justify-between rounded-frame bg-cocoa-900 px-2.5 py-1 font-mono text-[0.5625rem] uppercase tracking-[0.18em] tabular-nums text-mint-base">
+        {/* `.counter` for the recipe, `text-mint-base` to override its
+            colour — a Tailwind utility outranks the component layer, so
+            this wins without needing a hand-typed copy of the class. */}
+        <div className="counter flex items-center justify-between rounded-frame bg-cocoa-900 px-2.5 py-1 text-mint-base">
           <span aria-hidden>
             {typeof shotsLeft === "number"
               ? `${String(Math.max(0, shotsLeft)).padStart(3, "0")} LEFT`
@@ -174,7 +176,7 @@ export function DigicamShell({
       {/* The dial sits on its own light strip rather than directly on the body:
           every model's body is pale now, but the hues differ, and one backdrop
           is simpler than tinting text per model. */}
-      <div className="relative z-[2] mx-5 mt-2 shrink-0 overflow-hidden rounded-pill bg-cream-50/90 py-0.5">
+      <div className="relative z-[2] mx-5 mt-2 shrink-0 overflow-hidden rounded-slab border-2 border-cocoa-900 bg-cream-50 py-0.5">
         {dial}
       </div>
 
