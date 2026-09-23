@@ -16,16 +16,18 @@ import "./globals.css";
 /**
  * Interface faces.
  *
- *  - **Archivo 800** for our words — headings, the wordmark, ink blocks. Set
- *    tight; at display sizes the tracking is what makes it read as a masthead
- *    rather than as a big paragraph.
+ *  - **Archivo 800** for our words — headings and the wordmark (hand-set in
+ *    `home-screen.tsx`'s masthead, not through `shell/wordmark.tsx`'s unused
+ *    `Wordmark` export). Set tight; at display sizes the tracking is what
+ *    makes it read as a masthead rather than as a big paragraph.
  *  - **Plus Jakarta Sans** for body copy and everything the user typed.
- *  - **DM Mono** for machine text: counters, timestamps, and the tracked-caps
- *    micro-labels this design runs on.
+ *  - **DM Mono** for machine text: counters, timestamps, the tracked-caps
+ *    micro-labels this design runs on, and the solid ink label, `.blk`.
  *
- * Caption faces below are for the booth strip only. They are never used by the
- * interface, which is exactly why Task 3 has to force them to load before the
- * canvas draws with them.
+ * Caption faces below are for the booth strip only. `strip-editor.tsx`
+ * deliberately renders each face picker's label in its own face, which is
+ * exactly why the browser fetches them at all — a caption-only face downloads
+ * lazily and needs a real consumer to trigger that.
  */
 const display = Archivo({
   weight: ["600", "800"],

@@ -94,7 +94,7 @@ export function RenderCheck() {
 
   return (
     <div className="mx-auto min-h-full w-full max-w-6xl bg-cream-50 px-4 py-8">
-      <h1 className="font-display text-3xl tracking-[-0.03em] text-cocoa-900">Render check</h1>
+      <h1 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-cocoa-900">Render check</h1>
       <p className="mt-2 max-w-2xl text-sm text-cocoa-600">
         Every filter through the export renderer (left of each pair) and the live
         preview approximation (right). They should read as the same look. Development

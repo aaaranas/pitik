@@ -107,7 +107,7 @@ export function JoinScreen({ code }: { code: string }) {
 
         {state.kind === "invalid" ? (
           <>
-            <h1 className="mt-4 font-display text-2xl tracking-[-0.04em] text-cocoa-900">
+            <h1 className="mt-4 font-display text-2xl font-extrabold tracking-[-0.04em] text-cocoa-900">
               That code isn&rsquo;t valid
             </h1>
             <p className="mt-2 text-sm text-cocoa-600">
@@ -118,6 +118,9 @@ export function JoinScreen({ code }: { code: string }) {
 
         {state.kind === "local" ? (
           <>
+            {/* state.title is the roll's own title, i.e. user text — it stays
+                font-sans (the default here) rather than font-display, same as
+                every other place someone's own words are rendered. */}
             <h1 className="mt-4 text-2xl font-semibold tracking-tight text-cocoa-900">{state.title}</h1>
             <p className="mt-2 text-sm text-cocoa-600">This roll is already on your device.</p>
             <Link
@@ -131,7 +134,7 @@ export function JoinScreen({ code }: { code: string }) {
 
         {state.kind === "needs-account" ? (
           <>
-            <h1 className="mt-4 font-display text-2xl tracking-[-0.04em] text-cocoa-900">
+            <h1 className="mt-4 font-display text-2xl font-extrabold tracking-[-0.04em] text-cocoa-900">
               You&rsquo;ll need an account for this
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-cocoa-600">
@@ -150,7 +153,7 @@ export function JoinScreen({ code }: { code: string }) {
 
         {state.kind === "error" ? (
           <>
-            <h1 className="mt-4 font-display text-2xl tracking-[-0.04em] text-cocoa-900">
+            <h1 className="mt-4 font-display text-2xl font-extrabold tracking-[-0.04em] text-cocoa-900">
               Couldn&rsquo;t join that roll
             </h1>
             <p className="mt-2 text-sm text-cocoa-600">{state.message}</p>

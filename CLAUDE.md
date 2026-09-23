@@ -53,23 +53,30 @@ a dependency that phones home, that test will fail and it is right.
 The app is dressed as a Y2K zine, not as a product page. Three faces for the
 interface, all self-hosted through `next/font`, all declared once in `layout.tsx`:
 
-- `font-display` (Archivo 800) is for our words — headings, the wordmark, ink
-  blocks. Set it tight: at 2rem and above it takes `tracking-[-0.04em]`, because
-  the tracking is what makes it read as a masthead rather than a big paragraph.
+- `font-display` (Archivo 800) is for our words — headings and the wordmark.
+  The live wordmark is hand-set in `home-screen.tsx`'s masthead; the `Wordmark`
+  export in `shell/wordmark.tsx` is unused, so don't point anyone there.
+  Tracking tightens as size grows rather than following one fixed number —
+  roughly `-0.02em` at dialog-title size down to `-0.05em` at the masthead's
+  largest numerals, with a few compact headings carrying none at all. Check a
+  nearby heading at the same size before picking a value.
 - `font-sans` (Plus Jakarta Sans) carries body copy **and everything the user
   typed**. Roll titles, captions, names. Keep user text here: Archivo's character
   coverage is narrower, so an emoji or CJK roll title would fall back mid-string.
 - `font-mono` (DM Mono) carries machine text **and the zine's micro-labels** —
-  counters, timestamps, and the tracked-caps furniture (`REC ●`, `36 EXP`,
-  `01` / `02`). Here it is deliberately decorative as well as functional.
+  counters, timestamps, the tracked-caps furniture (`REC ●`, `35MM`, `01` /
+  `02`), and the solid ink label itself, `.blk`. Here it is deliberately
+  decorative as well as functional.
 
 Three further faces — Cormorant Garamond, Caveat and Dancing Script — exist only
-for the booth strip caption and are never used by the interface. That is exactly
-why `exportStrip` forces the chosen face to load before drawing: canvas falls
-back to a generic for an unloaded face and reports nothing, and a caption-only
-face downloads lazily. Each also carries a size multiplier, because these faces
-set at very different x-heights and a caption would otherwise shrink just by
-being restyled.
+for the booth strip caption, and they are not merely dormant: `strip-editor.tsx`
+deliberately renders each face picker's label in its own face rather than a
+shared one, which is half of why these faces load at all — a caption-only face
+downloads lazily and needs a real consumer to trigger that fetch. `exportStrip`
+then forces the chosen face to load again before drawing, because canvas falls
+back to a generic for an unloaded face and reports nothing. Each face also
+carries a size multiplier, because these faces set at very different x-heights
+and a caption would otherwise shrink just by being restyled.
 
 next/font hashes its family names, so it publishes them as `--font-*-face` and
 the Tailwind theme keys point at those. Keep the two names distinct — a
@@ -87,8 +94,9 @@ Reach for these before inventing anything: `.slab` (the card — ink border, har
 offset shadow, never a blur), `.blk` (solid ink label), `.rule-ink` (3px
 structural rule), `.rule-dot`, `.sticker` (rotated badge), `.counter` (machine
 text), `.polaroid` and `.tape` (a photograph as an object), `.chip` (square tag).
-`.hairline`, `.soft-grain`, `.squish` and the `tint-*` set survive from the
-previous system.
+`.soft-grain`, `.squish` and the `tint-*` set survive from the previous system.
+(`.hairline` also survives in `globals.css` but has zero consumers left — don't
+reach for it.)
 
 **`.slab` must never carry a `.tint-*` class.** Both declare `background`;
 `.slab` is defined later in `globals.css` and silently wins, killing the tint
@@ -113,7 +121,7 @@ is the failure the first pastel build shipped with.
 
 The values are solved, not chosen. `scripts/check-contrast.mjs` reads them out
 of `globals.css` and runs inside `pnpm check`; a hand-picked draft of this
-palette failed 10 of its 29 pairs. If you change a hex, that gate is what tells
+palette failed 10 of its 31 pairs. If you change a hex, that gate is what tells
 you whether you got away with it. It covers dark-ground pairs too, not just
 the cream ground below.
 

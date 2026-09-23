@@ -427,8 +427,8 @@ and pulling a shared roll brings the strip without the motion behind it.
 ## Testing
 
 ```bash
-pnpm test        # 207 unit tests
-pnpm test:e2e    # 24 end-to-end tests, mobile and desktop
+pnpm test        # 308 unit tests
+pnpm test:e2e    # 26 end-to-end tests, mobile and desktop
 ```
 
 **Unit** (Vitest) covers the parts where correctness is invisible to the eye:
