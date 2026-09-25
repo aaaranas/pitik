@@ -350,7 +350,7 @@ export function BoothRunner({ template }: { template: BoothTemplate }) {
             <ShutterFlash flashKey={flashKey} />
             {phase === "running" && countdown !== null && countdown > 0 ? (
               <div className="absolute inset-0 z-20 grid place-items-center">
-                <span className="font-display text-[7rem] leading-none text-blush-lamp drop-shadow-[0_2px_24px_rgba(0,0,0,0.6)]">
+                <span className="font-display font-extrabold text-[7rem] leading-none text-blush-lamp drop-shadow-[0_2px_24px_rgba(0,0,0,0.6)]">
                   {countdown}
                 </span>
               </div>
