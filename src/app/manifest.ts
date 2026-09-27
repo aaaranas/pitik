@@ -12,7 +12,20 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Pitik",
     description:
       "A nostalgic digital camera and photobooth for the people you're with. Works offline; your photos stay on your device.",
-    id: "/",
+    // The app's identity, and the reason it is not "/".
+    //
+    // Chrome keys "is this already installed?" off this value, in a registry
+    // that lives in Chrome's own app data — not in the site's storage. An
+    // uninstall that leaves that registry stale (no WebAPK left in
+    // chrome://webapks, yet the install sheet still says "already installed")
+    // is unrecoverable from the site side and survives clearing site data,
+    // so the only lever the app has is to present a different identity.
+    //
+    // Changing it again would orphan existing installs, which is why it is
+    // written down here rather than treated as a spare knob: bump it only to
+    // break out of that stuck state, never casually. start_url and scope stay
+    // "/" — this string is an identifier, never navigated to.
+    id: "/pitik-app",
     start_url: "/",
     scope: "/",
     display: "standalone",
