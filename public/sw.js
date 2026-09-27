@@ -13,7 +13,12 @@
  *   everything else    straight to the network
  */
 
-const VERSION = "pitik-v1";
+// Bumped to v2 for the zine rebrand. This is not cosmetic: /icons/ is served
+// cache-first below and the icon filenames are not content-hashed, so an
+// already-installed app would keep serving the previous mark indefinitely.
+// `activate` drops every cache whose key doesn't start with VERSION, which is
+// what actually evicts them.
+const VERSION = "pitik-v2";
 const SHELL_CACHE = `${VERSION}-shell`;
 const ASSET_CACHE = `${VERSION}-assets`;
 const OFFLINE_URL = "/offline";

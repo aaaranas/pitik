@@ -362,11 +362,23 @@ closed — a camera app leaks megabytes per mistake, not kilobytes.
   icons plus shortcuts straight to the camera and the booth.
 - **Icons** are generated, not committed as opaque binaries:
   `scripts/generate-icons.mjs` draws the mark and encodes PNG using only Node's
-  `zlib`. Change the constants, run `pnpm icons`, and every size agrees.
+  `zlib`. Change the geometry, run `pnpm icons`, and every size agrees. It reads
+  its colours out of `globals.css` rather than holding its own hexes, for the
+  same reason `check-contrast.mjs` does — the icons had already drifted a whole
+  palette behind the app once.
+- **The mark** is a lens barrel in ink with a sky iris, a viewfinder tick at ten
+  o'clock, and the hard blush offset the rest of the app puts under a `.slab`.
+  The framed version sits on cream paper; the maskable and apple-touch versions
+  are full-bleed on `sky-tint`, because a mask crops the ink frame away and
+  cream with no frame has no presence. The same geometry is drawn again as SVG
+  in `shell/wordmark.tsx` — the two are meant to move together. Below ~40px the
+  offset is dropped: at one pixel it reads as a smudge, not as ink twice.
 - **Service worker** (`public/sw.js`) is hand-written and small: network-first
   for navigations with an `/offline` fallback, cache-first for hashed static
   assets, stale-while-revalidate for the rest. It never caches anything
-  user-generated and never touches a cross-origin request.
+  user-generated and never touches a cross-origin request. Icon filenames are
+  *not* hashed and `/icons/` is cache-first, so changing the mark means bumping
+  `VERSION` — otherwise an installed app keeps the old one indefinitely.
 - **Updates never apply silently.** A new build waits behind a visible prompt,
   because the app can be mid-capture when one lands.
 

@@ -78,6 +78,14 @@ export const metadata: Metadata = {
   description:
     "A nostalgic digital camera and photobooth for the people you're with. Shoot a roll, print a strip, keep the night.",
   applicationName: "Pitik",
+  // `scripts/generate-icons.mjs` writes these two alongside the manifest's
+  // 192/512 pair, and without this block nothing pointed at them: the
+  // manifest never references a favicon, and iOS looks for the apple-touch
+  // icon at the document root rather than under /icons.
+  icons: {
+    icon: [{ url: "/icons/favicon-32.png", type: "image/png", sizes: "32x32" }],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+  },
   appleWebApp: {
     capable: true,
     title: "Pitik",
