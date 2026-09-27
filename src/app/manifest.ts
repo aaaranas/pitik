@@ -17,8 +17,12 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#0b0908",
-    theme_color: "#0b0908",
+    // cream-50 and the ink frame of the icon. These track `globals.css`'s
+    // --color-cream-50 and the `themeColor` in layout.tsx's viewport: the
+    // splash screen an installed app shows is drawn from these two, so a
+    // stale value here is a dark flash in front of a light app.
+    background_color: "#FDFBF7",
+    theme_color: "#FDFBF7",
     categories: ["photo", "lifestyle", "social"],
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },

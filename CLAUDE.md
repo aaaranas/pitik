@@ -146,6 +146,32 @@ A boundary that is a control's only affordance — it has no fill or label to
 carry it otherwise — uses `edge-strong`, not `cream-300`: `cream-300` is a
 decorative divider and does not clear 3:1.
 
+## Identity
+
+The mark is a lens barrel in ink, a `sky-base` iris, a viewfinder tick at ten
+o'clock, and the hard `blush-base` offset that `.slab` puts under a card. It is
+drawn twice and both must move together: `scripts/generate-icons.mjs` rasterises
+it for the installed icon, `shell/wordmark.tsx` re-draws it as SVG for the app.
+The fractions are the shared contract — barrel `0.345`/`0.215`, iris `0.133`,
+tick `0.435` at 135°, offset `0.032`.
+
+- **The icon script reads its colours out of `globals.css`.** Do not put hexes
+  back in it. It held its own copies once and the icons shipped a near-black
+  ground and a red-orange iris for weeks after the app became cream and
+  pastels, because no gate could see them.
+- **Changing the mark means bumping `VERSION` in `public/sw.js`.** Icon
+  filenames are not content-hashed and `/icons/` is served cache-first, so an
+  installed app keeps the old mark until its cache key changes.
+- **Maskable and apple-touch are full-bleed on `sky-tint`, not cream.** The
+  mask crops the ink frame away, and cream with no frame has no presence
+  against a wallpaper. The framed icon keeps the app's own cream paper.
+- **Below ~40px the offset is dropped.** At one pixel it reads as a smudge on
+  the barrel rather than as ink printed twice; the favicon and the in-app SVG
+  both go without it.
+- The tick clears the barrel by a real gap rather than a proportional one. A
+  tight gap closes into a blob at favicon size, which is the size where the
+  asymmetry is doing the most work.
+
 ## Filters
 
 - Filters are **data**. Add presets to `src/lib/filters/presets.ts`; never put
